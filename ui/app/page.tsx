@@ -1,19 +1,26 @@
-import { Button } from "@/components/ui/button"
+import { COURSES } from "@/lib/data";
+import { CatalogClient } from "@/components/catalog/catalog-client";
 
 export default function Page() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
+    <section>
+      <div className="mx-auto max-w-[1400px] px-6 pt-8">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="font-display text-3xl tracking-tight md:text-4xl">
+              OMSCS course catalog
+            </h1>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+              {COURSES.length} courses indexed. Filter, sort, and open any
+              course for distributions and reviews.
+            </p>
+          </div>
+          <span className="text-xs text-muted-foreground">
+            Anonymous reviews — anyone can post
+          </span>
         </div>
       </div>
-    </div>
-  )
+      <CatalogClient courses={COURSES} />
+    </section>
+  );
 }
