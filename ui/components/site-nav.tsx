@@ -24,14 +24,14 @@ export function SiteNav() {
   );
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink/15 bg-paper/85 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-[1400px] items-stretch gap-8 px-6 py-3">
-        <Link href="/" className="group flex items-baseline gap-2 leading-none">
-          <span className="font-display text-2xl tracking-tight">
-            OMSCS<span className="text-claret">·</span>Hub
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
+      <div className="mx-auto flex max-w-[1400px] items-center gap-8 px-6 py-3">
+        <Link href="/" className="flex items-baseline gap-1.5">
+          <span className="font-display text-xl tracking-tight">
+            OMSCS<span className="text-rose md:text-2xl">·</span>Hub
           </span>
         </Link>
-        <nav className="flex flex-1 items-end gap-6">
+        <nav className="flex flex-1 items-center gap-1">
           {NAV.map((item) => {
             const active =
               item.href === "/"
@@ -42,17 +42,13 @@ export function SiteNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "group relative -mb-3 pb-3 text-sm transition",
-                  active ? "text-ink" : "text-muted-foreground hover:text-ink",
+                  "rounded-md px-3 py-1.5 text-sm transition",
+                  active
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:bg-foreground hover:text-background",
                 )}
               >
-                <span className="font-medium">{item.label}</span>
-                <span
-                  className={cn(
-                    "absolute right-0 -bottom-px left-0 h-[2px] origin-left scale-x-0 bg-ink transition-transform",
-                    active && "scale-x-100",
-                  )}
-                />
+                {item.label}
               </Link>
             );
           })}
@@ -61,9 +57,9 @@ export function SiteNav() {
           type="button"
           aria-label="Toggle theme"
           onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-          className="grid size-9 place-items-center rounded-full border border-ink/20 hover:bg-ink hover:text-paper transition"
+          className="grid size-8 place-items-center rounded-md text-muted-foreground transition hover:bg-foreground hover:text-background"
         >
-          {mounted && resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
+          {mounted && resolvedTheme === "dark" ? <SunIcon size={15} /> : <MoonIcon size={15} />}
         </button>
       </div>
     </header>

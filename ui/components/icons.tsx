@@ -38,6 +38,12 @@ export const ArrowRight = svg(
     <path d="m13 5 7 7-7 7" />
   </>,
 );
+export const ArrowLeft = svg(
+  <>
+    <path d="M19 12H5" />
+    <path d="m11 5-7 7 7 7" />
+  </>,
+);
 export const SlidersIcon = svg(
   <>
     <path d="M4 6h12" />
@@ -93,13 +99,11 @@ export const StarIcon = ({ size = 16, className, ...rest }: IconProps) => (
 );
 export const SortIcon = svg(
   <>
-    <path d="M3 7h13" />
-    <path d="M3 12h9" />
-    <path d="M3 17h5" />
-    <path d="m17 7 4 4" />
-    <path d="M21 11V3" />
-    <path d="M21 17v4" />
-    <path d="m17 17 4-4" />
+    <path d="M4 7h11" />
+    <path d="M4 12h8" />
+    <path d="M4 17h5" />
+    <path d="M17 5v14" />
+    <path d="m14 16 3 3 3-3" />
   </>,
 );
 export const SparklesIcon = svg(

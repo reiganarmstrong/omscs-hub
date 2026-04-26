@@ -49,13 +49,13 @@ export default function RootLayout({
         "font-sans",
       )}
     >
-      <body className="min-h-svh bg-paper text-ink">
+      <body className="min-h-svh bg-background text-foreground">
         <ThemeProvider>
           <ReviewsProvider>
             <PlannerProvider>
               <PrefsProvider>
                 <SiteNav />
-                <main className="grain relative">{children}</main>
+                <main>{children}</main>
                 <SiteFooter />
               </PrefsProvider>
             </PlannerProvider>

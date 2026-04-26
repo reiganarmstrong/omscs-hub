@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function Page() {
   return (
-    <div className="mx-auto max-w-3xl px-6 pt-6 pb-16">
-      <header className="border-b border-ink/15 pb-3">
+    <div className="mx-auto max-w-3xl px-6 pt-8 pb-16">
+      <header className="pb-3">
         <h1 className="font-display text-3xl tracking-tight md:text-4xl">
           About OMSCS Hub
         </h1>
@@ -12,7 +12,7 @@ export default function Page() {
         </p>
       </header>
 
-      <div className="mt-6 space-y-6 text-[15px] leading-relaxed">
+      <div className="mt-6 space-y-6 reading text-[15px]">
         <p>
           OMSCS Hub is an unofficial catalog and degree planner for Georgia
           Tech&apos;s Online Master of Science in Computer Science. It exists to

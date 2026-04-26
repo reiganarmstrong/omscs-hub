@@ -7,17 +7,17 @@ export function Tag({
   className,
 }: {
   children: React.ReactNode;
-  variant?: "default" | "gold" | "claret" | "outline";
+  variant?: "default" | "leaf" | "rose" | "outline";
   className?: string;
 }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono text-[10px] tracking-widest uppercase",
-        variant === "default" && "bg-ink/8 text-ink",
-        variant === "gold" && "bg-gold text-gold-fg",
-        variant === "claret" && "bg-claret/12 text-claret",
-        variant === "outline" && "border border-ink/30 text-ink",
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
+        variant === "default" && "bg-muted text-muted-foreground",
+        variant === "leaf" && "bg-leaf/12 text-leaf",
+        variant === "rose" && "bg-rose/12 text-rose",
+        variant === "outline" && "border border-border text-muted-foreground",
         className,
       )}
     >
@@ -39,12 +39,10 @@ export function Stat({
 }) {
   return (
     <div className="flex flex-col">
-      <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-        {label}
-      </span>
+      <span className="label">{label}</span>
       <span
         className={cn(
-          "font-display tabular",
+          "font-display tabular text-foreground",
           size === "sm" && "text-xl",
           size === "md" && "text-2xl",
           size === "lg" && "text-4xl",
@@ -52,7 +50,7 @@ export function Stat({
       >
         {value}
         {unit && (
-          <span className="ml-1 font-mono text-[10px] text-muted-foreground tracking-widest">
+          <span className="ml-1 text-xs font-normal text-muted-foreground">
             {unit}
           </span>
         )}
@@ -64,15 +62,15 @@ export function Stat({
 export function Stars({ value, max = 5 }: { value: number; max?: number }) {
   const filled = Math.round(value);
   return (
-    <span className="inline-flex items-center gap-0.5 text-gold-fg">
+    <span className="inline-flex items-center gap-0.5 text-leaf">
       {Array.from({ length: max }).map((_, i) => (
         <svg
           key={i}
           width="12"
           height="12"
           viewBox="0 0 24 24"
-          fill={i < filled ? "var(--gold)" : "transparent"}
-          stroke="var(--gold)"
+          fill={i < filled ? "currentColor" : "transparent"}
+          stroke="currentColor"
           strokeWidth={1.4}
           aria-hidden
         >
