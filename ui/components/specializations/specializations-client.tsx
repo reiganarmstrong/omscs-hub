@@ -6,91 +6,101 @@ import {
   SPECIALIZATIONS,
   bucketProgress,
 } from "@/lib/data/specializations";
-import { COURSES_BY_ID } from "@/lib/data";
+import { COURSES, COURSES_BY_ID } from "@/lib/data";
 import { usePlanner } from "@/lib/store/planner-store";
 import { usePrefs } from "@/lib/store/prefs-store";
-import { CheckIcon, ChevronRight } from "@/components/icons";
-import { Stars } from "@/components/badges";
+import { CheckIcon, ChevronRight, SearchIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
-import type { Specialization, SpecRequirement } from "@/lib/types";
+import type {
+  Course,
+  Specialization,
+  SpecRequirement,
+  Term,
+} from "@/lib/types";
+
+const UNSCHEDULED = "unassigned";
 
 export function SpecializationsClient() {
-  const { plan } = usePlanner();
+  const { plan, add, remove, has } = usePlanner();
   const { selectedSpec, setSelectedSpec } = usePrefs();
   const plannedIds = React.useMemo(
     () => new Set(Object.values(plan).flat()),
     [plan],
   );
 
-  // Local override lets the user browse a different track without changing
-  // their saved selection. When no override is set, the active view follows
-  // the saved track (or the first track as a fallback).
+  const toggleCourse = React.useCallback(
+    (courseId: string) => {
+      const term = has(courseId);
+      if (term) remove(term, courseId);
+      else add(UNSCHEDULED, courseId);
+    },
+    [add, remove, has],
+  );
+
   const [override, setOverride] = React.useState<typeof selectedSpec>(null);
   const active = override ?? selectedSpec ?? SPECIALIZATIONS[0].id;
   const setActive = setOverride;
 
-  const spec = SPECIALIZATIONS.find((s) => s.id === active) ?? SPECIALIZATIONS[0];
+  const spec =
+    SPECIALIZATIONS.find((s) => s.id === active) ?? SPECIALIZATIONS[0];
 
   return (
-    <div className="mx-auto max-w-[1400px] px-6 pt-6 pb-16">
-      <header className="border-b border-ink/15 pb-3">
+    <div className="mx-auto max-w-[1400px] px-6 pt-8 pb-16">
+      <header className="pb-4">
         <h1 className="font-display text-3xl tracking-tight md:text-4xl">
           Specializations
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Pick a track to see its required core, foundational pool, and elective
-          buckets. Courses you&apos;ve added to your planner are checked off.
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          Pick a track to see its required core, foundational pool, and
+          elective buckets. Click any course to add or remove it from your
+          plan — newly added courses land in the planner&apos;s
+          <em> Unscheduled </em>
+          area, ready to assign to a semester.
         </p>
       </header>
 
-      <div className="mt-5 grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr]">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr]">
         <nav>
-          <div className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-            Tracks
-          </div>
-          <ul className="mt-2 divide-y divide-ink/12 border-y border-ink/12">
-            {SPECIALIZATIONS.map((s) => {
+          <div className="label">Tracks</div>
+          <ul className="mt-2 overflow-hidden rounded-lg border border-border bg-card">
+            {SPECIALIZATIONS.map((s, i) => {
               const ids = new Set(s.requirements.flatMap((r) => r.poolCourseIds));
               const matched = [...ids].filter((id) => plannedIds.has(id)).length;
               const isActive = s.id === spec.id;
               const isMine = s.id === selectedSpec;
               return (
-                <li key={s.id}>
+                <li key={s.id} className={i > 0 ? "border-t border-border" : ""}>
                   <button
                     type="button"
                     onClick={() => setActive(s.id)}
                     className={cn(
-                      "flex w-full items-center justify-between gap-2 py-2.5 pr-2 pl-2 text-left transition",
-                      isActive ? "bg-ink/5" : "hover:bg-ink/3",
+                      "flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition",
+                      isActive ? "bg-muted" : "hover:bg-muted/60",
                     )}
                   >
                     <span className="flex min-w-0 flex-col">
                       <span className="flex items-center gap-1.5">
-                        <span className="truncate text-sm font-medium">{s.name}</span>
+                        <span className="truncate text-sm font-medium">
+                          {s.name}
+                        </span>
                         {isMine && (
-                          <span className="rounded-full bg-gold px-1.5 py-px font-mono text-[9px] tracking-widest text-gold-fg uppercase">
+                          <span className="rounded-full bg-leaf/12 px-1.5 py-px text-[10px] font-medium text-leaf">
                             mine
                           </span>
                         )}
                       </span>
-                      <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+                      <span className="text-xs text-muted-foreground">
                         {matched} planned · {s.totalCourses} total
                       </span>
                     </span>
-                    {isActive && <ChevronRight size={14} />}
+                    {isActive && (
+                      <ChevronRight size={14} className="text-muted-foreground" />
+                    )}
                   </button>
                 </li>
               );
             })}
           </ul>
-
-          <div className="mt-4 font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-            Tip
-          </div>
-          <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-            Setting a track here is the same setting used by the planner.
-            Switch any time without losing your plan.
-          </p>
         </nav>
 
         <div>
@@ -101,21 +111,22 @@ export function SpecializationsClient() {
             onUnpick={() => setSelectedSpec(null)}
             plannedIds={plannedIds}
           />
-          <div className="mt-6 space-y-5">
+          <div className="mt-5 space-y-4">
             {spec.requirements.map((req, idx) => (
               <RequirementBlock
                 key={req.id}
                 index={idx + 1}
                 req={req}
                 plannedIds={plannedIds}
+                onToggle={toggleCourse}
               />
             ))}
             {spec.freeElectiveCount > 0 && (
               <FreeElectiveBlock
                 index={spec.requirements.length + 1}
-                count={spec.freeElectiveCount}
                 spec={spec}
                 plannedIds={plannedIds}
+                onToggle={toggleCourse}
               />
             )}
           </div>
@@ -139,25 +150,31 @@ function SpecHeader({
   plannedIds: Set<string>;
 }) {
   const prog = bucketProgress(spec, plannedIds);
-  const requiredPct = (prog.matchedFulfilled / prog.requiredFulfilled) * 100;
-  const totalPct = ((prog.matchedFulfilled + prog.freeElectivesUsed) / spec.totalCourses) * 100;
+  const requiredPct =
+    prog.requiredFulfilled === 0
+      ? 0
+      : (prog.matchedFulfilled / prog.requiredFulfilled) * 100;
+  const totalPct =
+    ((prog.matchedFulfilled + prog.freeElectivesUsed) / spec.totalCourses) * 100;
 
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4 border border-ink/15 bg-card p-5">
+    <div className="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-border bg-card p-5">
       <div className="min-w-0 flex-1">
-        <h2 className="font-display text-3xl tracking-tight">{spec.name}</h2>
+        <h2 className="font-display text-2xl tracking-tight md:text-3xl">
+          {spec.name}
+        </h2>
         <p className="mt-1 text-sm text-muted-foreground">{spec.blurb}</p>
-        <p className="mt-2 max-w-2xl text-[14px] leading-relaxed">
+        <p className="reading mt-2 max-w-2xl text-[14px] text-foreground">
           {spec.description}
         </p>
-        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Mini label="Total courses" value={String(spec.totalCourses)} />
           <Mini
-            label="Required buckets"
+            label="Required slots"
             value={`${prog.matchedFulfilled}/${prog.requiredFulfilled}`}
           />
           <Mini
-            label="Free electives used"
+            label="Free electives"
             value={`${prog.freeElectivesUsed}/${spec.freeElectiveCount}`}
           />
           <Mini
@@ -165,30 +182,30 @@ function SpecHeader({
             value={`${prog.plannedTotal}/${spec.totalCourses}`}
           />
         </div>
-        <div className="mt-3 space-y-2">
+        <div className="mt-4 space-y-2">
           <ProgressBar
             label="Required structure"
             value={requiredPct}
-            note={`${prog.matchedFulfilled} / ${prog.requiredFulfilled} bucket slots filled`}
+            note={`${prog.matchedFulfilled} / ${prog.requiredFulfilled} slots`}
           />
           <ProgressBar
             label="Degree progress"
             value={totalPct}
             note={`${prog.matchedFulfilled + prog.freeElectivesUsed} / ${spec.totalCourses} courses`}
-            accent="gold"
+            accent="leaf"
           />
         </div>
       </div>
-      <div className="flex shrink-0 flex-col gap-2">
+      <div className="flex shrink-0 flex-col items-end gap-2">
         {isMine ? (
           <>
-            <span className="inline-flex items-center gap-1 rounded-full bg-gold px-3 py-1 font-mono text-[10px] tracking-widest text-gold-fg uppercase">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-leaf/12 px-3 py-1 text-xs font-medium text-leaf">
               <CheckIcon size={12} /> Selected as your track
             </span>
             <button
               type="button"
               onClick={onUnpick}
-              className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase hover:text-claret"
+              className="text-xs text-muted-foreground hover:text-rose"
             >
               Clear selection
             </button>
@@ -197,7 +214,7 @@ function SpecHeader({
           <button
             type="button"
             onClick={onPick}
-            className="inline-flex items-center gap-2 bg-ink px-4 py-2 font-mono text-[11px] tracking-widest text-paper uppercase hover:bg-claret"
+            className="inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm text-background hover:opacity-90"
           >
             Pick this track
           </button>
@@ -211,37 +228,41 @@ function RequirementBlock({
   index,
   req,
   plannedIds,
+  onToggle,
 }: {
   index: number;
   req: SpecRequirement;
   plannedIds: Set<string>;
+  onToggle: (id: string) => void;
 }) {
   const matched = req.poolCourseIds.filter((id) => plannedIds.has(id));
   const filled = Math.min(matched.length, req.pick);
   const fulfilled = filled >= req.pick;
 
   return (
-    <section className="border border-ink/15 bg-card">
-      <header className="flex items-center justify-between gap-3 border-b border-ink/15 px-4 py-2.5">
+    <section className="overflow-hidden rounded-lg border border-border bg-card">
+      <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5">
         <div className="flex items-baseline gap-3">
-          <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+          <span className="text-xs text-muted-foreground tabular">
             #{String(index).padStart(2, "0")}
           </span>
-          <h3 className="font-display text-xl tracking-tight">{req.label}</h3>
+          <h3 className="font-display text-lg tracking-tight">{req.label}</h3>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <span
             className={cn(
-              "font-mono text-[11px] tabular tracking-widest uppercase",
-              fulfilled ? "text-gold-fg" : "text-muted-foreground",
+              "tabular text-sm",
+              fulfilled ? "text-leaf" : "text-muted-foreground",
             )}
           >
             {filled} / {req.pick}
           </span>
           <span
             className={cn(
-              "rounded-full px-2 py-0.5 font-mono text-[10px] tracking-widest uppercase",
-              fulfilled ? "bg-gold text-gold-fg" : "bg-ink/8 text-muted-foreground",
+              "rounded-full px-2 py-0.5 text-[11px] font-medium",
+              fulfilled
+                ? "bg-leaf/12 text-leaf"
+                : "bg-muted text-muted-foreground",
             )}
           >
             {fulfilled ? "Fulfilled" : req.required ? "Required" : "Pending"}
@@ -249,45 +270,22 @@ function RequirementBlock({
         </div>
       </header>
       {req.notes && (
-        <p className="border-b border-ink/10 px-4 py-2 text-[12px] text-muted-foreground">
+        <p className="border-b border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
           {req.notes}
         </p>
       )}
-      <ul className="divide-y divide-ink/10">
+      <CourseTableHeader />
+      <ul className="divide-y divide-border">
         {req.poolCourseIds.map((id) => {
           const c = COURSES_BY_ID[id];
           if (!c) return null;
-          const planned = plannedIds.has(id);
           return (
-            <li
+            <CourseRow
               key={id}
-              className="grid grid-cols-[28px_90px_1fr_72px_72px] items-baseline gap-3 px-4 py-2 text-sm"
-            >
-              <span
-                aria-hidden
-                className={cn(
-                  "grid size-5 place-items-center rounded-[2px] border border-ink/30",
-                  planned && "bg-ink text-paper border-ink",
-                )}
-              >
-                {planned && <CheckIcon size={12} />}
-              </span>
-              <span className="font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
-                {c.code}
-              </span>
-              <Link
-                href={`/courses/${c.id}`}
-                className={cn("flex-1 truncate hover:underline", planned && "font-medium")}
-              >
-                {c.title}
-              </Link>
-              <span className="text-right font-mono tabular text-[11px] text-muted-foreground">
-                ★{c.stats.avgRating.toFixed(1)}
-              </span>
-              <span className="text-right font-mono tabular text-[11px] text-muted-foreground">
-                {c.stats.avgWorkload.toFixed(0)} hr
-              </span>
-            </li>
+              course={c}
+              planned={plannedIds.has(id)}
+              onToggle={() => onToggle(id)}
+            />
           );
         })}
       </ul>
@@ -297,74 +295,203 @@ function RequirementBlock({
 
 function FreeElectiveBlock({
   index,
-  count,
   spec,
   plannedIds,
+  onToggle,
 }: {
   index: number;
-  count: number;
   spec: Specialization;
   plannedIds: Set<string>;
+  onToggle: (id: string) => void;
 }) {
-  const bucketIds = new Set(spec.requirements.flatMap((r) => r.poolCourseIds));
-  const used = [...plannedIds].filter((id) => !bucketIds.has(id));
+  const count = spec.freeElectiveCount;
+  // Eligible candidates for free electives: any course not in this spec's
+  // bucket pools (the official rule allows any approved 6XXX/7XXX/8XXX).
+  const candidates = React.useMemo(() => {
+    const bucketIds = new Set(
+      spec.requirements.flatMap((r) => r.poolCourseIds),
+    );
+    return COURSES.filter((c) => !bucketIds.has(c.id)).sort(
+      (a, b) => b.stats.avgRating - a.stats.avgRating,
+    );
+  }, [spec]);
+  const used = candidates.filter((c) => plannedIds.has(c.id));
   const filled = Math.min(used.length, count);
   const fulfilled = filled >= count;
 
+  const [q, setQ] = React.useState("");
+  const ql = q.trim().toLowerCase();
+  const filteredCandidates = candidates.filter((c) => {
+    if (!ql) return true;
+    return `${c.code} ${c.title} ${c.tags.join(" ")}`.toLowerCase().includes(ql);
+  });
+
   return (
-    <section className="border border-dashed border-ink/30 bg-card/50">
-      <header className="flex items-center justify-between gap-3 border-b border-ink/15 px-4 py-2.5">
+    <section className="overflow-hidden rounded-lg border border-dashed border-border bg-card/60">
+      <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5">
         <div className="flex items-baseline gap-3">
-          <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+          <span className="text-xs text-muted-foreground tabular">
             #{String(index).padStart(2, "0")}
           </span>
-          <h3 className="font-display text-xl tracking-tight">
+          <h3 className="font-display text-lg tracking-tight">
             Pick {count} free electives
           </h3>
         </div>
-        <span
-          className={cn(
-            "font-mono text-[11px] tabular tracking-widest uppercase",
-            fulfilled ? "text-gold-fg" : "text-muted-foreground",
-          )}
-        >
-          {filled} / {count}
-        </span>
+        <div className="flex items-center gap-2.5">
+          <span
+            className={cn(
+              "tabular text-sm",
+              fulfilled ? "text-leaf" : "text-muted-foreground",
+            )}
+          >
+            {filled} / {count}
+          </span>
+          <span
+            className={cn(
+              "rounded-full px-2 py-0.5 text-[11px] font-medium",
+              fulfilled
+                ? "bg-leaf/12 text-leaf"
+                : "bg-muted text-muted-foreground",
+            )}
+          >
+            {fulfilled ? "Fulfilled" : "Pending"}
+          </span>
+        </div>
       </header>
-      <p className="px-4 py-2 text-[12px] text-muted-foreground">
+      <p className="border-b border-border bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
         Any approved 6XXX/7XXX/8XXX OMSCS course outside the buckets above.
-        Common choices: ML4T, DVA, AI Ethics, HCI, Educational Technology, Game
-        Design.
+        Pick favourites here; they&apos;ll count toward your remaining slots.
       </p>
-      <ul className="px-4 pb-3">
-        {used.length === 0 ? (
-          <li className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-            No free electives planned yet.
+      <div className="border-b border-border px-4 py-2">
+        <div className="relative">
+          <span className="absolute top-1/2 left-2.5 -translate-y-1/2 text-muted-foreground">
+            <SearchIcon size={13} />
+          </span>
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search free-elective candidates by code, title, or tag…"
+            className="w-full rounded-md border border-border bg-background py-1.5 pr-2 pl-8 text-sm focus:border-foreground/40 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      <CourseTableHeader />
+      <ul className="max-h-[420px] divide-y divide-border overflow-y-auto">
+        {filteredCandidates.length === 0 && (
+          <li className="px-4 py-3 text-sm text-muted-foreground">
+            No candidates match.
           </li>
-        ) : (
-          used.slice(0, count).map((id) => {
-            const c = COURSES_BY_ID[id];
-            if (!c) return null;
-            return (
-              <li key={id} className="flex items-baseline justify-between gap-3 py-1 text-sm">
-                <span className="flex items-baseline gap-2 truncate">
-                  <span className="font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
-                    {c.code}
-                  </span>
-                  <Link
-                    href={`/courses/${c.id}`}
-                    className="truncate hover:underline"
-                  >
-                    {c.title}
-                  </Link>
-                </span>
-                <Stars value={c.stats.avgRating} />
-              </li>
-            );
-          })
         )}
+        {filteredCandidates.map((c) => (
+          <CourseRow
+            key={c.id}
+            course={c}
+            planned={plannedIds.has(c.id)}
+            onToggle={() => onToggle(c.id)}
+          />
+        ))}
       </ul>
     </section>
+  );
+}
+
+function CourseTableHeader() {
+  return (
+    <div className="hidden border-b border-border bg-muted/30 px-4 py-1.5 text-[11px] text-muted-foreground md:grid md:grid-cols-[24px_84px_minmax(0,1fr)_50px_50px_60px_72px] md:items-baseline md:gap-3">
+      <span></span>
+      <span>Code</span>
+      <span>Title</span>
+      <span className="text-right">Diff</span>
+      <span className="text-right">★</span>
+      <span className="text-right">hr/wk</span>
+      <span className="text-right">Terms</span>
+    </div>
+  );
+}
+
+function CourseRow({
+  course,
+  planned,
+  onToggle,
+}: {
+  course: Course;
+  planned: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <li
+      className={cn(
+        "grid items-baseline gap-2 px-4 py-2 text-sm",
+        "grid-cols-[24px_minmax(0,1fr)] sm:grid-cols-[24px_84px_minmax(0,1fr)]",
+        "md:grid-cols-[24px_84px_minmax(0,1fr)_50px_50px_60px_72px] md:gap-3",
+        planned && "bg-leaf/[0.06]",
+      )}
+    >
+      <button
+        type="button"
+        aria-label={planned ? "Remove from plan" : "Add to plan"}
+        aria-pressed={planned}
+        onClick={onToggle}
+        className={cn(
+          "grid size-4 place-items-center rounded-sm border transition",
+          planned
+            ? "border-foreground bg-foreground text-background"
+            : "border-border hover:border-foreground/40",
+        )}
+      >
+        {planned && <CheckIcon size={11} />}
+      </button>
+      <span className="hidden text-xs text-muted-foreground sm:inline">
+        {course.code}
+      </span>
+      <Link
+        href={`/courses/${course.id}`}
+        className={cn(
+          "truncate hover:underline",
+          planned && "font-medium text-foreground",
+        )}
+      >
+        <span className="sm:hidden text-xs text-muted-foreground">
+          {course.code} ·{" "}
+        </span>
+        {course.title}
+      </Link>
+      <span className="hidden text-right tabular text-xs text-muted-foreground md:inline">
+        {course.stats.avgDifficulty.toFixed(1)}
+      </span>
+      <span className="hidden text-right tabular text-xs text-muted-foreground md:inline">
+        {course.stats.avgRating.toFixed(1)}
+      </span>
+      <span className="hidden text-right tabular text-xs text-muted-foreground md:inline">
+        {course.stats.avgWorkload.toFixed(0)}
+      </span>
+      <span className="hidden justify-end gap-0.5 text-right md:flex">
+        <TermBadges terms={course.termsOffered} />
+      </span>
+    </li>
+  );
+}
+
+function TermBadges({ terms }: { terms: Term[] }) {
+  const all: Term[] = ["Fall", "Spring", "Summer"];
+  return (
+    <span className="inline-flex items-baseline gap-0.5">
+      {all.map((t) => (
+        <span
+          key={t}
+          title={`${t}${terms.includes(t) ? "" : " — not offered"}`}
+          className={cn(
+            "inline-flex h-4 w-5 items-center justify-center rounded-sm text-[10px] font-medium",
+            terms.includes(t)
+              ? "bg-leaf/12 text-leaf"
+              : "bg-muted text-muted-foreground/60",
+          )}
+        >
+          {t.charAt(0)}
+        </span>
+      ))}
+    </span>
   );
 }
 
@@ -377,19 +504,22 @@ function ProgressBar({
   label: string;
   value: number;
   note: string;
-  accent?: "ink" | "gold";
+  accent?: "ink" | "leaf";
 }) {
-  const color = accent === "gold" ? "var(--gold)" : "var(--ink)";
+  const color = accent === "leaf" ? "var(--leaf)" : "var(--foreground)";
   return (
     <div>
-      <div className="flex items-baseline justify-between font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+      <div className="flex items-baseline justify-between text-xs text-muted-foreground">
         <span>{label}</span>
-        <span>{note}</span>
+        <span className="tabular">{note}</span>
       </div>
-      <div className="mt-1 h-1.5 w-full bg-ink/10">
+      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
         <div
           className="h-full transition-all"
-          style={{ width: `${Math.min(100, value)}%`, background: color }}
+          style={{
+            width: `${Math.min(100, value)}%`,
+            background: color,
+          }}
         />
       </div>
     </div>
@@ -398,11 +528,9 @@ function ProgressBar({
 
 function Mini({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-l border-ink/15 pl-2">
-      <div className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-        {label}
-      </div>
-      <div className="font-display tabular text-xl">{value}</div>
+    <div>
+      <div className="label">{label}</div>
+      <div className="font-display tabular text-xl text-foreground">{value}</div>
     </div>
   );
 }

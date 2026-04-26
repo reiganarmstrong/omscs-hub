@@ -6,16 +6,16 @@ import type { Course, Term } from "@/lib/types";
 import { WORKLOAD_BUCKETS } from "@/lib/types";
 import { useReviews } from "@/lib/store/reviews-store";
 import { aggregateStats } from "@/lib/data";
-
-type Stats = ReturnType<typeof aggregateStats>;
 import { usePlanner } from "@/lib/store/planner-store";
 import { SPECIALIZATIONS_BY_ID } from "@/lib/data/specializations";
 import { DistributionChart } from "@/components/distribution-chart";
 import { ReviewList } from "@/components/reviews/review-list";
 import { ReviewForm } from "@/components/reviews/review-form";
 import { Tag, Stars } from "@/components/badges";
-import { ArrowRight, CheckIcon, PlusIcon } from "@/components/icons";
+import { ArrowLeft, ArrowRight, CheckIcon, PlusIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
+
+type Stats = ReturnType<typeof aggregateStats>;
 
 const ALL_TERMS: Term[] = ["Fall", "Spring", "Summer"];
 
@@ -31,17 +31,17 @@ export function CourseDetail({ course }: { course: Course }) {
     <div className="mx-auto max-w-[1400px] px-6 pt-8 pb-16">
       <Crumbs course={course} />
 
-      <header className="mt-4 grid grid-cols-12 gap-6 border-b border-ink pb-8">
+      <header className="mt-3 grid grid-cols-12 gap-6 border-b border-border pb-8">
         <div className="col-span-12 lg:col-span-8">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground uppercase">
+          <div className="flex items-baseline justify-between">
+            <span className="text-xs tracking-wide text-muted-foreground">
               {course.code}
             </span>
-            <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+            <span className="text-xs text-muted-foreground">
               {course.credits} credit hours
             </span>
           </div>
-          <h1 className="mt-1 font-display text-3xl leading-tight tracking-tight md:text-4xl">
+          <h1 className="mt-1 font-display text-3xl leading-tight tracking-tight md:text-[2.6rem]">
             {course.title}
             {course.shortTitle && (
               <span className="ml-2 text-base text-muted-foreground">
@@ -49,13 +49,13 @@ export function CourseDetail({ course }: { course: Course }) {
               </span>
             )}
           </h1>
-          <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+          <p className="reading mt-3 max-w-3xl text-[15px] text-muted-foreground">
             {course.description}
           </p>
 
           <div className="mt-5 flex flex-wrap gap-1.5">
             {course.specializations.map((s) => (
-              <Tag key={s.id} variant={s.role === "core" ? "gold" : "outline"}>
+              <Tag key={s.id} variant={s.role === "core" ? "leaf" : "outline"}>
                 {SPECIALIZATIONS_BY_ID[s.id]?.name} · {s.role}
               </Tag>
             ))}
@@ -70,12 +70,12 @@ export function CourseDetail({ course }: { course: Course }) {
         </aside>
       </header>
 
-      <section className="mt-8">
+      <section className="mt-10">
         <SectionHead
           title="Distributions"
-          note={`From ${stats.numReviews} reviews — mean bin highlighted.`}
+          note={`${stats.numReviews} reviews — mean bin highlighted.`}
         />
-        <div className="mt-5 grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="mt-5 grid grid-cols-1 gap-8 rounded-xl border border-border bg-card p-6 lg:grid-cols-3">
           <DistributionChart
             label="Difficulty"
             unit="of 5"
@@ -83,7 +83,7 @@ export function CourseDetail({ course }: { course: Course }) {
             binLabels={["1", "2", "3", "4", "5"]}
             mean={stats.avgDifficulty}
             meanIndex={meanDiffIdx}
-            accent="claret"
+            accent="rose"
           />
           <DistributionChart
             label="Weekly workload"
@@ -92,7 +92,7 @@ export function CourseDetail({ course }: { course: Course }) {
             binLabels={WORKLOAD_BUCKETS.map((b) => b.label)}
             mean={stats.avgWorkload}
             meanIndex={meanWLBucket}
-            accent="gold"
+            accent="leaf"
           />
           <DistributionChart
             label="Overall rating"
@@ -108,17 +108,17 @@ export function CourseDetail({ course }: { course: Course }) {
 
       <section className="mt-10">
         <SectionHead title="Logistics" />
-        <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
           <Block heading="Terms offered">
-            <div className="mt-2 grid grid-cols-3 overflow-hidden rounded-sm border border-ink/25">
+            <div className="mt-2 grid grid-cols-3 overflow-hidden rounded-md border border-border">
               {ALL_TERMS.map((t) => (
                 <div
                   key={t}
                   className={cn(
-                    "flex items-center justify-center gap-1.5 px-3 py-2 text-center font-mono text-[10px] tracking-widest uppercase",
+                    "flex items-center justify-center gap-1.5 px-3 py-2 text-center text-xs",
                     course.termsOffered.includes(t)
-                      ? "bg-ink text-paper"
-                      : "bg-paper text-muted-foreground line-through",
+                      ? "bg-neutral-950 text-white"
+                      : "bg-card text-muted-foreground line-through",
                   )}
                 >
                   {t}
@@ -137,9 +137,7 @@ export function CourseDetail({ course }: { course: Course }) {
                 ))}
               </ul>
             ) : (
-              <span className="font-mono text-[11px] text-muted-foreground tracking-widest uppercase">
-                None listed
-              </span>
+              <span className="text-sm text-muted-foreground">None listed.</span>
             )}
           </Block>
           <Block heading="Counts toward">
@@ -147,9 +145,7 @@ export function CourseDetail({ course }: { course: Course }) {
               {course.specializations.map((s) => (
                 <li key={s.id} className="flex items-center justify-between">
                   <span>{SPECIALIZATIONS_BY_ID[s.id]?.name}</span>
-                  <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-                    {s.role}
-                  </span>
+                  <span className="text-xs text-muted-foreground">{s.role}</span>
                 </li>
               ))}
             </ul>
@@ -189,11 +185,11 @@ function clampIdx(n: number, lo: number, hi: number) {
 
 function Crumbs({ course }: { course: Course }) {
   return (
-    <nav className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
-      <Link href="/" className="hover:text-ink">
+    <nav className="text-xs text-muted-foreground">
+      <Link href="/" className="hover:text-foreground">
         Catalog
       </Link>{" "}
-      / <span className="text-ink">{course.code}</span>
+      / <span className="text-foreground">{course.code}</span>
     </nav>
   );
 }
@@ -217,90 +213,111 @@ function SidebarSummary({
   );
 
   return (
-    <div className="border border-ink p-5 shadow-[3px_3px_0_var(--ink)]">
-      <div className="flex items-baseline justify-between border-b border-ink/15 pb-2">
-        <span className="font-mono text-[10px] tracking-[0.18em] uppercase">
-          At a glance
-        </span>
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="flex items-baseline justify-between">
+        <span className="label">At a glance</span>
         <Stars value={stats.avgRating} />
       </div>
-      <dl className="mt-3 grid grid-cols-3 gap-3 border-b border-ink/15 pb-4">
-        <Mini
-          label="Diff"
-          value={stats.avgDifficulty.toFixed(1)}
-          unit="/5"
-        />
+      <dl className="mt-3 grid grid-cols-3 gap-3">
+        <Mini label="Difficulty" value={stats.avgDifficulty.toFixed(1)} unit="/5" />
         <Mini
           label="Workload"
           value={stats.avgWorkload.toFixed(0)}
-          unit="hrs/wk"
+          unit="hr/wk"
         />
         <Mini label="Reviews" value={String(stats.numReviews)} />
       </dl>
 
-      <div className="mt-3 font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-        Planner
+      <div className="mt-4 border-t border-border pt-3">
+        <div className="label">Planner</div>
+        {inTerm ? (
+          <div className="mt-2 flex items-center justify-between rounded-md bg-leaf/12 px-3 py-2 text-leaf">
+            <span className="text-sm">
+              {inTerm === "unassigned"
+                ? "Planned (Unscheduled)"
+                : `Planned · ${inTerm.replace("-", " ")}`}
+              <CheckIcon size={13} className="-mt-0.5 ml-1 inline" />
+            </span>
+            <button
+              type="button"
+              onClick={() => remove(inTerm, course.id)}
+              className="text-xs underline hover:no-underline"
+            >
+              Remove
+            </button>
+          </div>
+        ) : !picker ? (
+          <div className="mt-2 grid grid-cols-2 gap-1.5">
+            <button
+              type="button"
+              onClick={() => setPicker(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm hover:border-foreground/30"
+            >
+              <PlusIcon size={14} /> Schedule…
+            </button>
+            <button
+              type="button"
+              onClick={() => add("unassigned", course.id)}
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm hover:border-foreground/30"
+            >
+              Add unscheduled
+            </button>
+          </div>
+        ) : (
+          <div className="mt-2 space-y-1.5">
+            <div className="grid grid-cols-[1fr_1fr_auto] gap-1.5">
+              <select
+                value={term}
+                onChange={(e) =>
+                  setTerm(e.target.value as typeof termOptions[number])
+                }
+                className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+              >
+                {termOptions.map((t) => (
+                  <option
+                    key={t}
+                    value={t}
+                    disabled={!course.termsOffered.includes(t)}
+                  >
+                    {t}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+              >
+                {yearOptions.map((y) => (
+                  <option key={y}>{y}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => {
+                  add(`${term}-${year}`, course.id);
+                  setPicker(false);
+                }}
+                className="rounded-md bg-foreground px-3 py-1.5 text-xs text-background hover:opacity-90"
+              >
+                Save
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPicker(false)}
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background py-1.5 text-xs text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+            >
+              <ArrowLeft size={12} /> Back
+            </button>
+          </div>
+        )}
       </div>
-      {inTerm ? (
-        <div className="mt-2 flex items-center justify-between rounded-sm bg-gold px-3 py-2 text-gold-fg">
-          <span className="font-mono text-[11px] tracking-widest uppercase">
-            <CheckIcon size={12} className="-mt-0.5 mr-1 inline" /> Planned · {inTerm.replace("-", " ")}
-          </span>
-          <button
-            type="button"
-            onClick={() => remove(inTerm, course.id)}
-            className="font-mono text-[10px] tracking-widest underline hover:no-underline"
-          >
-            Remove
-          </button>
-        </div>
-      ) : !picker ? (
-        <button
-          type="button"
-          onClick={() => setPicker(true)}
-          className="mt-2 inline-flex w-full items-center justify-center gap-2 border border-ink py-2 font-mono text-[11px] tracking-widest uppercase hover:bg-ink hover:text-paper"
-        >
-          <PlusIcon size={12} /> Add to planner
-        </button>
-      ) : (
-        <div className="mt-2 grid grid-cols-[1fr_1fr_auto] gap-1">
-          <select
-            value={term}
-            onChange={(e) => setTerm(e.target.value as typeof termOptions[number])}
-            className="rounded-sm border border-ink/25 bg-paper px-2 py-1 font-mono text-[11px]"
-          >
-            {termOptions.map((t) => (
-              <option key={t} value={t} disabled={!course.termsOffered.includes(t)}>
-                {t}
-              </option>
-            ))}
-          </select>
-          <select
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            className="rounded-sm border border-ink/25 bg-paper px-2 py-1 font-mono text-[11px]"
-          >
-            {yearOptions.map((y) => (
-              <option key={y}>{y}</option>
-            ))}
-          </select>
-          <button
-            type="button"
-            onClick={() => {
-              add(`${term}-${year}`, course.id);
-              setPicker(false);
-            }}
-            className="rounded-sm bg-ink px-2 py-1 font-mono text-[10px] tracking-widest text-paper uppercase"
-          >
-            Save
-          </button>
-        </div>
-      )}
 
-      <div className="mt-4 border-t border-ink/15 pt-3">
+      <div className="mt-3 border-t border-border pt-3">
         <Link
           href="/planner"
-          className="inline-flex items-center gap-1 font-mono text-[10px] tracking-widest text-muted-foreground uppercase hover:text-ink"
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
           Open planner <ArrowRight size={12} />
         </Link>
@@ -320,13 +337,11 @@ function Mini({
 }) {
   return (
     <div>
-      <span className="block font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-        {label}
-      </span>
-      <span className="font-display tabular text-2xl">
+      <span className="block label">{label}</span>
+      <span className="font-display tabular text-2xl text-foreground">
         {value}
         {unit && (
-          <span className="ml-0.5 font-mono text-[10px] text-muted-foreground tracking-widest">
+          <span className="ml-1 text-[10px] font-normal text-muted-foreground">
             {unit}
           </span>
         )}
@@ -343,7 +358,7 @@ function SectionHead({
   note?: string;
 }) {
   return (
-    <div className="flex items-end justify-between border-b border-ink/30 pb-2">
+    <div className="flex items-end justify-between border-b border-border pb-2">
       <h2 className="font-display text-2xl tracking-tight">{title}</h2>
       {note && (
         <span className="hidden max-w-md text-right text-xs text-muted-foreground md:inline">
@@ -362,10 +377,8 @@ function Block({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border border-ink/15 bg-card p-4">
-      <div className="border-b border-ink/15 pb-1 font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-        {heading}
-      </div>
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="label">{heading}</div>
       <div className="mt-2">{children}</div>
     </div>
   );
