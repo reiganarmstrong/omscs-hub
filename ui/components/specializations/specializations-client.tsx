@@ -214,7 +214,7 @@ function SpecHeader({
           <button
             type="button"
             onClick={onPick}
-            className="inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm text-background hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-md bg-leaf px-4 py-2 text-sm text-leaf-fg hover:opacity-90"
           >
             Pick this track
           </button>
@@ -436,8 +436,8 @@ function CourseRow({
         className={cn(
           "grid size-4 place-items-center rounded-sm border transition",
           planned
-            ? "border-foreground bg-foreground text-background"
-            : "border-border hover:border-foreground/40",
+            ? "border-leaf bg-leaf text-leaf-fg"
+            : "border-border hover:border-leaf/60",
         )}
       >
         {planned && <CheckIcon size={11} />}

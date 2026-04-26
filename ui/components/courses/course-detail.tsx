@@ -298,7 +298,7 @@ function SidebarSummary({
                   add(`${term}-${year}`, course.id);
                   setPicker(false);
                 }}
-                className="rounded-md bg-foreground px-3 py-1.5 text-xs text-background hover:opacity-90"
+                className="rounded-md bg-leaf px-3 py-1.5 text-xs text-leaf-fg hover:opacity-90"
               >
                 Save
               </button>

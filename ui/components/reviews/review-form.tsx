@@ -62,7 +62,7 @@ export function ReviewForm({ courseId }: { courseId: string }) {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm text-background hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-md bg-leaf px-4 py-2 text-sm text-leaf-fg hover:opacity-90"
           >
             <PlusIcon size={14} /> Write a review
           </button>
@@ -133,8 +133,8 @@ export function ReviewForm({ courseId }: { courseId: string }) {
                 className={cn(
                   "rounded-full border px-3 py-1 text-xs transition",
                   stage === s
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border text-muted-foreground hover:border-foreground/40",
+                    ? "border-leaf bg-leaf text-leaf-fg"
+                    : "border-border text-muted-foreground hover:border-leaf/60 hover:text-leaf",
                 )}
               >
                 {s} of program
@@ -172,7 +172,7 @@ export function ReviewForm({ courseId }: { courseId: string }) {
         </label>
         <button
           type="submit"
-          className="inline-flex items-center gap-2 rounded-md bg-foreground px-5 py-2 text-sm text-background hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-md bg-leaf px-5 py-2 text-sm text-leaf-fg hover:opacity-90"
         >
           Submit anonymously
         </button>
@@ -213,7 +213,7 @@ function Numeric({
           step={step}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="flex-1 cursor-pointer accent-[color:var(--foreground)]"
+          className="flex-1 cursor-pointer accent-[color:var(--leaf)]"
         />
         <span className="w-12 text-right font-display tabular text-2xl">
           {value}
@@ -272,7 +272,7 @@ function ListEditor({
                 onClick={() =>
                   setItems((p) => p.filter((_, idx) => idx !== i))
                 }
-                className="rounded-md border border-border px-2 text-sm text-muted-foreground hover:bg-foreground hover:text-background"
+                className="rounded-md border border-border px-2 text-sm text-muted-foreground hover:bg-rose hover:text-white"
               >
                 ×
               </button>

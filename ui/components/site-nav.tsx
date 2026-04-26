@@ -44,8 +44,8 @@ export function SiteNav() {
                 className={cn(
                   "rounded-md px-3 py-1.5 text-sm transition",
                   active
-                    ? "bg-foreground text-background"
-                    : "text-muted-foreground hover:bg-foreground hover:text-background",
+                    ? "bg-leaf text-leaf-fg"
+                    : "text-muted-foreground hover:bg-leaf/12 hover:text-leaf",
                 )}
               >
                 {item.label}
@@ -57,7 +57,7 @@ export function SiteNav() {
           type="button"
           aria-label="Toggle theme"
           onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-          className="grid size-8 place-items-center rounded-md text-muted-foreground transition hover:bg-foreground hover:text-background"
+          className="grid size-8 place-items-center rounded-md text-muted-foreground transition hover:bg-leaf/12 hover:text-leaf"
         >
           {mounted && resolvedTheme === "dark" ? <SunIcon size={15} /> : <MoonIcon size={15} />}
         </button>

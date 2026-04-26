@@ -203,8 +203,8 @@ function Pill({
       className={cn(
         "rounded-full border px-2.5 py-0.5 text-xs transition",
         active
-          ? "border-foreground bg-foreground text-background"
-          : "border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+          ? "border-leaf bg-leaf text-leaf-fg"
+          : "border-border text-muted-foreground hover:border-leaf/60 hover:text-leaf"
       )}
     >
       {children}
@@ -228,8 +228,8 @@ function CheckBox({
       className={cn(
         "grid size-4 place-items-center rounded-sm border transition",
         checked
-          ? "border-foreground bg-foreground text-background"
-          : "border-border bg-background hover:border-foreground/40"
+          ? "border-leaf bg-leaf text-leaf-fg"
+          : "border-border bg-background hover:border-leaf/60"
       )}
     >
       {checked && (
@@ -336,7 +336,7 @@ function ActiveChips({
         <button
           key={i}
           onClick={c.clear}
-          className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-foreground hover:bg-foreground hover:text-background"
+          className="inline-flex items-center gap-1 rounded-full bg-leaf/12 px-2 py-0.5 text-xs text-leaf hover:bg-leaf hover:text-leaf-fg"
         >
           {c.label}
           <XIcon size={11} />

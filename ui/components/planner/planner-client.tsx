@@ -293,8 +293,8 @@ function SpecSelector({
           className={cn(
             "rounded-full border px-2.5 py-0.5 text-xs transition",
             selected === null
-              ? "border-foreground bg-foreground text-background"
-              : "border-border text-muted-foreground hover:border-foreground/40",
+              ? "border-leaf bg-leaf text-leaf-fg"
+              : "border-border text-muted-foreground hover:border-leaf/60 hover:text-leaf",
           )}
         >
           None
@@ -311,8 +311,8 @@ function SpecSelector({
               className={cn(
                 "rounded-full border px-2.5 py-0.5 text-xs transition",
                 isActive
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border text-muted-foreground hover:border-foreground/40",
+                  ? "border-leaf bg-leaf text-leaf-fg"
+                  : "border-border text-muted-foreground hover:border-leaf/60 hover:text-leaf",
               )}
             >
               {s.name.replace(" & Robotics", "")}
@@ -590,7 +590,7 @@ function UnscheduledRow({
         <button
           type="button"
           onClick={() => onAssign(`${term}-${year}`)}
-          className="rounded-md bg-foreground px-3 py-1 text-xs text-background hover:opacity-90"
+          className="rounded-md bg-leaf px-3 py-1 text-xs text-leaf-fg hover:opacity-90"
         >
           Assign
         </button>
