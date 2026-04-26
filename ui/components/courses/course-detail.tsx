@@ -115,13 +115,16 @@ export function CourseDetail({ course }: { course: Course }) {
                 <div
                   key={t}
                   className={cn(
-                    "px-3 py-2 text-center font-mono text-[10px] tracking-widest uppercase",
+                    "flex items-center justify-center gap-1.5 px-3 py-2 text-center font-mono text-[10px] tracking-widest uppercase",
                     course.termsOffered.includes(t)
                       ? "bg-ink text-paper"
                       : "bg-paper text-muted-foreground line-through",
                   )}
                 >
                   {t}
+                  {course.termsOffered.includes(t) && (
+                    <CheckIcon size={13} className="shrink-0 text-leaf" />
+                  )}
                 </div>
               ))}
             </div>
