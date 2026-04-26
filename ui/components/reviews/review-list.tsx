@@ -23,6 +23,23 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
   const [recommendOnly, setRecommendOnly] = React.useState(false);
   const [semQuery, setSemQuery] = React.useState("");
   const [open, setOpen] = React.useState(false);
+  const sortMenuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (
+        event.target instanceof Node &&
+        !sortMenuRef.current?.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [open]);
 
   const sorted = React.useMemo(() => {
     const filtered = reviews.filter((r) => {
@@ -47,18 +64,18 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-3 border-y border-ink py-3">
-        <div className="font-mono text-[11px] tracking-widest uppercase">
-          {sorted.length} of {reviews.length} reviews
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5">
+        <div className="text-sm text-muted-foreground">
+          {sorted.length} of {reviews.length}
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <input
-            placeholder="Filter by semester (e.g. Fall 2024)"
+            placeholder="Filter by semester"
             value={semQuery}
             onChange={(e) => setSemQuery(e.target.value)}
-            className="rounded-sm border border-ink/25 bg-paper px-2 py-1 font-mono text-[11px] focus:border-ink focus:outline-none"
+            className="rounded-md border border-border bg-background px-2 py-1 text-xs focus:border-foreground/40 focus:outline-none"
           />
-          <label className="flex items-center gap-1.5 font-mono text-[10px] tracking-widest uppercase">
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <input
               type="checkbox"
               checked={recommendOnly}
@@ -69,7 +86,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
           <select
             value={minRating}
             onChange={(e) => setMinRating(Number(e.target.value))}
-            className="rounded-sm border border-ink/25 bg-paper px-2 py-1 font-mono text-[11px]"
+            className="rounded-md border border-border bg-background px-2 py-1 text-xs"
           >
             <option value={1}>≥ 1★</option>
             <option value={2}>≥ 2★</option>
@@ -77,11 +94,11 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
             <option value={4}>≥ 4★</option>
             <option value={5}>= 5★</option>
           </select>
-          <div className="relative">
+          <div ref={sortMenuRef} className="relative">
             <button
               type="button"
               onClick={() => setOpen((o) => !o)}
-              className="flex items-center gap-2 rounded-sm border border-ink/25 px-3 py-1 font-mono text-[11px] tracking-widest uppercase hover:border-ink"
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-xs hover:border-foreground/30"
             >
               <SortIcon size={12} />
               {SORTS.find((s) => s.v === sort)?.label}
@@ -89,7 +106,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
             </button>
             {open && (
               <div
-                className="absolute right-0 z-30 mt-1 w-52 border border-ink bg-paper shadow-[3px_3px_0_var(--ink)]"
+                className="absolute right-0 z-30 mt-1 w-52 overflow-hidden rounded-md border border-border bg-popover shadow-md"
                 onMouseLeave={() => setOpen(false)}
               >
                 {SORTS.map((s) => (
@@ -101,8 +118,8 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
                       setOpen(false);
                     }}
                     className={cn(
-                      "block w-full px-3 py-1.5 text-left font-mono text-[11px] tracking-widest uppercase hover:bg-ink hover:text-paper",
-                      sort === s.v && "bg-ink/8",
+                      "block w-full px-3 py-1.5 text-left text-sm hover:bg-muted",
+                      sort === s.v && "bg-muted",
                     )}
                   >
                     {s.label}
@@ -114,64 +131,64 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
         </div>
       </div>
 
-      <ol className="divide-y divide-ink/12">
-        {sorted.map((r, idx) => (
-          <li key={r.id} className="grid grid-cols-[auto_1fr] gap-6 py-6">
-            <aside className="flex w-32 flex-col gap-2 border-r border-ink/15 pr-4 font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-              <span className="text-ink text-base font-display tabular">
-                #{String(idx + 1).padStart(3, "0")}
-              </span>
-              <Mini label="Semester" value={r.semester} />
-              <Mini label="Stage" value={r.programStage} />
-              <Mini label="Posted" value={fmtDate(r.createdAt)} />
+      <ol className="mt-4 space-y-4">
+        {sorted.map((r) => (
+          <li
+            key={r.id}
+            className="grid grid-cols-1 gap-5 rounded-lg border border-border bg-card p-5 sm:grid-cols-[140px_1fr]"
+          >
+            <aside className="flex flex-col gap-1.5 text-sm sm:border-r sm:border-border sm:pr-4">
+              <div>
+                <div className="label">Semester</div>
+                <div className="text-foreground">{r.semester}</div>
+              </div>
+              <div>
+                <div className="label">Stage</div>
+                <div className="text-foreground">{r.programStage} of program</div>
+              </div>
+              <div>
+                <div className="label">Posted</div>
+                <div className="text-muted-foreground">{fmtDate(r.createdAt)}</div>
+              </div>
               {r.id.startsWith("user-") && (
-                <span className="inline-block w-fit bg-gold px-1.5 py-0.5 text-gold-fg uppercase">
-                  You
+                <span className="mt-1 inline-block w-fit rounded-full bg-leaf/12 px-2 py-0.5 text-xs text-leaf">
+                  Your review
                 </span>
               )}
             </aside>
             <div>
-              <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+              <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
                 <div className="flex items-center gap-2">
                   <Stars value={r.rating} />
-                  <span className="font-mono text-[11px] tabular text-muted-foreground">
+                  <span className="text-xs tabular text-muted-foreground">
                     {r.rating} / 5
                   </span>
                 </div>
                 <Pill label="Difficulty" value={`${r.difficulty}/5`} />
-                <Pill label="Workload" value={`${r.workload} hrs/wk`} />
+                <Pill label="Workload" value={`${r.workload} hr/wk`} />
                 <Pill
                   label="Recommend"
                   value={r.recommend ? "Yes" : "No"}
-                  tone={r.recommend ? "gold" : "claret"}
+                  tone={r.recommend ? "leaf" : "rose"}
                 />
               </div>
-              <p className="mt-3 text-[15px] leading-relaxed">{r.body}</p>
+              <p className="reading mt-3 text-[15px] text-foreground">
+                {r.body}
+              </p>
               <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Bullets label="Pros" items={r.pros} accent="gold" />
-                <Bullets label="Cons" items={r.cons} accent="claret" />
+                <Bullets label="Pros" items={r.pros} accent="leaf" />
+                <Bullets label="Cons" items={r.cons} accent="rose" />
               </div>
             </div>
           </li>
         ))}
         {sorted.length === 0 && (
-          <li className="py-10 text-center font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
+          <li className="rounded-lg border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
             No reviews match these filters.
           </li>
         )}
       </ol>
     </div>
-  );
-}
-
-function Mini({ label, value }: { label: string; value: string }) {
-  return (
-    <span>
-      <span className="block">{label}</span>
-      <span className="text-ink normal-case font-sans tracking-normal text-[12px]">
-        {value}
-      </span>
-    </span>
   );
 }
 
@@ -182,19 +199,20 @@ function Pill({
 }: {
   label: string;
   value: string;
-  tone?: "default" | "gold" | "claret";
+  tone?: "default" | "leaf" | "rose";
 }) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-baseline gap-1 border-l pl-3 font-mono text-[11px] tabular tracking-widest uppercase",
-        tone === "gold" && "border-gold",
-        tone === "claret" && "border-claret",
-        tone === "default" && "border-ink/30",
-      )}
-    >
+    <span className="inline-flex items-baseline gap-1.5 text-xs">
       <span className="text-muted-foreground">{label}</span>
-      <span className="text-ink">{value}</span>
+      <span
+        className={cn(
+          "tabular text-foreground",
+          tone === "leaf" && "text-leaf",
+          tone === "rose" && "text-rose",
+        )}
+      >
+        {value}
+      </span>
     </span>
   );
 }
@@ -206,20 +224,22 @@ function Bullets({
 }: {
   label: string;
   items: string[];
-  accent: "gold" | "claret";
+  accent: "leaf" | "rose";
 }) {
+  if (!items.length) return null;
   return (
     <div>
       <div
         className={cn(
-          "mb-1 inline-flex items-center gap-1 font-mono text-[10px] tracking-widest uppercase",
-          accent === "gold" ? "text-gold-fg" : "text-claret",
+          "mb-1 inline-flex items-center gap-1.5 text-xs font-medium",
+          accent === "leaf" ? "text-leaf" : "text-rose",
         )}
       >
         <span
           className="size-1.5 rounded-full"
           style={{
-            background: accent === "gold" ? "var(--gold)" : "var(--claret)",
+            background:
+              accent === "leaf" ? "var(--leaf)" : "var(--rose)",
           }}
         />
         {label}

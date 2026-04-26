@@ -14,8 +14,7 @@ export function ReviewForm({ courseId }: { courseId: string }) {
   const [difficulty, setDifficulty] = React.useState(3);
   const [workload, setWorkload] = React.useState(15);
   const [recommend, setRecommend] = React.useState(true);
-  const [stage, setStage] =
-    React.useState<"First" | "Mid" | "Late">("Mid");
+  const [stage, setStage] = React.useState<"First" | "Mid" | "Late">("Mid");
   const [semester, setSemester] = React.useState("Fall 2025");
   const [body, setBody] = React.useState("");
   const [pros, setPros] = React.useState<string[]>([""]);
@@ -46,28 +45,28 @@ export function ReviewForm({ courseId }: { courseId: string }) {
 
   if (!open) {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-2 border-y border-ink/15 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3">
         <div>
-          <div className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-            Add yours
-          </div>
-          <p className="mt-1 max-w-md text-sm text-muted-foreground">
-            Reviews are anonymous. Posting writes to your browser only — when
-            the back-end ships, the form will publish to the real archive.
+          <div className="text-sm font-medium">Add your review</div>
+          <p className="mt-0.5 max-w-md text-xs text-muted-foreground">
+            Anonymous. Stored locally for now — when the back-end ships, it
+            will publish to the real archive.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-2 bg-ink px-4 py-2 font-mono text-[11px] tracking-[0.2em] text-paper uppercase transition hover:bg-claret"
-        >
-          <PlusIcon size={12} /> Write an anonymous review
-        </button>
-        {submitted && (
-          <span className="inline-flex items-center gap-1 font-mono text-[10px] tracking-widest text-claret uppercase">
-            <CheckIcon size={12} /> Posted to local archive.
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          {submitted && (
+            <span className="inline-flex items-center gap-1 text-xs text-leaf">
+              <CheckIcon size={13} /> Posted to local archive.
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm text-background hover:opacity-90"
+          >
+            <PlusIcon size={14} /> Write a review
+          </button>
+        </div>
       </div>
     );
   }
@@ -75,16 +74,14 @@ export function ReviewForm({ courseId }: { courseId: string }) {
   return (
     <form
       onSubmit={submit}
-      className="border border-ink p-5 shadow-[3px_3px_0_var(--ink)]"
+      className="rounded-lg border border-border bg-card p-5"
     >
-      <div className="flex items-baseline justify-between border-b border-ink/15 pb-2">
-        <div className="font-mono text-[10px] tracking-[0.2em] uppercase">
-          Write a review
-        </div>
+      <div className="flex items-baseline justify-between border-b border-border pb-2">
+        <div className="text-sm font-medium">Write a review</div>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase hover:text-ink"
+          className="text-xs text-muted-foreground hover:text-foreground"
         >
           Cancel
         </button>
@@ -124,7 +121,7 @@ export function ReviewForm({ courseId }: { courseId: string }) {
             value={semester}
             onChange={(e) => setSemester(e.target.value)}
             placeholder="e.g. Fall 2025"
-            className="w-full rounded-sm border border-ink/25 bg-paper px-3 py-2 font-mono text-sm focus:border-ink focus:outline-none"
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-foreground/40 focus:outline-none"
           />
           <Label>Program stage</Label>
           <div className="flex gap-1">
@@ -134,10 +131,10 @@ export function ReviewForm({ courseId }: { courseId: string }) {
                 type="button"
                 onClick={() => setStage(s)}
                 className={cn(
-                  "rounded-full border px-3 py-1 font-mono text-[10px] tracking-widest uppercase transition",
+                  "rounded-full border px-3 py-1 text-xs transition",
                   stage === s
-                    ? "border-ink bg-ink text-paper"
-                    : "border-ink/25 text-ink hover:border-ink/60",
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border text-muted-foreground hover:border-foreground/40",
                 )}
               >
                 {s} of program
@@ -155,17 +152,17 @@ export function ReviewForm({ courseId }: { courseId: string }) {
           required
           rows={5}
           placeholder="What was the experience like? What surprised you? Who should take it?"
-          className="mt-1 w-full rounded-sm border border-ink/25 bg-paper px-3 py-2 text-[15px] leading-relaxed focus:border-ink focus:outline-none"
+          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-[15px] leading-relaxed focus:border-foreground/40 focus:outline-none"
         />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <ListEditor label="Pros" items={pros} setItems={setPros} accent="gold" />
-        <ListEditor label="Cons" items={cons} setItems={setCons} accent="claret" />
+        <ListEditor label="Pros" items={pros} setItems={setPros} accent="leaf" />
+        <ListEditor label="Cons" items={cons} setItems={setCons} accent="rose" />
       </div>
 
-      <div className="mt-5 flex items-center justify-between border-t border-ink/15 pt-4">
-        <label className="flex cursor-pointer items-center gap-2 font-mono text-[11px] tracking-widest uppercase">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
           <input
             type="checkbox"
             checked={recommend}
@@ -175,7 +172,7 @@ export function ReviewForm({ courseId }: { courseId: string }) {
         </label>
         <button
           type="submit"
-          className="inline-flex items-center gap-2 bg-ink px-5 py-2 font-mono text-[11px] tracking-[0.2em] text-paper uppercase hover:bg-claret"
+          className="inline-flex items-center gap-2 rounded-md bg-foreground px-5 py-2 text-sm text-background hover:opacity-90"
         >
           Submit anonymously
         </button>
@@ -185,11 +182,7 @@ export function ReviewForm({ courseId }: { courseId: string }) {
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return (
-    <label className="block font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-      {children}
-    </label>
-  );
+  return <label className="block label">{children}</label>;
 }
 
 function Numeric({
@@ -220,13 +213,13 @@ function Numeric({
           step={step}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="flex-1 cursor-pointer accent-[color:var(--ink)]"
+          className="flex-1 cursor-pointer accent-[color:var(--foreground)]"
         />
         <span className="w-12 text-right font-display tabular text-2xl">
           {value}
         </span>
       </div>
-      <div className="mt-1 flex justify-between font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+      <div className="mt-1 flex justify-between text-xs text-muted-foreground">
         <span>{hints[0]}</span>
         <span>{hints[1]}</span>
       </div>
@@ -243,20 +236,21 @@ function ListEditor({
   label: string;
   items: string[];
   setItems: React.Dispatch<React.SetStateAction<string[]>>;
-  accent: "gold" | "claret";
+  accent: "leaf" | "rose";
 }) {
   return (
     <div>
       <div
         className={cn(
-          "mb-1 inline-flex items-center gap-1 font-mono text-[10px] tracking-widest uppercase",
-          accent === "gold" ? "text-gold-fg" : "text-claret",
+          "mb-1 inline-flex items-center gap-1.5 text-xs font-medium",
+          accent === "leaf" ? "text-leaf" : "text-rose",
         )}
       >
         <span
           className="size-1.5 rounded-full"
           style={{
-            background: accent === "gold" ? "var(--gold)" : "var(--claret)",
+            background:
+              accent === "leaf" ? "var(--leaf)" : "var(--rose)",
           }}
         />
         {label}
@@ -270,7 +264,7 @@ function ListEditor({
                 setItems((p) => p.map((x, idx) => (idx === i ? e.target.value : x)))
               }
               placeholder={`Add a ${label.toLowerCase().slice(0, -1)}…`}
-              className="flex-1 rounded-sm border border-ink/25 bg-paper px-2 py-1 text-[13px] focus:border-ink focus:outline-none"
+              className="flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:border-foreground/40 focus:outline-none"
             />
             {items.length > 1 && (
               <button
@@ -278,7 +272,7 @@ function ListEditor({
                 onClick={() =>
                   setItems((p) => p.filter((_, idx) => idx !== i))
                 }
-                className="rounded-sm border border-ink/25 px-2 font-mono text-[10px] tracking-widest hover:bg-ink hover:text-paper"
+                className="rounded-md border border-border px-2 text-sm text-muted-foreground hover:bg-foreground hover:text-background"
               >
                 ×
               </button>
@@ -288,7 +282,7 @@ function ListEditor({
         <button
           type="button"
           onClick={() => setItems((p) => [...p, ""])}
-          className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase hover:text-ink"
+          className="text-xs text-muted-foreground hover:text-foreground"
         >
           + Add another
         </button>
