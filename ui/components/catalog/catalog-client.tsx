@@ -21,7 +21,7 @@ type SortKey =
 
 const SORTS: { v: SortKey; label: string }[] = [
   { v: "code", label: "Course code" },
-  { v: "title", label: "Title (A→Z)" },
+  { v: "title", label: "Title (A–Z)" },
   { v: "rating-desc", label: "Rating ↓" },
   { v: "rating-asc", label: "Rating ↑" },
   { v: "difficulty-desc", label: "Difficulty ↓" },
@@ -47,6 +47,23 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
   const [sort, setSort] = React.useState<SortKey>("rating-desc");
   const [view, setView] = React.useState<"grid" | "table">("grid");
   const [sortOpen, setSortOpen] = React.useState(false);
+  const sortMenuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!sortOpen) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (
+        event.target instanceof Node &&
+        !sortMenuRef.current?.contains(event.target)
+      ) {
+        setSortOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [sortOpen]);
 
   const filtered = React.useMemo(() => {
     const q = filter.q.trim().toLowerCase();
@@ -94,7 +111,7 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
   }, [courses, filter, sort]);
 
   return (
-    <div className="mx-auto grid max-w-[1400px] grid-cols-[240px_1fr] gap-8 px-6 pt-5 pb-10">
+    <div className="mx-auto grid max-w-[1400px] grid-cols-[240px_1fr] gap-8 px-6 pt-5 pb-12">
       <FilterRail
         filter={filter}
         setFilter={setFilter}
@@ -102,31 +119,31 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
         total={courses.length}
       />
       <div>
-        <div className="flex flex-wrap items-center gap-3 border-b border-ink pb-3">
+        <div className="flex flex-wrap items-center gap-2 pb-3">
           <div className="relative flex flex-1 items-center">
             <span className="absolute left-3 text-muted-foreground">
-              <SearchIcon size={14} />
+              <SearchIcon size={15} />
             </span>
             <input
               value={filter.q}
               onChange={(e) => setFilter((f) => ({ ...f, q: e.target.value }))}
               placeholder="Search by code, title, tag, keyword…"
-              className="w-full rounded-sm border border-ink/25 bg-paper py-2 pr-3 pl-9 font-mono text-sm focus:border-ink focus:outline-none"
+              className="w-full rounded-md border border-border bg-card py-2 pr-3 pl-9 text-sm placeholder:text-muted-foreground focus:border-foreground/40 focus:outline-none"
             />
           </div>
-          <div className="relative">
+          <div ref={sortMenuRef} className="relative">
             <button
               type="button"
               onClick={() => setSortOpen((o) => !o)}
-              className="flex items-center gap-2 rounded-sm border border-ink/25 px-3 py-2 font-mono text-[11px] tracking-widest uppercase hover:border-ink"
+              className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm hover:border-foreground/30"
             >
-              <SortIcon size={12} />
+              <SortIcon size={14} />
               {SORTS.find((s) => s.v === sort)?.label}
-              <ChevronDown size={12} />
+              <ChevronDown size={14} />
             </button>
             {sortOpen && (
               <div
-                className="absolute right-0 z-30 mt-1 w-56 border border-ink bg-paper shadow-[3px_3px_0_var(--ink)]"
+                className="absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-md border border-border bg-popover shadow-md"
                 onMouseLeave={() => setSortOpen(false)}
               >
                 {SORTS.map((s) => (
@@ -138,8 +155,8 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
                       setSortOpen(false);
                     }}
                     className={cn(
-                      "block w-full px-3 py-1.5 text-left font-mono text-[11px] tracking-widest uppercase hover:bg-ink hover:text-paper",
-                      sort === s.v && "bg-ink/8",
+                      "block w-full px-3 py-1.5 text-left text-sm hover:bg-muted",
+                      sort === s.v && "bg-muted",
                     )}
                   >
                     {s.label}
@@ -148,15 +165,17 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
               </div>
             )}
           </div>
-          <div className="flex overflow-hidden rounded-sm border border-ink/25">
+          <div className="flex overflow-hidden rounded-md border border-border bg-card">
             {(["grid", "table"] as const).map((v) => (
               <button
                 key={v}
                 type="button"
                 onClick={() => setView(v)}
                 className={cn(
-                  "px-3 py-2 font-mono text-[11px] tracking-widest uppercase",
-                  view === v ? "bg-ink text-paper" : "hover:bg-ink/8",
+                  "px-3 py-2 text-sm",
+                  view === v
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 {v === "grid" ? "Cards" : "Table"}
@@ -167,7 +186,7 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
 
         {view === "grid" ? (
           filtered.length ? (
-            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((c) => (
                 <CourseCard key={c.id} course={c} />
               ))}
@@ -176,8 +195,8 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
             <Empty />
           )
         ) : (
-          <div className="mt-6">
-            <div className="grid grid-cols-[100px_1fr_72px_72px_72px_120px] gap-3 border-b border-ink px-2 pb-2 font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+          <div className="rounded-lg border border-border bg-card">
+            <div className="grid grid-cols-[100px_1fr_72px_72px_72px_88px] gap-3 border-b border-border px-3 py-2 text-xs text-muted-foreground">
               <span>Code</span>
               <span>Title</span>
               <span className="text-right">Diff</span>
@@ -185,11 +204,13 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
               <span className="text-right">Rating</span>
               <span className="text-right">Reviews</span>
             </div>
-            {filtered.length ? (
-              filtered.map((c) => <CourseRow key={c.id} course={c} />)
-            ) : (
-              <Empty />
-            )}
+            <div className="divide-y divide-border">
+              {filtered.length ? (
+                filtered.map((c) => <CourseRow key={c.id} course={c} />)
+              ) : (
+                <Empty />
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -199,9 +220,9 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
 
 function Empty() {
   return (
-    <div className="mt-12 border border-dashed border-ink/30 p-10 text-center">
-      <div className="font-display text-2xl">No courses match.</div>
-      <div className="mt-1 font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
+    <div className="rounded-lg border border-dashed border-border p-10 text-center">
+      <div className="text-base font-medium text-foreground">No courses match.</div>
+      <div className="mt-1 text-sm text-muted-foreground">
         Loosen a filter, then try again.
       </div>
     </div>

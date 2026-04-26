@@ -10,27 +10,27 @@ export function CourseCard({ course }: { course: Course }) {
   return (
     <Link
       href={`/courses/${course.id}`}
-      className="group fade-up block border border-ink/15 bg-card p-5 transition hover:border-ink hover:shadow-[3px_3px_0_var(--ink)]"
+      className="group fade-up block rounded-xl border border-border bg-card p-5 transition hover:border-foreground/30 hover:shadow-sm"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="font-mono text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="text-xs tracking-wide text-muted-foreground">
           {course.code}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <Stars value={s.avgRating} />
-          <span className="font-mono text-[11px] tabular text-muted-foreground">
+          <span className="text-xs tabular text-muted-foreground">
             {s.avgRating.toFixed(1)}
           </span>
         </div>
       </div>
-      <h3 className="mt-1 font-display text-2xl leading-[1.05] tracking-tight group-hover:underline">
+      <h3 className="mt-1 font-display text-xl leading-snug tracking-tight group-hover:text-foreground">
         {course.title}
       </h3>
-      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+      <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
         {course.description}
       </p>
 
-      <div className="mt-4 grid grid-cols-3 gap-3 border-t border-ink/15 pt-3">
+      <div className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-3">
         <Mini label="Difficulty" value={s.avgDifficulty.toFixed(1)} suffix="/5" />
         <Mini label="Workload" value={s.avgWorkload.toFixed(0)} suffix="hr/wk" />
         <Mini label="Reviews" value={s.numReviews.toString()} />
@@ -38,13 +38,12 @@ export function CourseCard({ course }: { course: Course }) {
 
       <div className="mt-3 flex flex-wrap gap-1">
         {tagSpecs.map((sp) => (
-          <Tag key={sp.id} variant={sp.role === "core" ? "gold" : "outline"}>
+          <Tag key={sp.id} variant={sp.role === "core" ? "leaf" : "outline"}>
             {SPECIALIZATIONS_BY_ID[sp.id]?.name?.split(" ")[0]}
-            {" · "}
-            {sp.role}
+            {sp.role === "core" ? " · core" : ""}
           </Tag>
         ))}
-        {course.termsOffered.length === 3 && <Tag variant="default">All terms</Tag>}
+        {course.termsOffered.length === 3 && <Tag>Every term</Tag>}
       </div>
     </Link>
   );
@@ -61,13 +60,11 @@ function Mini({
 }) {
   return (
     <div>
-      <div className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-        {label}
-      </div>
-      <div className="font-display tabular text-lg">
+      <div className="label">{label}</div>
+      <div className="font-display tabular text-base text-foreground">
         {value}
         {suffix && (
-          <span className="ml-1 font-mono text-[10px] text-muted-foreground">
+          <span className="ml-1 text-[10px] font-normal text-muted-foreground">
             {suffix}
           </span>
         )}
