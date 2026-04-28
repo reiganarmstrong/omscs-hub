@@ -27,6 +27,7 @@ const ROLES: { v: CourseRole | "any"; label: string }[] = [
 ]
 
 export function FilterRail({ filter, setFilter, count, total }: Props) {
+  const [mobileOpen, setMobileOpen] = React.useState(false)
   const reset = () =>
     setFilter({
       q: "",
@@ -40,13 +41,23 @@ export function FilterRail({ filter, setFilter, count, total }: Props) {
     })
 
   return (
-    <aside className="sticky top-[68px] h-[calc(100svh-80px)] overflow-y-auto pr-1 text-sm">
-      <div className="flex items-baseline justify-between pb-2">
-        <h2 className="text-base font-semibold">Filters</h2>
+    <aside className="rounded-xl border border-sidebar-border bg-sidebar px-4 py-4 text-sm shadow-sm lg:sticky lg:top-[68px] lg:h-[calc(100svh-80px)] lg:overflow-y-auto">
+      <div className="flex items-baseline justify-between gap-3 pb-2">
+        <button
+          type="button"
+          onClick={() => setMobileOpen((open) => !open)}
+          aria-expanded={mobileOpen}
+          className="flex items-baseline gap-2 text-left lg:pointer-events-none"
+        >
+          <h2 className="text-base font-semibold">Filters</h2>
+          <span className="text-xs text-muted-foreground lg:hidden">
+            {mobileOpen ? "Hide" : "Show"}
+          </span>
+        </button>
         <button
           type="button"
           onClick={reset}
-          className="text-xs text-muted-foreground hover:text-foreground"
+          className="shrink-0 text-xs text-muted-foreground hover:text-foreground"
         >
           Reset
         </button>
@@ -57,117 +68,119 @@ export function FilterRail({ filter, setFilter, count, total }: Props) {
 
       <ActiveChips filter={filter} setFilter={setFilter} />
 
-      <Section title="Specialization">
-        <div className="flex flex-col gap-1">
-          {SPECIALIZATIONS.map((s) => {
-            const checked = filter.specs.includes(s.id)
-            return (
-              <label
-                key={s.id}
-                className="flex cursor-pointer items-center gap-2 py-0.5"
+      <div className={cn("mt-1", mobileOpen ? "block" : "hidden lg:block")}>
+        <Section title="Specialization">
+          <div className="flex flex-col gap-1">
+            {SPECIALIZATIONS.map((s) => {
+              const checked = filter.specs.includes(s.id)
+              return (
+                <label
+                  key={s.id}
+                  className="flex cursor-pointer items-center gap-2 py-0.5"
+                >
+                  <CheckBox
+                    checked={checked}
+                    onChange={() =>
+                      setFilter((f) => ({
+                        ...f,
+                        specs: checked
+                          ? f.specs.filter((x) => x !== s.id)
+                          : [...f.specs, s.id as SpecializationId],
+                      }))
+                    }
+                  />
+                  <span className="text-[13px]">{s.name}</span>
+                </label>
+              )
+            })}
+          </div>
+        </Section>
+
+        <Section title="Role">
+          <div className="flex flex-wrap gap-1">
+            {ROLES.map((r) => (
+              <Pill
+                key={r.v}
+                active={filter.role === r.v}
+                onClick={() => setFilter((f) => ({ ...f, role: r.v }))}
               >
-                <CheckBox
-                  checked={checked}
-                  onChange={() =>
-                    setFilter((f) => ({
-                      ...f,
-                      specs: checked
-                        ? f.specs.filter((x) => x !== s.id)
-                        : [...f.specs, s.id as SpecializationId],
-                    }))
-                  }
-                />
-                <span className="text-[13px]">{s.name}</span>
-              </label>
-            )
-          })}
-        </div>
-      </Section>
+                {r.label}
+              </Pill>
+            ))}
+          </div>
+        </Section>
 
-      <Section title="Role">
-        <div className="flex flex-wrap gap-1">
-          {ROLES.map((r) => (
-            <Pill
-              key={r.v}
-              active={filter.role === r.v}
-              onClick={() => setFilter((f) => ({ ...f, role: r.v }))}
-            >
-              {r.label}
-            </Pill>
-          ))}
-        </div>
-      </Section>
+        <Section title="Term offered">
+          <div className="flex flex-wrap gap-1">
+            {TERMS.map((t) => (
+              <Pill
+                key={t}
+                active={filter.terms.includes(t)}
+                onClick={() =>
+                  setFilter((f) => ({
+                    ...f,
+                    terms: f.terms.includes(t)
+                      ? f.terms.filter((x) => x !== t)
+                      : [...f.terms, t],
+                  }))
+                }
+              >
+                {t}
+              </Pill>
+            ))}
+          </div>
+        </Section>
 
-      <Section title="Term offered">
-        <div className="flex gap-1">
-          {TERMS.map((t) => (
-            <Pill
-              key={t}
-              active={filter.terms.includes(t)}
-              onClick={() =>
-                setFilter((f) => ({
-                  ...f,
-                  terms: f.terms.includes(t)
-                    ? f.terms.filter((x) => x !== t)
-                    : [...f.terms, t],
-                }))
-              }
-            >
-              {t}
-            </Pill>
-          ))}
-        </div>
-      </Section>
+        <Section title="Difficulty">
+          <Range
+            label="Difficulty"
+            min={1}
+            max={5}
+            step={0.5}
+            value={filter.difficulty}
+            onChange={(v) => setFilter((f) => ({ ...f, difficulty: v }))}
+            format={(v) => v.toFixed(1)}
+          />
+        </Section>
 
-      <Section title="Difficulty">
-        <Range
-          label="Difficulty"
-          min={1}
-          max={5}
-          step={0.5}
-          value={filter.difficulty}
-          onChange={(v) => setFilter((f) => ({ ...f, difficulty: v }))}
-          format={(v) => v.toFixed(1)}
-        />
-      </Section>
+        <Section title="Workload (hrs/wk)">
+          <Range
+            label="Workload"
+            min={0}
+            max={50}
+            step={1}
+            value={filter.workload}
+            onChange={(v) => setFilter((f) => ({ ...f, workload: v }))}
+          />
+        </Section>
 
-      <Section title="Workload (hrs/wk)">
-        <Range
-          label="Workload"
-          min={0}
-          max={50}
-          step={1}
-          value={filter.workload}
-          onChange={(v) => setFilter((f) => ({ ...f, workload: v }))}
-        />
-      </Section>
+        <Section title="Rating">
+          <Range
+            label="Rating"
+            min={1}
+            max={5}
+            step={0.5}
+            value={filter.rating}
+            onChange={(v) => setFilter((f) => ({ ...f, rating: v }))}
+            format={(v) => v.toFixed(1)}
+          />
+        </Section>
 
-      <Section title="Rating">
-        <Range
-          label="Rating"
-          min={1}
-          max={5}
-          step={0.5}
-          value={filter.rating}
-          onChange={(v) => setFilter((f) => ({ ...f, rating: v }))}
-          format={(v) => v.toFixed(1)}
-        />
-      </Section>
-
-      <Section title="Minimum reviews">
-        <input
-          type="number"
-          min={0}
-          value={filter.minReviews}
-          onChange={(e) =>
-            setFilter((f) => ({
-              ...f,
-              minReviews: Number(e.target.value) || 0,
-            }))
-          }
-          className="tabular w-24 rounded-md border border-border bg-background px-2 py-1 text-sm focus:border-foreground/40 focus:outline-none"
-        />
-      </Section>
+        <Section title="Minimum reviews">
+          <input
+            type="number"
+            min={0}
+            value={filter.minReviews}
+            onChange={(e) =>
+              setFilter((f) => ({
+                ...f,
+                minReviews: Number(e.target.value) || 0,
+              }))
+            }
+            className="tabular w-24 rounded-md border border-border bg-background px-2 py-1 text-sm focus:border-foreground/40 focus:outline-none"
+          />
+        </Section>
+      </div>
     </aside>
   )
 }
