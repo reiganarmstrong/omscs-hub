@@ -193,8 +193,8 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
                 className={cn(
                   "flex-1 px-3 py-2 text-sm sm:flex-none",
                   view === v
-                    ? "bg-leaf text-leaf-fg"
-                    : "text-muted-foreground hover:bg-leaf/12 hover:text-leaf"
+                    ? "bg-black text-white dark:bg-white dark:text-black"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 {v === "grid" ? "Cards" : "Table"}

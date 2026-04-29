@@ -84,7 +84,7 @@ export function SpecializationsClient() {
                           {s.name}
                         </span>
                         {isMine && (
-                          <span className="rounded-full bg-leaf/12 px-1.5 py-px text-[10px] font-medium text-leaf">
+                          <span className="rounded-full bg-black/10 px-1.5 py-px text-[10px] font-medium text-black dark:bg-white/12 dark:text-white">
                             mine
                           </span>
                         )}

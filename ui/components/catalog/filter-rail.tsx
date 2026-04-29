@@ -177,7 +177,7 @@ export function FilterRail({ filter, setFilter, count, total }: Props) {
                 minReviews: Number(e.target.value) || 0,
               }))
             }
-            className="tabular w-24 rounded-md border border-border bg-background px-2 py-1 text-sm focus:border-foreground/40 focus:outline-none"
+            className="tabular w-24 rounded-md border border-border bg-background px-2 py-1 text-sm focus:border-foreground/40 focus:outline-none dark:bg-card"
           />
         </Section>
       </div>
@@ -216,8 +216,8 @@ function Pill({
       className={cn(
         "rounded-full border px-2.5 py-0.5 text-xs transition",
         active
-          ? "border-leaf bg-leaf text-leaf-fg"
-          : "border-border text-muted-foreground hover:border-leaf/60 hover:text-leaf"
+          ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+          : "border-border text-muted-foreground hover:border-foreground/60 hover:text-foreground"
       )}
     >
       {children}
@@ -241,8 +241,8 @@ function CheckBox({
       className={cn(
         "grid size-4 place-items-center rounded-sm border transition",
         checked
-          ? "border-leaf bg-leaf text-leaf-fg"
-          : "border-border bg-background hover:border-leaf/60"
+          ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+          : "border-border bg-background hover:border-foreground/60 dark:bg-card"
       )}
     >
       {checked && (
@@ -349,7 +349,7 @@ function ActiveChips({
         <button
           key={i}
           onClick={c.clear}
-          className="inline-flex items-center gap-1 rounded-full bg-leaf/12 px-2 py-0.5 text-xs text-leaf hover:bg-leaf hover:text-leaf-fg"
+          className="inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-0.5 text-xs text-black hover:bg-black hover:text-white dark:bg-white/12 dark:text-white dark:hover:bg-white dark:hover:text-black"
         >
           {c.label}
           <XIcon size={11} />

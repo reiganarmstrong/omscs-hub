@@ -47,7 +47,7 @@ function Slider({
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
-          className="absolute h-full rounded-full bg-leaf"
+          className="absolute h-full rounded-full bg-black dark:bg-white"
         />
       </SliderPrimitive.Track>
       {values.map((_, index) => (
@@ -55,7 +55,7 @@ function Slider({
           data-slot="slider-thumb"
           key={index}
           aria-label={thumbLabels?.[index]}
-          className="block size-3.5 rounded-full border border-leaf bg-background transition outline-none focus-visible:ring-3 focus-visible:ring-leaf/30 disabled:pointer-events-none disabled:opacity-50"
+          className="block size-3.5 rounded-full border border-black bg-background transition outline-none focus-visible:ring-3 focus-visible:ring-black/30 disabled:pointer-events-none disabled:opacity-50 dark:border-white dark:focus-visible:ring-white/30"
         />
       ))}
     </SliderPrimitive.Root>
