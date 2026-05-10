@@ -293,8 +293,8 @@ function SpecSelector({
           className={cn(
             "rounded-full border px-2.5 py-0.5 text-xs transition",
             selected === null
-              ? "border-leaf bg-leaf text-leaf-fg"
-              : "border-border text-muted-foreground hover:border-leaf/60 hover:text-leaf",
+              ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+              : "border-border text-muted-foreground hover:border-foreground/60 hover:text-foreground",
           )}
         >
           None
@@ -311,8 +311,8 @@ function SpecSelector({
               className={cn(
                 "rounded-full border px-2.5 py-0.5 text-xs transition",
                 isActive
-                  ? "border-leaf bg-leaf text-leaf-fg"
-                  : "border-border text-muted-foreground hover:border-leaf/60 hover:text-leaf",
+                  ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                  : "border-border text-muted-foreground hover:border-foreground/60 hover:text-foreground",
               )}
             >
               {s.name.replace(" & Robotics", "")}
