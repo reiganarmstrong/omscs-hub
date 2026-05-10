@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "omscentral-scraper"
+version = "0.1.0"
+description = "Scrape OMSCentral course and review data into JSON files."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+omscentral-scrape = "omscentral_scraper.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/omscentral_scraper"]
+
