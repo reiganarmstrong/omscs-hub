@@ -72,8 +72,8 @@ jobs:
         working-directory: infra/environments/dev
         run: |
           if [ -z "$TF_DEV_BACKEND_HCL" ]; then
-            echo "TF_DEV_BACKEND_HCL is not set; Terraform will use -backend=false."
-            exit 0
+            echo "TF_DEV_BACKEND_HCL is required."
+            exit 1
           fi
 
           printf '%s\n' "$TF_DEV_BACKEND_HCL" > backend.hcl
@@ -87,12 +87,12 @@ jobs:
       - name: Terraform init
         working-directory: infra/environments/dev
         run: |
-          if [ -s backend.hcl ] && [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
-            terraform init -backend-config=backend.hcl
-          else
-            echo "Remote backend credentials are not fully set; initializing without backend."
-            terraform init -backend=false
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "TF_DEV_R2_ACCESS_KEY_ID and TF_DEV_R2_SECRET_ACCESS_KEY are required."
+            exit 1
           fi
+
+          terraform init -backend-config=backend.hcl
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.TF_DEV_R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_DEV_R2_SECRET_ACCESS_KEY }}
