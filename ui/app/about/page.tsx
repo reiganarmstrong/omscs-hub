@@ -43,17 +43,16 @@ export default function Page() {
             <li>One catalog with reviews, distributions, and term offerings per course.</li>
             <li>Filtering and sorting that scale from novice to power user.</li>
             <li>A planner that knows when each course actually runs.</li>
-            <li>A submission flow that does not require an account.</li>
+            <li>Verified OMSCS Hub review submission for @gatech.edu accounts.</li>
           </ul>
         </section>
 
         <section>
           <h2 className="font-display text-xl tracking-tight">Status</h2>
           <p className="mt-2 text-muted-foreground">
-            This is the front-end prototype. Reviews you submit are stored in
-            your browser only. The seed data (courses and reviews) is
-            synthetic — realistic in shape, but not pulled from real students.
-            A back-end and an anonymous submission API are next.
+            OMSCentral imports and OMSCS Hub account reviews are stored
+            separately in D1. The UI still keeps deterministic seed data as a
+            fallback until the API is configured and the import has run.
           </p>
         </section>
 

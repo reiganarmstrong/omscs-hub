@@ -20,12 +20,18 @@ type Stats = ReturnType<typeof aggregateStats>;
 const ALL_TERMS: Term[] = ["Fall", "Spring", "Summer"];
 
 export function CourseDetail({ course }: { course: Course }) {
-  const { reviewsFor, statsFor } = useReviews();
+  const { reviewsFor, statsFor, loadCourseReviews, loadingCourseIds, reviewErrors } = useReviews();
   const reviews = reviewsFor(course.id);
   const stats = statsFor(course.id);
   const meanWLBucket = bucketIndexFor(stats.avgWorkload);
   const meanRatingIdx = clampIdx(Math.round(stats.avgRating) - 1, 0, 4);
   const meanDiffIdx = clampIdx(Math.round(stats.avgDifficulty) - 1, 0, 4);
+  const reviewError = reviewErrors[course.id];
+  const isReviewFallbackNotice = reviewError?.startsWith("Review API unavailable.");
+
+  React.useEffect(() => {
+    void loadCourseReviews(course.id);
+  }, [course.id, loadCourseReviews]);
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 pt-8 pb-16">
@@ -156,8 +162,21 @@ export function CourseDetail({ course }: { course: Course }) {
       <section className="mt-10">
         <SectionHead
           title={`Reviews (${reviews.length})`}
-          note="Anonymous. Sort and filter below; add your own at any time."
+          note="OMSCentral imports are public. OMSCS Hub reviews require a verified gatech.edu account."
         />
+        {loadingCourseIds.has(course.id) && (
+          <p className="mt-3 text-xs text-muted-foreground">Loading review archive…</p>
+        )}
+        {reviewError && (
+          <p
+            className={cn(
+              "mt-3 text-xs",
+              isReviewFallbackNotice ? "text-muted-foreground" : "text-rose",
+            )}
+          >
+            {reviewError}
+          </p>
+        )}
 
         <div className="mt-4">
           <ReviewForm courseId={course.id} />

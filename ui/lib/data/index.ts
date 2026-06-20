@@ -18,19 +18,30 @@ export function aggregateStats(reviews: Review[]) {
   let sumD = 0,
     sumW = 0,
     sumR = 0;
+  let countD = 0,
+    countW = 0,
+    countR = 0;
   for (const r of reviews) {
-    sumD += r.difficulty;
-    sumW += r.workload;
-    sumR += r.rating;
-    distDifficulty[Math.max(0, Math.min(4, r.difficulty - 1))]++;
-    distRating[Math.max(0, Math.min(4, r.rating - 1))]++;
-    distWorkload[workloadBucketIndex(r.workload)]++;
+    if (r.difficulty !== null) {
+      sumD += r.difficulty;
+      countD++;
+      distDifficulty[Math.max(0, Math.min(4, r.difficulty - 1))]++;
+    }
+    if (r.workload !== null) {
+      sumW += r.workload;
+      countW++;
+      distWorkload[workloadBucketIndex(r.workload)]++;
+    }
+    if (r.rating !== null) {
+      sumR += r.rating;
+      countR++;
+      distRating[Math.max(0, Math.min(4, r.rating - 1))]++;
+    }
   }
-  const n = reviews.length || 1;
   return {
-    avgDifficulty: +(sumD / n).toFixed(2),
-    avgWorkload: +(sumW / n).toFixed(1),
-    avgRating: +(sumR / n).toFixed(2),
+    avgDifficulty: countD ? +(sumD / countD).toFixed(2) : 0,
+    avgWorkload: countW ? +(sumW / countW).toFixed(1) : 0,
+    avgRating: countR ? +(sumR / countR).toFixed(2) : 0,
     numReviews: reviews.length,
     distDifficulty,
     distRating,

@@ -43,8 +43,8 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
 
   const sorted = React.useMemo(() => {
     const filtered = reviews.filter((r) => {
-      if (r.rating < minRating) return false;
-      if (recommendOnly && !r.recommend) return false;
+      if ((r.rating ?? 0) < minRating) return false;
+      if (recommendOnly && r.recommend !== true) return false;
       if (semQuery && !r.semester.toLowerCase().includes(semQuery.toLowerCase()))
         return false;
       return true;
@@ -52,12 +52,12 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
     const cmp: Record<ReviewSortKey, (a: Review, b: Review) => number> = {
       newest: (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
       oldest: (a, b) => +new Date(a.createdAt) - +new Date(b.createdAt),
-      highest: (a, b) => b.rating - a.rating,
-      lowest: (a, b) => a.rating - b.rating,
-      hardest: (a, b) => b.difficulty - a.difficulty,
-      easiest: (a, b) => a.difficulty - b.difficulty,
-      longest: (a, b) => b.workload - a.workload,
-      shortest: (a, b) => a.workload - b.workload,
+      highest: (a, b) => (b.rating ?? 0) - (a.rating ?? 0),
+      lowest: (a, b) => (a.rating ?? 0) - (b.rating ?? 0),
+      hardest: (a, b) => (b.difficulty ?? 0) - (a.difficulty ?? 0),
+      easiest: (a, b) => (a.difficulty ?? 0) - (b.difficulty ?? 0),
+      longest: (a, b) => (b.workload ?? 0) - (a.workload ?? 0),
+      shortest: (a, b) => (a.workload ?? 0) - (b.workload ?? 0),
     };
     return [...filtered].sort(cmp[sort]);
   }, [reviews, sort, minRating, recommendOnly, semQuery]);
@@ -144,41 +144,44 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
               </div>
               <div>
                 <div className="label">Stage</div>
-                <div className="text-foreground">{r.programStage} of program</div>
+                <div className="text-foreground">
+                  {r.programStage ? `${r.programStage} of program` : "Not reported"}
+                </div>
               </div>
               <div>
                 <div className="label">Posted</div>
                 <div className="text-muted-foreground">{fmtDate(r.createdAt)}</div>
               </div>
-              {r.id.startsWith("user-") && (
-                <span className="mt-1 inline-block w-fit rounded-full bg-leaf/12 px-2 py-0.5 text-xs text-leaf">
-                  Your review
-                </span>
-              )}
+              <span
+                className={cn(
+                  "mt-1 inline-block w-fit rounded-full px-2 py-0.5 text-xs",
+                  r.source === "app"
+                    ? "bg-leaf/12 text-leaf"
+                    : "bg-muted text-muted-foreground",
+                )}
+              >
+                {r.source === "app" ? "OMSCS Hub" : "OMSCentral"}
+              </span>
             </aside>
             <div>
               <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
                 <div className="flex items-center gap-2">
-                  <Stars value={r.rating} />
+                  <Stars value={r.rating ?? 0} />
                   <span className="text-xs tabular text-muted-foreground">
-                    {r.rating} / 5
+                    {r.rating ? `${r.rating} / 5` : "No rating"}
                   </span>
                 </div>
-                <Pill label="Difficulty" value={`${r.difficulty}/5`} />
-                <Pill label="Workload" value={`${r.workload} hr/wk`} />
+                <Pill label="Difficulty" value={r.difficulty ? `${r.difficulty}/5` : "N/A"} />
+                <Pill label="Workload" value={r.workload ? `${r.workload} hr/wk` : "N/A"} />
                 <Pill
                   label="Recommend"
-                  value={r.recommend ? "Yes" : "No"}
-                  tone={r.recommend ? "leaf" : "rose"}
+                  value={r.recommend === null ? "N/A" : r.recommend ? "Yes" : "No"}
+                  tone={r.recommend === true ? "leaf" : r.recommend === false ? "rose" : "default"}
                 />
               </div>
               <p className="reading mt-3 text-[15px] text-foreground">
                 {r.body}
               </p>
-              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Bullets label="Pros" items={r.pros} accent="leaf" />
-                <Bullets label="Cons" items={r.cons} accent="rose" />
-              </div>
             </div>
           </li>
         ))}
@@ -214,42 +217,6 @@ function Pill({
         {value}
       </span>
     </span>
-  );
-}
-
-function Bullets({
-  label,
-  items,
-  accent,
-}: {
-  label: string;
-  items: string[];
-  accent: "leaf" | "rose";
-}) {
-  if (!items.length) return null;
-  return (
-    <div>
-      <div
-        className={cn(
-          "mb-1 inline-flex items-center gap-1.5 text-xs font-medium",
-          accent === "leaf" ? "text-leaf" : "text-rose",
-        )}
-      >
-        <span
-          className="size-1.5 rounded-full"
-          style={{
-            background:
-              accent === "leaf" ? "var(--leaf)" : "var(--rose)",
-          }}
-        />
-        {label}
-      </div>
-      <ul className="ml-4 list-disc text-[13px] text-muted-foreground">
-        {items.map((it, i) => (
-          <li key={i}>{it}</li>
-        ))}
-      </ul>
-    </div>
   );
 }
 

@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            api/pnpm-lock.yaml
+            ui/pnpm-lock.yaml
+
+      - name: Install API dependencies
+        working-directory: api
+        run: pnpm install --frozen-lockfile
+
+      - name: API typecheck
+        working-directory: api
+        run: pnpm typecheck
+
+      - name: API tests
+        working-directory: api
+        run: pnpm test
+
+      - name: API build
+        working-directory: api
+        run: pnpm build
+
+      - name: Install UI dependencies
+        working-directory: ui
+        run: pnpm install --frozen-lockfile
+
+      - name: UI lint
+        working-directory: ui
+        run: pnpm lint
+
+      - name: UI typecheck
+        working-directory: ui
+        run: pnpm typecheck
+
+      - name: UI build
+        working-directory: ui
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.5
+
+      - name: Write Terraform backend config
+        working-directory: infra/environments/dev
+        run: |
+          if [ -z "$TF_DEV_BACKEND_HCL" ]; then
+            echo "TF_DEV_BACKEND_HCL is required."
+            exit 1
+          fi
+
+          printf '%s\n' "$TF_DEV_BACKEND_HCL" > backend.hcl
+        env:
+          TF_DEV_BACKEND_HCL: ${{ secrets.TF_DEV_BACKEND_HCL }}
+
+      - name: Terraform format check
+        working-directory: infra
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        working-directory: infra/environments/dev
+        run: |
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "TF_DEV_R2_ACCESS_KEY_ID and TF_DEV_R2_SECRET_ACCESS_KEY are required."
+            exit 1
+          fi
+
+          terraform init -backend-config=backend.hcl
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TF_DEV_R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_DEV_R2_SECRET_ACCESS_KEY }}
+
+      - name: Terraform validate
+        working-directory: infra/environments/dev
+        run: terraform validate

@@ -1,0 +1,14 @@
+name = "omscs-hub-review-api-dev"
+main = "src/index.ts"
+compatibility_date = "2026-05-10"
+workers_dev = true
+
+[vars]
+CORS_ORIGIN = "https://dev.omscs-hub.reaganarmstrong.com,http://localhost:3001"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "omscs-hub-reviews-dev"
+database_id = "fc7d1a6c-7357-4d25-8416-d1fd8c04e710"
+preview_database_id = "fc7d1a6c-7357-4d25-8416-d1fd8c04e710"
+migrations_dir = "migrations"
