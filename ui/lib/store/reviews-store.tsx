@@ -3,61 +3,63 @@
 import * as React from "react";
 import type { Review } from "@/lib/types";
 import { aggregateStats, SEEDED_REVIEWS } from "@/lib/data";
-import { readStorage, subscribeStorage, writeStorage } from "./storage";
-
-type AddReviewInput = Omit<Review, "id" | "createdAt">;
+import { fetchCourseReviews, hasApiBaseUrl } from "@/lib/api/reviews";
 
 type Ctx = {
   reviewsFor: (courseId: string) => Review[];
   statsFor: (courseId: string) => ReturnType<typeof aggregateStats>;
-  addReview: (input: AddReviewInput) => Review;
-  resetUserReviews: () => void;
+  loadCourseReviews: (courseId: string) => Promise<void>;
+  replaceCourseReviews: (courseId: string, reviews: Review[]) => void;
+  loadingCourseIds: Set<string>;
+  reviewErrors: Record<string, string | undefined>;
 };
 
 const ReviewsCtx = React.createContext<Ctx | null>(null);
-const STORAGE_KEY = "omscs-hub:user-reviews:v1";
-const EMPTY: Review[] = [];
 
 export function ReviewsProvider({ children }: { children: React.ReactNode }) {
-  const userReviews = React.useSyncExternalStore(
-    (cb) => subscribeStorage(STORAGE_KEY, cb),
-    () => readStorage<Review[]>(STORAGE_KEY, EMPTY),
-    () => EMPTY,
-  );
+  const [remoteReviews, setRemoteReviews] = React.useState<Record<string, Review[]>>({});
+  const [loadingCourseIds, setLoadingCourseIds] = React.useState<Set<string>>(new Set());
+  const [reviewErrors, setReviewErrors] = React.useState<Record<string, string | undefined>>({});
+
+  const loadCourseReviews = React.useCallback(async (courseId: string) => {
+    if (!hasApiBaseUrl()) return;
+    setLoadingCourseIds((current) => new Set(current).add(courseId));
+    setReviewErrors((current) => ({ ...current, [courseId]: undefined }));
+    try {
+      const reviews = await fetchCourseReviews(courseId);
+      setRemoteReviews((current) => ({ ...current, [courseId]: reviews }));
+    } catch (error) {
+      setReviewErrors((current) => ({
+        ...current,
+        [courseId]: error instanceof Error ? error.message : "Unable to load reviews.",
+      }));
+    } finally {
+      setLoadingCourseIds((current) => {
+        const next = new Set(current);
+        next.delete(courseId);
+        return next;
+      });
+    }
+  }, []);
+
+  const replaceCourseReviews = React.useCallback((courseId: string, reviews: Review[]) => {
+    setRemoteReviews((current) => ({ ...current, [courseId]: reviews }));
+  }, []);
 
   const value: Ctx = React.useMemo(() => {
-    const byCourse = new Map<string, Review[]>();
-    for (const r of userReviews) {
-      const arr = byCourse.get(r.courseId) ?? [];
-      arr.push(r);
-      byCourse.set(r.courseId, arr);
-    }
     return {
       reviewsFor(courseId) {
-        const seeded = SEEDED_REVIEWS[courseId] ?? [];
-        const user = byCourse.get(courseId) ?? [];
-        return [...user, ...seeded];
+        return remoteReviews[courseId] ?? SEEDED_REVIEWS[courseId] ?? [];
       },
       statsFor(courseId) {
-        const seeded = SEEDED_REVIEWS[courseId] ?? [];
-        const user = byCourse.get(courseId) ?? [];
-        return aggregateStats([...user, ...seeded]);
+        return aggregateStats(remoteReviews[courseId] ?? SEEDED_REVIEWS[courseId] ?? []);
       },
-      addReview(input) {
-        const review: Review = {
-          ...input,
-          id: `user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-          createdAt: new Date().toISOString(),
-        };
-        const next = [review, ...userReviews];
-        writeStorage(STORAGE_KEY, next);
-        return review;
-      },
-      resetUserReviews() {
-        writeStorage(STORAGE_KEY, EMPTY);
-      },
+      loadCourseReviews,
+      replaceCourseReviews,
+      loadingCourseIds,
+      reviewErrors,
     };
-  }, [userReviews]);
+  }, [loadCourseReviews, loadingCourseIds, remoteReviews, replaceCourseReviews, reviewErrors]);
 
   return <ReviewsCtx.Provider value={value}>{children}</ReviewsCtx.Provider>;
 }

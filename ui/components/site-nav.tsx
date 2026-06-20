@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useAuth, UserButton } from "@clerk/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -17,6 +18,7 @@ const NAV = [
 export function SiteNav() {
   const pathname = usePathname();
   const { resolvedTheme, setTheme } = useTheme();
+  const { isSignedIn } = useAuth();
   const mounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -61,6 +63,23 @@ export function SiteNav() {
         >
           {mounted && resolvedTheme === "dark" ? <SunIcon size={15} /> : <MoonIcon size={15} />}
         </button>
+        {!isSignedIn && (
+          <Link
+            href="/sign-in"
+            className="rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground hover:border-leaf/60 hover:text-leaf"
+          >
+            Sign in
+          </Link>
+        )}
+        {isSignedIn && (
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "size-8",
+              },
+            }}
+          />
+        )}
       </div>
     </header>
   );

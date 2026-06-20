@@ -39,16 +39,19 @@ export type Course = {
 export type Review = {
   id: string;
   courseId: string;
+  source?: "omscentral" | "app";
   semester: string; // "Fall 2024"
-  difficulty: number;   // 1-5
-  workload: number;     // hours/week
-  rating: number;       // 1-5
-  programStage: "First" | "Mid" | "Late";
+  difficulty: number | null;   // 1-5
+  workload: number | null;     // hours/week
+  rating: number | null;       // 1-5
+  programStage: "First" | "Mid" | "Late" | null;
   body: string;
   pros: string[];
   cons: string[];
-  recommend: boolean;
+  recommend: boolean | null;
   createdAt: string; // ISO
+  updatedAt?: string;
+  deletedAt?: string | null;
 };
 
 export type SpecRequirement = {

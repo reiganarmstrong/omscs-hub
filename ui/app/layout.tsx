@@ -8,7 +8,10 @@ import { PlannerProvider } from "@/lib/store/planner-store";
 import { PrefsProvider } from "@/lib/store/prefs-store";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
+import { ClerkClientProvider } from "@/components/auth/clerk-client-provider";
 import { cn } from "@/lib/utils";
+
+const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
 
 const display = Fraunces({
   subsets: ["latin"],
@@ -50,17 +53,19 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-svh bg-background text-foreground">
-        <ThemeProvider>
-          <ReviewsProvider>
-            <PlannerProvider>
-              <PrefsProvider>
-                <SiteNav />
-                <main>{children}</main>
-                <SiteFooter />
-              </PrefsProvider>
-            </PlannerProvider>
-          </ReviewsProvider>
-        </ThemeProvider>
+        <ClerkClientProvider publishableKey={clerkPublishableKey}>
+          <ThemeProvider>
+            <ReviewsProvider>
+              <PlannerProvider>
+                <PrefsProvider>
+                  <SiteNav />
+                  <main>{children}</main>
+                  <SiteFooter />
+                </PrefsProvider>
+              </PlannerProvider>
+            </ReviewsProvider>
+          </ThemeProvider>
+        </ClerkClientProvider>
       </body>
     </html>
   );

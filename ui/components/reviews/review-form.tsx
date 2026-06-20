@@ -1,14 +1,23 @@
 "use client";
 
 import * as React from "react";
+import { useAuth, useUser } from "@clerk/react";
+import Link from "next/link";
 import { useReviews } from "@/lib/store/reviews-store";
+import { createReview, hasApiBaseUrl } from "@/lib/api/reviews";
 import { cn } from "@/lib/utils";
 import { CheckIcon, PlusIcon } from "@/components/icons";
 
+const MIN_REVIEW_BODY_LENGTH = 20;
+
 export function ReviewForm({ courseId }: { courseId: string }) {
-  const { addReview } = useReviews();
+  const { loadCourseReviews } = useReviews();
+  const { isSignedIn, getToken } = useAuth();
+  const { user } = useUser();
   const [open, setOpen] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   const [rating, setRating] = React.useState(4);
   const [difficulty, setDifficulty] = React.useState(3);
@@ -17,30 +26,47 @@ export function ReviewForm({ courseId }: { courseId: string }) {
   const [stage, setStage] = React.useState<"First" | "Mid" | "Late">("Mid");
   const [semester, setSemester] = React.useState("Fall 2025");
   const [body, setBody] = React.useState("");
-  const [pros, setPros] = React.useState<string[]>([""]);
-  const [cons, setCons] = React.useState<string[]>([""]);
 
-  const submit = (e: React.FormEvent) => {
+  const primaryEmail = user?.primaryEmailAddress?.emailAddress ?? "";
+  const canWrite = isSignedIn && primaryEmail.toLowerCase().endsWith("@gatech.edu");
+  const apiConfigured = hasApiBaseUrl();
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!body.trim()) return;
-    addReview({
-      courseId,
-      rating,
-      difficulty,
-      workload,
-      recommend,
-      programStage: stage,
-      semester: semester.trim() || "Unspecified",
-      body: body.trim(),
-      pros: pros.filter((p) => p.trim()),
-      cons: cons.filter((p) => p.trim()),
-    });
-    setSubmitted(true);
-    setBody("");
-    setPros([""]);
-    setCons([""]);
-    setTimeout(() => setSubmitted(false), 2400);
-    setOpen(false);
+    const trimmedBody = body.trim();
+    if (trimmedBody.length < MIN_REVIEW_BODY_LENGTH) {
+      setError(`Review must be at least ${MIN_REVIEW_BODY_LENGTH} characters.`);
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      const token = await getToken();
+      if (!token) throw new Error("Sign in again before submitting.");
+      await createReview(
+        courseId,
+        {
+          rating,
+          difficulty,
+          workload,
+          recommend,
+          programStage: stage,
+          semester: semester.trim() || "Unspecified",
+          body: trimmedBody,
+        },
+        token,
+      );
+      await loadCourseReviews(courseId);
+      setSubmitted(true);
+      setBody("");
+      setTimeout(() => setSubmitted(false), 2400);
+      setOpen(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to submit review.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!open) {
@@ -49,23 +75,38 @@ export function ReviewForm({ courseId }: { courseId: string }) {
         <div>
           <div className="text-sm font-medium">Add your review</div>
           <p className="mt-0.5 max-w-md text-xs text-muted-foreground">
-            Anonymous. Stored locally for now — when the back-end ships, it
-            will publish to the real archive.
+            Verified Georgia Tech email required. Review appears as OMSCS Hub,
+            not OMSCentral.
           </p>
         </div>
         <div className="flex items-center gap-3">
           {submitted && (
             <span className="inline-flex items-center gap-1 text-xs text-leaf">
-              <CheckIcon size={13} /> Posted to local archive.
+              <CheckIcon size={13} /> Posted.
             </span>
           )}
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-2 rounded-md bg-leaf px-4 py-2 text-sm text-leaf-fg hover:opacity-90"
-          >
-            <PlusIcon size={14} /> Write a review
-          </button>
+          {!isSignedIn ? (
+            <Link
+              href="/sign-in"
+              className="inline-flex items-center gap-2 rounded-md bg-leaf px-4 py-2 text-sm text-leaf-fg hover:opacity-90"
+            >
+              Sign in to review
+            </Link>
+          ) : !canWrite ? (
+            <span className="max-w-xs text-xs text-rose">
+              Use a verified @gatech.edu account to write reviews.
+            </span>
+          ) : !apiConfigured ? (
+            <span className="max-w-xs text-xs text-rose">API URL not configured.</span>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="inline-flex items-center gap-2 rounded-md bg-leaf px-4 py-2 text-sm text-leaf-fg hover:opacity-90"
+            >
+              <PlusIcon size={14} /> Write a review
+            </button>
+          )}
         </div>
       </div>
     );
@@ -150,15 +191,12 @@ export function ReviewForm({ courseId }: { courseId: string }) {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           required
+          minLength={MIN_REVIEW_BODY_LENGTH}
+          maxLength={8000}
           rows={5}
           placeholder="What was the experience like? What surprised you? Who should take it?"
           className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-[15px] leading-relaxed focus:border-foreground/40 focus:outline-none"
         />
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <ListEditor label="Pros" items={pros} setItems={setPros} accent="leaf" />
-        <ListEditor label="Cons" items={cons} setItems={setCons} accent="rose" />
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
@@ -170,11 +208,13 @@ export function ReviewForm({ courseId }: { courseId: string }) {
           />
           I would recommend this course
         </label>
+        {error && <span className="max-w-md text-xs text-rose">{error}</span>}
         <button
           type="submit"
-          className="inline-flex items-center gap-2 rounded-md bg-leaf px-5 py-2 text-sm text-leaf-fg hover:opacity-90"
+          disabled={submitting}
+          className="inline-flex items-center gap-2 rounded-md bg-leaf px-5 py-2 text-sm text-leaf-fg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-55"
         >
-          Submit anonymously
+          {submitting ? "Submitting…" : "Submit review"}
         </button>
       </div>
     </form>
@@ -222,70 +262,6 @@ function Numeric({
       <div className="mt-1 flex justify-between text-xs text-muted-foreground">
         <span>{hints[0]}</span>
         <span>{hints[1]}</span>
-      </div>
-    </div>
-  );
-}
-
-function ListEditor({
-  label,
-  items,
-  setItems,
-  accent,
-}: {
-  label: string;
-  items: string[];
-  setItems: React.Dispatch<React.SetStateAction<string[]>>;
-  accent: "leaf" | "rose";
-}) {
-  return (
-    <div>
-      <div
-        className={cn(
-          "mb-1 inline-flex items-center gap-1.5 text-xs font-medium",
-          accent === "leaf" ? "text-leaf" : "text-rose",
-        )}
-      >
-        <span
-          className="size-1.5 rounded-full"
-          style={{
-            background:
-              accent === "leaf" ? "var(--leaf)" : "var(--rose)",
-          }}
-        />
-        {label}
-      </div>
-      <div className="space-y-1.5">
-        {items.map((v, i) => (
-          <div key={i} className="flex gap-1.5">
-            <input
-              value={v}
-              onChange={(e) =>
-                setItems((p) => p.map((x, idx) => (idx === i ? e.target.value : x)))
-              }
-              placeholder={`Add a ${label.toLowerCase().slice(0, -1)}…`}
-              className="flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:border-foreground/40 focus:outline-none"
-            />
-            {items.length > 1 && (
-              <button
-                type="button"
-                onClick={() =>
-                  setItems((p) => p.filter((_, idx) => idx !== i))
-                }
-                className="rounded-md border border-border px-2 text-sm text-muted-foreground hover:bg-rose hover:text-white"
-              >
-                ×
-              </button>
-            )}
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() => setItems((p) => [...p, ""])}
-          className="text-xs text-muted-foreground hover:text-foreground"
-        >
-          + Add another
-        </button>
       </div>
     </div>
   );

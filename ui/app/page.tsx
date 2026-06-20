@@ -16,7 +16,7 @@ export default function Page() {
             </p>
           </div>
           <span className="text-xs text-muted-foreground">
-            Anonymous reviews — anyone can post
+            Public OMSCentral archive + verified OMSCS Hub reviews
           </span>
         </div>
       </div>
