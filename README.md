@@ -22,8 +22,8 @@ comparing electives across specializations.
   every course detail page renders **distribution graphs** showing how many
   students reported each value — so you can see when an "average" hides a
   bimodal distribution.
-- **Frictionless contribution.** Reviews are submitted anonymously. No account,
-  no signup, no name attached to your post.
+- **Verified contribution.** Imported OMSCentral reviews stay source-labeled.
+  New OMSCS Hub reviews require a verified `@gatech.edu` account.
 - **Honest planning.** The planner respects each course's actual term
   offerings (Fall / Spring / Summer) and surfaces aggregate workload and
   difficulty across the courses you've selected.
@@ -43,20 +43,19 @@ Features added on top of the existing OMSCentral feature set:
 - **Specialization compare view** with rules and full elective pools.
 - **Term-aware planner** with live aggregate workload, difficulty, and degree
   progress. Courses won't slot into a term they aren't offered in.
-- **Anonymous review submission** that updates aggregates and distributions
-  immediately (locally stored, until the back-end ships).
+- **Verified OMSCS Hub review submission** through Clerk and the D1-backed API,
+  with OMSCentral imports kept as distinct source-labeled reviews.
 
 ## Status
 
-This is the **front-end prototype**.
+This is moving from **front-end prototype** to Cloudflare-backed review system.
 
-- Course list, reviews, and aggregate stats are **synthetic test data**
-  generated deterministically from per-course profiles. They are realistic in
-  shape but are not real student reviews.
-- Submitted reviews are stored in your browser (`localStorage`) and shown in
-  the live aggregates. They are not persisted to a server.
-- A real back-end and review-submission API are planned next; auth will follow
-  after that, but reviews will remain anonymous.
+- Course list and fallback aggregates still come from deterministic seed data
+  until the D1 import is loaded.
+- A Cloudflare Workers API under `api/` provides D1-backed review reads and
+  authenticated review writes.
+- The UI is configured for static export and Workers Assets deployment.
+- Clerk is configured manually for v1; see `docs/clerk-setup.md`.
 
 ## Stack
 
@@ -69,14 +68,14 @@ This is the **front-end prototype**.
 ## Running locally
 
 ```bash
-cd ui
-pnpm install          # already pre-installed in this repo
-pnpm dev              # Next.js dev server with Turbopack
-pnpm typecheck        # TypeScript check
-pnpm lint             # ESLint
+cd api && pnpm install && pnpm dev
+cd ui && pnpm install && pnpm dev
+cd api && pnpm typecheck && pnpm test
+cd ui && pnpm typecheck && pnpm lint
 ```
 
-The dev server runs at <http://localhost:3000>.
+The UI dev server runs at <http://localhost:3000>. The API dev server defaults
+to <http://localhost:8787>.
 
 ## Project layout
 
@@ -91,7 +90,7 @@ ui/
   components/
     catalog/                 # Filter rail, course card, course row, catalog client
     courses/                 # Course detail (charts, sidebar, sections)
-    reviews/                 # Sortable list, anonymous submission form
+    reviews/                 # Sortable list, verified submission form
     planner/                 # Term grid, picker, plan health
     badges.tsx               # Tag, Stat, Stars
     distribution-chart.tsx   # Custom SVG distribution bars
@@ -106,8 +105,15 @@ ui/
       specializations.ts     # Track definitions
       index.ts               # Aggregation + distribution baking
     store/
-      reviews-store.tsx      # Anonymous review provider (localStorage)
+      reviews-store.tsx      # API-backed review provider with seeded fallback
       planner-store.tsx      # Per-term plan provider (localStorage)
+api/
+  src/                       # Hono Worker API
+  migrations/                # D1 SQL migrations
+  scripts/import-omscentral.ts
+infra/
+  modules/                   # Cloudflare Terraform modules
+  environments/dev           # Dev Terraform root
 ```
 
 ## Design notes
