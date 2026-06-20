@@ -1,0 +1,27 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "dev": "wrangler dev",
+    "import:omscentral": "tsx scripts/import-omscentral.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clerk/backend": "^3.4.7",
+    "@hono/zod-validator": "^0.8.0",
+    "hono": "^4.12.18",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260510.1",
+    "@types/node": "^25.6.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5",
+    "wrangler": "^4.90.0"
+  }
+}
