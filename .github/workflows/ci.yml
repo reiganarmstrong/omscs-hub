@@ -62,3 +62,41 @@ jobs:
         env:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.5
+
+      - name: Write Terraform backend config
+        working-directory: infra/environments/dev
+        run: |
+          if [ -z "$TF_DEV_BACKEND_HCL" ]; then
+            echo "TF_DEV_BACKEND_HCL is not set; Terraform will use -backend=false."
+            exit 0
+          fi
+
+          printf '%s\n' "$TF_DEV_BACKEND_HCL" > backend.hcl
+        env:
+          TF_DEV_BACKEND_HCL: ${{ secrets.TF_DEV_BACKEND_HCL }}
+
+      - name: Terraform format check
+        working-directory: infra
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        working-directory: infra/environments/dev
+        run: |
+          if [ -s backend.hcl ] && [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
+            terraform init -backend-config=backend.hcl
+          else
+            echo "Remote backend credentials are not fully set; initializing without backend."
+            terraform init -backend=false
+          fi
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TF_DEV_R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_DEV_R2_SECRET_ACCESS_KEY }}
+
+      - name: Terraform validate
+        working-directory: infra/environments/dev
+        run: terraform validate
