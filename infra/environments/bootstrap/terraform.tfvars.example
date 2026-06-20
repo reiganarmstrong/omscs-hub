@@ -1,0 +1,6 @@
+cloudflare_account_id = "00000000000000000000000000000000"
+
+r2_bucket_jurisdiction = "default"
+r2_bucket_location     = "enam"
+r2_bucket_name         = "omscs-hub-terraform-state"
+r2_storage_class       = "Standard"

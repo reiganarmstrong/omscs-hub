@@ -1,0 +1,7 @@
+cloudflare_account_id = "00000000000000000000000000000000"
+cloudflare_zone_id    = "00000000000000000000000000000000"
+cloudflare_zone_name  = "example.com"
+ui_custom_hostname    = "omscs.example.com"
+
+# Optional. If unset, use https://<api_worker_name>.<account_id>.workers.dev.
+api_custom_hostname = "omscs-api.example.com"
