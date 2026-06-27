@@ -75,7 +75,9 @@ export function SpecializationsClient() {
                     onClick={() => setActive(s.id)}
                     className={cn(
                       "flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition",
-                      isActive ? "bg-muted" : "hover:bg-muted/60",
+                      isActive
+                        ? "bg-black text-white dark:bg-white dark:text-black"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     )}
                   >
                     <span className="flex min-w-0 flex-col">
@@ -89,12 +91,22 @@ export function SpecializationsClient() {
                           </span>
                         )}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span
+                        className={cn(
+                          "text-xs",
+                          isActive
+                            ? "text-white/70 dark:text-black/65"
+                            : "text-muted-foreground",
+                        )}
+                      >
                         {matched} planned · {s.totalCourses} total
                       </span>
                     </span>
                     {isActive && (
-                      <ChevronRight size={14} className="text-muted-foreground" />
+                      <ChevronRight
+                        size={14}
+                        className="text-white/70 dark:text-black/65"
+                      />
                     )}
                   </button>
                 </li>
@@ -270,7 +282,7 @@ function RequirementBlock({
         </div>
       </header>
       {req.notes && (
-        <p className="border-b border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
+        <p className="border-b border-border px-4 py-2 text-xs text-muted-foreground">
           {req.notes}
         </p>
       )}
@@ -358,7 +370,7 @@ function FreeElectiveBlock({
           </span>
         </div>
       </header>
-      <p className="border-b border-border bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
+      <p className="border-b border-border px-4 py-2 text-xs text-muted-foreground">
         Any approved 6XXX/7XXX/8XXX OMSCS course outside the buckets above.
         Pick favourites here; they&apos;ll count toward your remaining slots.
       </p>
@@ -398,14 +410,14 @@ function FreeElectiveBlock({
 
 function CourseTableHeader() {
   return (
-    <div className="hidden border-b border-border bg-muted/30 px-4 py-1.5 text-[11px] text-muted-foreground md:grid md:grid-cols-[24px_84px_minmax(0,1fr)_50px_50px_60px_72px] md:items-baseline md:gap-3">
+    <div className="hidden border-b border-border px-4 py-1.5 text-[11px] text-muted-foreground md:grid md:grid-cols-[24px_84px_minmax(0,1fr)_50px_50px_60px_72px] md:items-baseline md:gap-3">
       <span></span>
       <span>Code</span>
       <span>Title</span>
-      <span className="text-right">Diff</span>
-      <span className="text-right">★</span>
-      <span className="text-right">hr/wk</span>
-      <span className="text-right">Terms</span>
+      <span>Diff</span>
+      <span>★</span>
+      <span>hr/wk</span>
+      <span>Terms</span>
     </div>
   );
 }
@@ -457,16 +469,16 @@ function CourseRow({
         </span>
         {course.title}
       </Link>
-      <span className="hidden text-right tabular text-xs text-muted-foreground md:inline">
+      <span className="hidden tabular text-xs text-muted-foreground md:inline">
         {course.stats.avgDifficulty.toFixed(1)}
       </span>
-      <span className="hidden text-right tabular text-xs text-muted-foreground md:inline">
+      <span className="hidden tabular text-xs text-muted-foreground md:inline">
         {course.stats.avgRating.toFixed(1)}
       </span>
-      <span className="hidden text-right tabular text-xs text-muted-foreground md:inline">
+      <span className="hidden tabular text-xs text-muted-foreground md:inline">
         {course.stats.avgWorkload.toFixed(0)}
       </span>
-      <span className="hidden justify-end gap-0.5 text-right md:flex">
+      <span className="hidden justify-start gap-0.5 md:flex">
         <TermBadges terms={course.termsOffered} />
       </span>
     </li>
@@ -475,6 +487,11 @@ function CourseRow({
 
 function TermBadges({ terms }: { terms: Term[] }) {
   const all: Term[] = ["Fall", "Spring", "Summer"];
+  const labels: Record<Term, string> = {
+    Fall: "Fa",
+    Spring: "Sp",
+    Summer: "Su",
+  };
   return (
     <span className="inline-flex items-baseline gap-0.5">
       {all.map((t) => (
@@ -482,13 +499,13 @@ function TermBadges({ terms }: { terms: Term[] }) {
           key={t}
           title={`${t}${terms.includes(t) ? "" : " — not offered"}`}
           className={cn(
-            "inline-flex h-4 w-5 items-center justify-center rounded-sm text-[10px] font-medium",
+            "inline-flex h-4 w-6 items-center justify-center rounded-sm border text-[10px] font-medium",
             terms.includes(t)
-              ? "bg-leaf/12 text-leaf"
-              : "bg-muted text-muted-foreground/60",
+              ? "border-leaf bg-leaf text-leaf-fg"
+              : "border-border bg-transparent text-muted-foreground/45",
           )}
         >
-          {t.charAt(0)}
+          {labels[t]}
         </span>
       ))}
     </span>

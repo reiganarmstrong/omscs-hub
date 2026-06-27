@@ -123,7 +123,7 @@ export function CourseDetail({ course }: { course: Course }) {
                   className={cn(
                     "flex items-center justify-center gap-1.5 px-3 py-2 text-center text-xs",
                     course.termsOffered.includes(t)
-                      ? "bg-neutral-950 text-white"
+                      ? "bg-neutral-950 text-white dark:bg-white dark:text-black"
                       : "bg-card text-muted-foreground line-through",
                   )}
                 >
@@ -270,14 +270,14 @@ function SidebarSummary({
             <button
               type="button"
               onClick={() => setPicker(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm hover:border-foreground/30"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
             >
               <PlusIcon size={14} /> Schedule…
             </button>
             <button
               type="button"
               onClick={() => add("unassigned", course.id)}
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm hover:border-foreground/30"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
             >
               Add unscheduled
             </button>
@@ -290,7 +290,7 @@ function SidebarSummary({
                 onChange={(e) =>
                   setTerm(e.target.value as typeof termOptions[number])
                 }
-                className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                className="rounded-md border border-border bg-background px-2 py-1.5 text-sm dark:border-white dark:bg-white dark:text-black"
               >
                 {termOptions.map((t) => (
                   <option
@@ -305,7 +305,7 @@ function SidebarSummary({
               <select
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
-                className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                className="rounded-md border border-border bg-background px-2 py-1.5 text-sm dark:border-white dark:bg-white dark:text-black"
               >
                 {yearOptions.map((y) => (
                   <option key={y}>{y}</option>
@@ -325,7 +325,7 @@ function SidebarSummary({
             <button
               type="button"
               onClick={() => setPicker(false)}
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background py-1.5 text-xs text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background py-1.5 text-xs text-muted-foreground hover:border-foreground/30 hover:text-foreground dark:border-white dark:bg-white dark:text-black"
             >
               <ArrowLeft size={12} /> Back
             </button>
