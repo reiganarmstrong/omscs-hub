@@ -70,9 +70,9 @@
     --popover-foreground: var(--ink);
     --primary: var(--ink);
     --primary-foreground: var(--paper);
-    --secondary: oklch(0.96 0.005 240);
+    --secondary: color-mix(in oklch, var(--leaf) 10%, var(--paper));
     --secondary-foreground: var(--ink);
-    --muted: oklch(0.96 0.005 240);
+    --muted: color-mix(in oklch, var(--leaf) 10%, var(--paper));
     --muted-foreground: oklch(0.5 0.015 250);
     --accent: var(--leaf);
     --accent-foreground: var(--leaf-fg);
@@ -90,7 +90,7 @@
     --sidebar-foreground: var(--ink);
     --sidebar-primary: var(--ink);
     --sidebar-primary-foreground: var(--paper);
-    --sidebar-accent: oklch(0.96 0.005 240);
+    --sidebar-accent: color-mix(in oklch, var(--leaf) 10%, var(--paper));
     --sidebar-accent-foreground: var(--ink);
     --sidebar-border: oklch(0.92 0.005 250);
     --sidebar-ring: var(--ring);
@@ -111,15 +111,15 @@
     --popover-foreground: var(--ink);
     --primary: var(--ink);
     --primary-foreground: var(--paper);
-    --secondary: oklch(0.24 0.012 250);
+    --secondary: color-mix(in oklch, var(--leaf) 40%, var(--paper));
     --secondary-foreground: var(--ink);
-    --muted: oklch(0.22 0.01 250);
+    --muted: color-mix(in oklch, var(--leaf) 36%, var(--paper));
     --muted-foreground: oklch(0.66 0.01 250);
     --accent: var(--leaf);
     --accent-foreground: var(--leaf-fg);
     --destructive: oklch(0.65 0.18 25);
     --border: oklch(0.30 0.012 250 / 0.7);
-    --input: oklch(0.30 0.012 250 / 0.7);
+    --input: color-mix(in oklch, var(--leaf) 44%, var(--paper));
     --ring: oklch(0.6 0.04 200);
     --chart-1: oklch(0.7 0.06 165);
     --chart-2: oklch(0.74 0.10 25);
@@ -130,7 +130,7 @@
     --sidebar-foreground: var(--ink);
     --sidebar-primary: var(--ink);
     --sidebar-primary-foreground: var(--paper);
-    --sidebar-accent: oklch(0.22 0.01 250);
+    --sidebar-accent: color-mix(in oklch, var(--leaf) 36%, var(--paper));
     --sidebar-accent-foreground: var(--ink);
     --sidebar-border: oklch(0.30 0.012 250 / 0.7);
     --sidebar-ring: var(--ring);

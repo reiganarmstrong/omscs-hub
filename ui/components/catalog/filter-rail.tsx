@@ -349,7 +349,7 @@ function ActiveChips({
         <button
           key={i}
           onClick={c.clear}
-          className="inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-0.5 text-xs text-black hover:bg-black hover:text-white dark:bg-white/12 dark:text-white dark:hover:bg-white dark:hover:text-black"
+          className="inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-0.5 text-xs text-black hover:bg-black hover:text-white dark:bg-white/12 dark:text-white dark:hover:bg-leaf dark:hover:text-leaf-fg"
         >
           {c.label}
           <XIcon size={11} />
