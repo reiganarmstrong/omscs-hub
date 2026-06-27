@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils"
 type SortKey =
   | "code"
   | "title"
+  | "title-desc"
   | "rating-desc"
   | "rating-asc"
   | "difficulty-desc"
@@ -22,6 +23,7 @@ type SortKey =
 const SORTS: { v: SortKey; label: string }[] = [
   { v: "code", label: "Course code" },
   { v: "title", label: "Title (A–Z)" },
+  { v: "title-desc", label: "Title (Z–A)" },
   { v: "rating-desc", label: "Rating ↓" },
   { v: "rating-asc", label: "Rating ↑" },
   { v: "difficulty-desc", label: "Difficulty ↓" },
@@ -106,6 +108,8 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
           return a.code.localeCompare(b.code)
         case "title":
           return a.title.localeCompare(b.title)
+        case "title-desc":
+          return b.title.localeCompare(a.title)
         case "rating-desc":
           return b.stats.avgRating - a.stats.avgRating
         case "rating-asc":
@@ -174,8 +178,10 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
                       setSortOpen(false)
                     }}
                     className={cn(
-                      "block w-full px-3 py-1.5 text-left text-sm hover:bg-muted",
-                      sort === s.v && "bg-muted"
+                      "block w-full px-3 py-1.5 text-left text-sm",
+                      sort === s.v
+                        ? "bg-black text-white dark:bg-white dark:text-black"
+                        : "hover:bg-leaf/12 hover:text-leaf dark:hover:bg-leaf dark:hover:text-leaf-fg"
                     )}
                   >
                     {s.label}

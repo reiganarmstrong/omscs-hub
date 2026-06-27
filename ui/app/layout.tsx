@@ -52,14 +52,14 @@ export default function RootLayout({
         "font-sans",
       )}
     >
-      <body className="min-h-svh bg-background text-foreground">
+      <body className="flex min-h-svh flex-col bg-background text-foreground">
         <ClerkClientProvider publishableKey={clerkPublishableKey}>
           <ThemeProvider>
             <ReviewsProvider>
               <PlannerProvider>
                 <PrefsProvider>
                   <SiteNav />
-                  <main>{children}</main>
+                  <main className="flex-1">{children}</main>
                   <SiteFooter />
                 </PrefsProvider>
               </PlannerProvider>
