@@ -98,7 +98,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
             <button
               type="button"
               onClick={() => setOpen((o) => !o)}
-              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-xs hover:border-foreground/30"
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-xs transition-colors hover:border-foreground/30"
             >
               <SortIcon size={12} />
               {SORTS.find((s) => s.v === sort)?.label}
@@ -118,7 +118,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
                       setOpen(false);
                     }}
                     className={cn(
-                      "block w-full px-3 py-1.5 text-left text-sm hover:bg-muted",
+                      "block w-full px-3 py-1.5 text-left text-sm transition-colors hover:bg-muted dark:hover:bg-leaf dark:hover:text-leaf-fg",
                       sort === s.v && "bg-muted",
                     )}
                   >

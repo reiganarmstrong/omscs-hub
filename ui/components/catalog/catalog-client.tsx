@@ -156,7 +156,7 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
             <button
               type="button"
               onClick={() => setSortOpen((o) => !o)}
-              className="flex w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm hover:border-foreground/30 sm:w-auto"
+              className="flex w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm transition-colors hover:border-foreground/30 sm:w-auto"
             >
               <SortIcon size={14} />
               <span className="truncate">
@@ -178,7 +178,7 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
                       setSortOpen(false)
                     }}
                     className={cn(
-                      "block w-full px-3 py-1.5 text-left text-sm",
+                      "block w-full px-3 py-1.5 text-left text-sm transition-colors",
                       sort === s.v
                         ? "bg-black text-white dark:bg-white dark:text-black"
                         : "hover:bg-leaf/12 hover:text-leaf dark:hover:bg-leaf dark:hover:text-leaf-fg"
@@ -197,10 +197,10 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
                 type="button"
                 onClick={() => setView(v)}
                 className={cn(
-                  "flex-1 px-3 py-2 text-sm sm:flex-none",
+                  "flex-1 px-3 py-2 text-sm transition-colors sm:flex-none",
                   view === v
                     ? "bg-black text-white dark:bg-white dark:text-black"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground dark:hover:bg-leaf dark:hover:text-leaf-fg"
                 )}
               >
                 {v === "grid" ? "Cards" : "Table"}

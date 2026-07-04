@@ -270,14 +270,14 @@ function SidebarSummary({
             <button
               type="button"
               onClick={() => setPicker(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm transition-colors hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
             >
               <PlusIcon size={14} /> Schedule…
             </button>
             <button
               type="button"
               onClick={() => add("unassigned", course.id)}
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm transition-colors hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
             >
               Add unscheduled
             </button>
@@ -325,7 +325,7 @@ function SidebarSummary({
             <button
               type="button"
               onClick={() => setPicker(false)}
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background py-1.5 text-xs text-muted-foreground hover:border-foreground/30 hover:text-foreground dark:border-white dark:bg-white dark:text-black"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background py-1.5 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground dark:border-white dark:bg-white dark:text-black"
             >
               <ArrowLeft size={12} /> Back
             </button>

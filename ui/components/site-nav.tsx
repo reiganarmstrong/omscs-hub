@@ -47,7 +47,7 @@ export function SiteNav() {
                   "rounded-md px-3 py-1.5 text-sm transition",
                   active
                     ? "bg-black text-white dark:bg-white dark:text-black"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground dark:hover:bg-leaf dark:hover:text-leaf-fg",
                 )}
               >
                 {item.label}
@@ -59,14 +59,14 @@ export function SiteNav() {
           type="button"
           aria-label="Toggle theme"
           onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-          className="grid size-8 place-items-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          className="grid size-8 place-items-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground dark:hover:bg-leaf dark:hover:text-leaf-fg"
         >
           {mounted && resolvedTheme === "dark" ? <SunIcon size={15} /> : <MoonIcon size={15} />}
         </button>
         {!isSignedIn && (
           <Link
             href="/sign-in"
-            className="rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground hover:border-leaf/60 hover:text-leaf"
+            className="rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-leaf/60 hover:text-leaf"
           >
             Sign in
           </Link>

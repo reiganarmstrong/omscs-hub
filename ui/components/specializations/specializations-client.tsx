@@ -74,10 +74,10 @@ export function SpecializationsClient() {
                     type="button"
                     onClick={() => setActive(s.id)}
                     className={cn(
-                      "flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition",
+                      "group flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition",
                       isActive
                         ? "bg-black text-white dark:bg-white dark:text-black"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground dark:hover:bg-leaf dark:hover:text-leaf-fg",
                     )}
                   >
                     <span className="flex min-w-0 flex-col">
@@ -96,7 +96,7 @@ export function SpecializationsClient() {
                           "text-xs",
                           isActive
                             ? "text-white/70 dark:text-black/65"
-                            : "text-muted-foreground",
+                            : "text-muted-foreground dark:group-hover:text-leaf-fg",
                         )}
                       >
                         {matched} planned · {s.totalCourses} total
