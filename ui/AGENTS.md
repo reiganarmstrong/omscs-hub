@@ -2,7 +2,7 @@
 
 ## Skill Usage
 
-- Use `frontend-skill` for frontend design work.
+- Use `frontend-design` for frontend design work. Prefer the Anthropic `frontend-design` skill over the deprecated OpenAI frontend skill.
 
 ## General
 
