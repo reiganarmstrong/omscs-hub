@@ -1,29 +1,46 @@
 # Terraform Environments
 
-Each directory here is a Terraform root module with its own state.
+Each directory here is a Terraform root module with its own state boundary.
 
 ## Roots
 
-- `bootstrap` creates the R2 bucket that can store dev Terraform state.
-- `dev` creates the dev application infrastructure in Cloudflare.
+- `bootstrap`: creates the Cloudflare R2 bucket used for dev Terraform remote
+  state.
+- `dev`: creates OMSCS Hub development infrastructure in Cloudflare.
 
-## Workflow
+## Bootstrap First
 
-Bootstrap must be created before dev can use R2 remote state.
+Bootstrap uses local state by default:
 
 ```bash
 cd bootstrap
+cp terraform.tfvars.example terraform.tfvars
 terraform init
+terraform fmt -check -recursive
+terraform validate
 terraform plan -var-file=terraform.tfvars
+terraform apply -var-file=terraform.tfvars
 ```
 
-After the bootstrap bucket exists and R2 credentials are available, initialize
-dev with its backend config:
+After the bucket exists, create R2 S3 credentials and configure dev backend
+values from the bootstrap output.
+
+## Initialize Dev
 
 ```bash
 cd ../dev
+cp terraform.tfvars.example terraform.tfvars
 terraform init -backend-config=backend.hcl
+terraform fmt -check -recursive
+terraform validate
+terraform plan -var-file=terraform.tfvars
 ```
 
-Keep backend configuration and variable files environment-specific. Shared,
-reusable infrastructure belongs in `../modules`.
+Use `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` for real R2 backend
+credentials rather than writing them into `backend.hcl`.
+
+## Boundary
+
+Environment roots wire modules together for a concrete deployment target.
+Reusable Terraform belongs in `../modules`; application code deploys remain in
+`../../api` and `../../ui`.

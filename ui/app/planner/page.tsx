@@ -2,7 +2,7 @@ import { PlannerClient } from "@/components/planner/planner-client";
 
 export default function Page() {
   return (
-    <div className="mx-auto max-w-[1400px] px-6 pt-8 pb-16">
+    <div className="mx-auto max-w-[1400px] px-6 pt-8">
       <header className="pb-2">
         <h1 className="font-display text-3xl tracking-tight md:text-4xl">
           Planner

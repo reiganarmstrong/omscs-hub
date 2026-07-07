@@ -6,7 +6,7 @@ export function CourseRow({ course }: { course: Course }) {
   return (
     <Link
       href={`/courses/${course.id}`}
-      className="grid grid-cols-[100px_1fr_72px_72px_72px_88px] items-baseline gap-3 rounded-md px-3 py-2.5 text-sm transition hover:bg-muted/60"
+      className="grid grid-cols-[100px_1fr_72px_72px_72px_88px] items-baseline gap-3 rounded-md px-3 py-2.5 text-sm transition hover:bg-muted/60 dark:hover:bg-leaf"
     >
       <span className="text-xs tracking-wide text-muted-foreground">
         {course.code}

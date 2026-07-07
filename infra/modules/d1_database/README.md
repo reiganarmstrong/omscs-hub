@@ -1,6 +1,7 @@
 # D1 Database Module
 
-Creates one Cloudflare D1 database.
+Creates one Cloudflare D1 database. OMSCS Hub dev uses this module for the
+review database consumed by the API Worker.
 
 ## Resource
 
@@ -17,6 +18,9 @@ Creates one Cloudflare D1 database.
 
 - `database_id`: Created D1 database ID. Use this in `api/wrangler.toml`.
 - `database_name`: Created D1 database name.
+
+The dev environment also exposes these values as root outputs so API migration,
+import, and deploy commands can target the same database.
 
 ## Example
 

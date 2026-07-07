@@ -155,7 +155,7 @@ export function PlannerClient() {
                 <button
                   type="button"
                   onClick={() => setPicker(picker === key ? null : key)}
-                  className="border-t border-border px-3 py-1.5 text-left text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+                  className="border-t border-border px-3 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground dark:hover:bg-leaf dark:hover:text-leaf-fg"
                 >
                   <PlusIcon size={12} className="-mt-0.5 mr-1 inline" /> Add course
                 </button>
@@ -650,15 +650,20 @@ function CoursePicker({
                 type="button"
                 onClick={() => onPick(c.id)}
                 className={cn(
-                  "flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted",
+                  "group flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-muted dark:hover:bg-leaf dark:hover:text-black",
                   planned && "opacity-50",
                 )}
               >
                 <span className="truncate">
-                  <span className="text-xs text-muted-foreground">{c.code}</span>{" "}
+                  <span className="text-xs text-muted-foreground dark:group-hover:text-black">
+                    {c.code}
+                  </span>{" "}
                   {c.title}
                 </span>
-                <Stars value={c.stats.avgRating} />
+                <Stars
+                  value={c.stats.avgRating}
+                  className="dark:group-hover:text-black"
+                />
               </button>
             </li>
           );

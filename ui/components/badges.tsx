@@ -59,10 +59,18 @@ export function Stat({
   );
 }
 
-export function Stars({ value, max = 5 }: { value: number; max?: number }) {
+export function Stars({
+  value,
+  max = 5,
+  className,
+}: {
+  value: number;
+  max?: number;
+  className?: string;
+}) {
   const filled = Math.round(value);
   return (
-    <span className="inline-flex items-center gap-0.5 text-leaf">
+    <span className={cn("inline-flex items-center gap-0.5 text-leaf", className)}>
       {Array.from({ length: max }).map((_, i) => (
         <svg
           key={i}
