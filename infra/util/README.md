@@ -1,8 +1,12 @@
 # Infrastructure Utility Scripts
 
-Helper scripts for running Terraform with Cloudflare credentials loaded from
-Bitwarden. Run these scripts from the Terraform environment directory you are
-working in, such as `infra/environments/dev`.
+Optional helper scripts for running Terraform with Cloudflare credentials loaded
+from Bitwarden. Run these scripts from the Terraform environment directory you
+are working in, such as `infra/environments/dev`.
+
+The app does not require these helpers; they are a convenience for local
+Terraform workflows that keep Cloudflare API tokens and R2 backend credentials
+out of files.
 
 ## Prerequisites
 
@@ -37,6 +41,13 @@ Example:
 cd infra/environments/dev
 ../../util/cf-env-loader.sh plan -var-file=terraform.tfvars
 ../../util/cf-env-loader.sh apply -var-file=terraform.tfvars
+```
+
+For read-only validation, use Terraform directly when no credentials are needed:
+
+```bash
+terraform fmt -check -recursive
+terraform validate
 ```
 
 ### `cf-init-env-loader.sh`

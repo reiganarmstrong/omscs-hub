@@ -1,7 +1,8 @@
 # Worker Routing Module
 
 Connects an existing Cloudflare Worker service to a custom domain, route, or
-both.
+both. OMSCS Hub dev uses this module for both the review API Worker and the
+static UI Worker.
 
 ## Resources
 
@@ -10,7 +11,9 @@ both.
 - `cloudflare_workers_route.this`: Created when `route_pattern` is set.
 
 The Worker service itself is deployed outside Terraform with Wrangler. This
-module only manages routing for that service.
+module only manages routing for that service. In the dev environment,
+Terraform-created placeholder Workers satisfy Cloudflare's "service must exist"
+requirement before routing is attached.
 
 ## Inputs
 

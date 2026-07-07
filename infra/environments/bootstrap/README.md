@@ -1,12 +1,15 @@
 # Bootstrap Environment
 
-This root provisions the Cloudflare R2 bucket used by the dev Terraform remote
-state backend. Keep this root on local state unless you later create a separate
-backend for bootstrap itself.
+This Terraform root provisions the Cloudflare R2 bucket used by the dev
+Terraform remote state backend. Keep this root on local state unless you later
+create a separate backend for bootstrap itself.
 
 ## Resources
 
 - `cloudflare_r2_bucket.terraform_state`: R2 bucket for dev Terraform state.
+
+This root does not create app resources. The application infrastructure lives in
+`../dev` after the state bucket exists.
 
 ## Inputs
 
@@ -35,7 +38,10 @@ variables.
 
 ```bash
 cd infra/environments/bootstrap
+cp terraform.tfvars.example terraform.tfvars
 terraform init
+terraform fmt -check -recursive
+terraform validate
 terraform plan -var-file=terraform.tfvars
 terraform apply -var-file=terraform.tfvars
 ```
@@ -46,3 +52,7 @@ Then initialize dev with:
 cd ../dev
 terraform init -backend-config=backend.hcl
 ```
+
+Use the `dev_backend_config` output for non-secret backend values. Keep R2
+access key ID and secret access key in environment variables or a secret
+manager.
