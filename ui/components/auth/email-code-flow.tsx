@@ -91,8 +91,8 @@ export function EmailCodeFlow({ mode }: { mode: Mode }) {
 
   return (
     <div className="mx-auto grid min-h-[calc(100svh-140px)] max-w-[980px] items-center px-6 py-12">
-      <div className="grid gap-8 border-y border-border py-10 md:grid-cols-[0.85fr_1fr]">
-        <div>
+      <div className="grid overflow-hidden rounded-xl border border-border bg-card shadow-sm md:grid-cols-[0.85fr_1fr]">
+        <div className="border-b border-border bg-secondary/50 p-6 sm:p-8 md:border-r md:border-b-0 md:p-10">
           <span className="text-xs tracking-wide text-muted-foreground">
             OMSCS Hub accounts
           </span>
@@ -105,7 +105,7 @@ export function EmailCodeFlow({ mode }: { mode: Mode }) {
           </p>
         </div>
 
-        <form onSubmit={pending ? verify : start} className="space-y-4">
+        <form onSubmit={pending ? verify : start} className="space-y-4 p-6 sm:p-8 md:p-10">
           <div>
             <label className="label">Email</label>
             <input
