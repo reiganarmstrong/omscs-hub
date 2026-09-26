@@ -4,7 +4,11 @@ import * as React from "react";
 import Link from "next/link";
 import { COURSES, COURSES_BY_ID, courseMatchesSearch } from "@/lib/data";
 import type { SpecializationId } from "@/lib/types";
-import { SPECIALIZATIONS, bucketProgress } from "@/lib/data/specializations";
+import {
+  SPECIALIZATIONS,
+  bucketProgress,
+  courseSpecializations,
+} from "@/lib/data/specializations";
 import { usePlanner } from "@/lib/store/planner-store";
 import { usePrefs } from "@/lib/store/prefs-store";
 import { cn } from "@/lib/utils";
@@ -108,7 +112,9 @@ export function PlannerClient() {
                             {c.code}
                           </span>{" "}
                           <span>{c.title}</span>
-                          <span className="block text-[10px] text-muted-foreground">Term availability unverified</span>
+                          <span className="block text-[10px] text-muted-foreground">
+                            Term availability unverified
+                          </span>
                           {role && (
                             <span
                               className={cn(
@@ -175,7 +181,7 @@ export function PlannerClient() {
         {spec && progress && (
           <div className="mt-4 rounded-xl border border-border bg-card p-4">
             <div className="flex items-center justify-between">
-              <div className="label">{spec.name} progress</div>
+              <div className="label">{spec.name} planned slots</div>
               <Link
                 href="/specializations"
                 className="text-xs text-muted-foreground hover:text-foreground"
@@ -232,6 +238,39 @@ export function PlannerClient() {
                 </span>
               </li>
             </ul>
+            <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
+              Current-catalog guidance · Last checked {spec.lastChecked}.{" "}
+              <a
+                href={spec.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="underline underline-offset-2"
+              >
+                Official specialization rules
+              </a>
+              . This plan does not establish earned credit or degree completion;
+              check your applicable catalog and Degree Works audit.
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              At most six non-CS/CSE hours can count. To continue after the
+              first 12 months, complete two foundational courses with B or
+              better; see the{" "}
+              <a
+                href="https://omscs.gatech.edu/current-courses"
+                target="_blank"
+                rel="noreferrer"
+                className="underline underline-offset-2"
+              >
+                current-course list
+              </a>
+              .
+            </p>
+            {progress.nonCsPlannedHours > progress.nonCsCreditLimit && (
+              <p role="status" className="mt-2 text-xs text-rose">
+                {progress.nonCsPlannedHours} non-CS/CSE hours planned; only{" "}
+                {progress.nonCsCreditLimit} hours count in this guidance.
+              </p>
+            )}
           </div>
         )}
       </aside>
@@ -246,12 +285,10 @@ function roleInSpec(
   if (!specId) return null;
   const spec = SPECIALIZATIONS.find((s) => s.id === specId);
   if (!spec) return null;
-  for (const req of spec.requirements) {
-    if (req.poolCourseIds.includes(courseId)) {
-      return req.required ? "required" : "bucket";
-    }
-  }
-  return "free";
+  const role = courseSpecializations(courseId).find(
+    (entry) => entry.id === spec.id,
+  )?.role;
+  return role === "core" ? "required" : role === "elective" ? "bucket" : "free";
 }
 
 function SpecSelector({
@@ -576,7 +613,10 @@ function CoursePicker({
 
   return (
     <div className="border-t border-border bg-background p-2">
-      <p className="mb-2 text-xs text-muted-foreground">Future term availability unverified. Choose a current Course for your intended term.</p>
+      <p className="mb-2 text-xs text-muted-foreground">
+        Future term availability unverified. Choose a current Course for your
+        intended term.
+      </p>
       <div className="relative">
         <span className="absolute top-1/2 left-2 -translate-y-1/2 text-muted-foreground">
           <SearchIcon size={12} />

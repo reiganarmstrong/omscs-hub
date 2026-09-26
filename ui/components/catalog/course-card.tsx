@@ -2,7 +2,10 @@ import Link from "next/link"
 import { CourseFacts } from "@/components/courses/course-facts"
 import type { Course } from "@/lib/types"
 import { Tag, Stars } from "@/components/badges"
-import { SPECIALIZATIONS_BY_ID } from "@/lib/data/specializations"
+import {
+  SPECIALIZATIONS_BY_ID,
+  courseSpecializations,
+} from "@/lib/data/specializations"
 
 export function CourseCard({
   course,
@@ -14,7 +17,7 @@ export function CourseCard({
   const s = course.stats
   const statsReady = reviewStatsState === "ready"
   const status = reviewStatsState === "loading" ? "Loading…" : "Unavailable"
-  const tagSpecs = course.specializations.slice(0, 3)
+  const tagSpecs = courseSpecializations(course.id).slice(0, 3)
 
   return (
     <article className="group fade-up relative block rounded-xl border border-border bg-card p-5 transition hover:border-foreground/30 hover:shadow-sm">

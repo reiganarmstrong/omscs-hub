@@ -27,6 +27,10 @@ export function PrefsProvider({ children }: { children: React.ReactNode }) {
   const value = React.useMemo<Ctx>(
     () => ({
       ...prefs,
+      selectedSpec:
+        (prefs.selectedSpec as string | null) === "interactive-intelligence"
+          ? "artificial-intelligence"
+          : prefs.selectedSpec,
       setSelectedSpec(id) {
         writeStorage(STORAGE_KEY, { ...prefs, selectedSpec: id });
       },

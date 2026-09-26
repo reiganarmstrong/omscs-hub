@@ -100,7 +100,6 @@ export const COURSES: Course[] = catalog.courses.map((course) => {
     shortTitle: annotation?.shortTitle,
     // The current-course list does not confirm offerings for any future term.
     termsOffered: [],
-    specializations: annotation?.specs ?? [],
     tags: [
       course.foundational ? "foundational" : "non-foundational",
       ...(annotation?.tags.filter(

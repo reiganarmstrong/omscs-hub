@@ -7,7 +7,11 @@ import type { Course } from "@/lib/types"
 import { useReviews } from "@/lib/store/reviews-store"
 import { aggregateStats } from "@/lib/data"
 import { usePlanner } from "@/lib/store/planner-store"
-import { SPECIALIZATIONS_BY_ID } from "@/lib/data/specializations"
+import {
+  SPECIALIZATIONS_BY_ID,
+  SPECIALIZATION_LAST_CHECKED,
+  courseSpecializations,
+} from "@/lib/data/specializations"
 import { ReviewList } from "@/components/reviews/review-list"
 import { ReviewForm } from "@/components/reviews/review-form"
 import { Tag, Stars } from "@/components/badges"
@@ -85,7 +89,7 @@ export function CourseDetail({ course }: { course: Course }) {
           )}
 
           <div className="mt-5 flex flex-wrap gap-1.5">
-            {course.specializations.map((s) => (
+            {courseSpecializations(course.id).map((s) => (
               <Tag key={s.id} variant={s.role === "core" ? "leaf" : "outline"}>
                 {SPECIALIZATIONS_BY_ID[s.id]?.name} · {s.role}
               </Tag>
@@ -131,15 +135,35 @@ export function CourseDetail({ course }: { course: Course }) {
           </Block>
           <Block heading="Counts toward">
             <ul className="mt-1 space-y-1 text-sm">
-              {course.specializations.map((s) => (
+              {courseSpecializations(course.id).map((s) => (
                 <li key={s.id} className="flex items-center justify-between">
-                  <span>{SPECIALIZATIONS_BY_ID[s.id]?.name}</span>
+                  <a
+                    href={SPECIALIZATIONS_BY_ID[s.id]?.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    {SPECIALIZATIONS_BY_ID[s.id]?.name}
+                  </a>
                   <span className="text-xs text-muted-foreground">
                     {s.role}
                   </span>
                 </li>
               ))}
             </ul>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Current-catalog guidance · Rule pages last checked{" "}
+              {SPECIALIZATION_LAST_CHECKED}. Verify your applicable catalog;
+              this is not a degree-completion decision.
+            </p>
+            <a
+              href="https://omscs.gatech.edu/specializations"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-block text-xs underline underline-offset-2"
+            >
+              Official specialization sources
+            </a>
           </Block>
         </div>
       </section>

@@ -1,4 +1,4 @@
-import type { Term, SpecializationId, CourseRole } from "@/lib/types";
+import type { Term } from "@/lib/types";
 
 type Seed = {
   code: string;
@@ -8,11 +8,10 @@ type Seed = {
   description: string;
   prereqs?: string[];
   termsOffered: Term[];
-  specs: { id: SpecializationId; role: CourseRole }[];
   tags: string[];
 };
 
-// Legacy topic and specialization annotations, pending sourced rule replacement.
+// Legacy topic annotations; sourced specialization rules live in specializations.ts.
 // Course facts and identities come exclusively from catalog.json.
 export const COURSE_SEEDS: Seed[] = [
   {
@@ -23,12 +22,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Foundations of modern operating systems: processes, threads, synchronization, memory, IPC, scheduling, file systems, virtualization, and distributed services.",
     prereqs: ["Systems programming in C", "Undergrad OS"],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "computing-systems", role: "core" },
-      { id: "machine-learning", role: "elective" },
-      { id: "interactive-intelligence", role: "core" },
-      { id: "computational-perception", role: "core" },
-    ],
     tags: ["systems", "C", "concurrency", "foundational"],
   },
   {
@@ -39,7 +32,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Research-flavored survey of OS design: shared memory multiprocessors, distributed shared memory, virtualization internals, kernel structures, and modern data-center systems.",
     prereqs: ["GIOS or equivalent"],
     termsOffered: ["Fall", "Spring"],
-    specs: [{ id: "computing-systems", role: "core" }],
     tags: ["systems", "research papers", "C"],
   },
   {
@@ -50,10 +42,6 @@ export const COURSE_SEEDS: Seed[] = [
       "End-to-end view of the internet: routing, transport, congestion control, software-defined networking, security, measurement, and content distribution.",
     prereqs: [],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "computing-systems", role: "core" },
-      { id: "interactive-intelligence", role: "elective" },
-    ],
     tags: ["networking", "Python", "Mininet"],
   },
   {
@@ -64,7 +52,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Modern cryptography: symmetric/asymmetric primitives, modes, MACs, signatures, key exchange, zero knowledge, and protocol analysis with proofs of security.",
     prereqs: ["Discrete math", "Probability"],
     termsOffered: ["Fall", "Spring"],
-    specs: [{ id: "computing-systems", role: "elective" }],
     tags: ["security", "math-heavy", "proofs"],
   },
   {
@@ -74,7 +61,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Threats, attacks, and defenses across network layers: malware, intrusion detection, web security, botnets, and machine-learning approaches to detection.",
     prereqs: ["Networks recommended"],
     termsOffered: ["Fall", "Spring"],
-    specs: [{ id: "computing-systems", role: "elective" }],
     tags: ["security", "Python", "labs"],
   },
   {
@@ -85,7 +71,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Security of industrial control systems, smart grids, and embedded controllers. Threat models, side channels, and formal protections.",
     prereqs: [],
     termsOffered: ["Fall", "Spring"],
-    specs: [{ id: "computing-systems", role: "elective" }],
     tags: ["security", "control systems"],
   },
   {
@@ -95,7 +80,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Design and verification of embedded software with real-time constraints, drivers, and hardware/software co-design.",
     prereqs: ["C programming"],
     termsOffered: ["Spring"],
-    specs: [{ id: "computing-systems", role: "elective" }],
     tags: ["embedded", "C", "RTOS"],
   },
   {
@@ -106,12 +90,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Lifecycle of building software: requirements, version control, testing, code review, design, and team workflows. Includes a course-long Android project.",
     prereqs: [],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "computing-systems", role: "core" },
-      { id: "interactive-intelligence", role: "core" },
-      { id: "human-computer-interaction", role: "core" },
-      { id: "machine-learning", role: "elective" },
-    ],
     tags: ["software engineering", "Java", "Android", "first course"],
   },
   {
@@ -122,10 +100,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Architectural styles, design patterns, model-driven engineering, and trade-off analysis for large software systems.",
     prereqs: ["SDP recommended"],
     termsOffered: ["Fall", "Spring"],
-    specs: [
-      { id: "computing-systems", role: "elective" },
-      { id: "human-computer-interaction", role: "elective" },
-    ],
     tags: ["architecture", "design", "Java"],
   },
   {
@@ -136,7 +110,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Static/dynamic program analysis, symbolic execution, fuzzing, and testing techniques. Heavy emphasis on tooling and theory.",
     prereqs: ["Compilers helpful"],
     termsOffered: ["Fall"],
-    specs: [{ id: "computing-systems", role: "elective" }],
     tags: ["analysis", "testing", "Datalog"],
   },
   {
@@ -147,10 +120,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Relational design, normalization, ER modeling, query languages, transactions, and modern data-management systems.",
     prereqs: [],
     termsOffered: ["Fall", "Spring"],
-    specs: [
-      { id: "computing-systems", role: "core" },
-      { id: "interactive-intelligence", role: "elective" },
-    ],
     tags: ["databases", "SQL", "ER models"],
   },
   {
@@ -160,10 +129,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Standards, data, and applications in healthcare IT. Project-driven introduction to FHIR, EHR, and population analytics.",
     prereqs: [],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "computing-systems", role: "elective" },
-      { id: "interactive-intelligence", role: "elective" },
-    ],
     tags: ["health", "Python", "team project"],
   },
   {
@@ -173,10 +138,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Real-time interactive systems, gameplay programming, and team-based production using Unity.",
     prereqs: [],
     termsOffered: ["Fall"],
-    specs: [
-      { id: "human-computer-interaction", role: "elective" },
-      { id: "interactive-intelligence", role: "elective" },
-    ],
     tags: ["Unity", "C#", "teams"],
   },
   {
@@ -186,7 +147,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Theory and practice of building tools for learning. Self-directed individual project across the semester.",
     prereqs: [],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [{ id: "human-computer-interaction", role: "elective" }],
     tags: ["self-directed", "writing-heavy"],
   },
   {
@@ -196,7 +156,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Computing techniques for journalism and storytelling: web scraping, NLP, visualization, and ethics.",
     prereqs: [],
     termsOffered: ["Spring"],
-    specs: [{ id: "interactive-intelligence", role: "elective" }],
     tags: ["NLP", "visualization", "Python"],
   },
   {
@@ -207,7 +166,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Imaging beyond the camera: HDR, panoramas, light fields, gradient-domain editing, and modern computational imaging.",
     prereqs: ["Linear algebra", "Calculus"],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [{ id: "computational-perception", role: "elective" }],
     tags: ["Python", "OpenCV", "creative"],
   },
   {
@@ -218,11 +176,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Foundations of vision: filtering, features, geometry, tracking, recognition, and modern deep approaches.",
     prereqs: ["Linear algebra", "Calculus", "Probability"],
     termsOffered: ["Fall", "Spring"],
-    specs: [
-      { id: "computational-perception", role: "core" },
-      { id: "machine-learning", role: "elective" },
-      { id: "interactive-intelligence", role: "elective" },
-    ],
     tags: ["vision", "Python", "math-heavy"],
   },
   {
@@ -233,11 +186,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Classical AI: search, games, CSPs, planning, probabilistic reasoning, learning, and HMMs. Project-heavy and pacing-intensive.",
     prereqs: ["Probability", "Linear algebra"],
     termsOffered: ["Fall", "Spring"],
-    specs: [
-      { id: "machine-learning", role: "core" },
-      { id: "interactive-intelligence", role: "core" },
-      { id: "computational-perception", role: "core" },
-    ],
     tags: ["AI", "Python", "exams"],
   },
   {
@@ -247,7 +195,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Survey of fairness, accountability, and societal impacts of AI. Case studies and reflective writing.",
     prereqs: [],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [{ id: "interactive-intelligence", role: "elective" }],
     tags: ["ethics", "writing"],
   },
   {
@@ -257,7 +204,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Methods to visualize scientific data sets: scalar/vector/tensor fields, isosurfaces, volume rendering, and large-data techniques.",
     prereqs: [],
     termsOffered: ["Spring"],
-    specs: [{ id: "computational-perception", role: "elective" }],
     tags: ["visualization", "OpenGL"],
   },
   {
@@ -268,10 +214,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Principles, methods, and theories of HCI. Heavy reading and writing; design-driven assignments.",
     prereqs: [],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "human-computer-interaction", role: "core" },
-      { id: "interactive-intelligence", role: "elective" },
-    ],
     tags: ["HCI", "writing", "design"],
   },
   {
@@ -281,7 +223,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Ethnography, interviews, contextual inquiry, and analysis techniques for understanding users in their context.",
     prereqs: [],
     termsOffered: ["Fall", "Spring"],
-    specs: [{ id: "human-computer-interaction", role: "elective" }],
     tags: ["research methods", "writing"],
   },
   {
@@ -291,7 +232,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Application-layer protocols and services on the modern internet: HTTP/3, QUIC, CDN architectures, and observability.",
     prereqs: ["Networks helpful"],
     termsOffered: ["Spring"],
-    specs: [{ id: "computing-systems", role: "elective" }],
     tags: ["networking", "systems"],
   },
   {
@@ -301,7 +241,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Mathematical and computational analysis of complex networks: structure, dynamics, and processes on networks.",
     prereqs: ["Probability"],
     termsOffered: ["Spring"],
-    specs: [{ id: "machine-learning", role: "elective" }],
     tags: ["graphs", "math", "Python"],
   },
   {
@@ -312,10 +251,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Cognitively-inspired AI: knowledge representation, frames, scripts, planning, learning, and metacognition. Build a Raven's-style agent.",
     prereqs: [],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "interactive-intelligence", role: "core" },
-      { id: "machine-learning", role: "elective" },
-    ],
     tags: ["AI", "Python", "agents", "first course"],
   },
   {
@@ -326,10 +261,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Probabilistic techniques for autonomous systems: localization, Kalman filters, particle filters, SLAM, and PID control.",
     prereqs: ["Probability", "Linear algebra"],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "computational-perception", role: "core" },
-      { id: "machine-learning", role: "elective" },
-    ],
     tags: ["robotics", "Python", "math"],
   },
   {
@@ -340,11 +271,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Survey of classical ML: supervised, unsupervised, and reinforcement learning. Open-ended, write-up-heavy assignments.",
     prereqs: ["Probability", "Linear algebra"],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "machine-learning", role: "core" },
-      { id: "interactive-intelligence", role: "core" },
-      { id: "computational-perception", role: "elective" },
-    ],
     tags: ["ML", "Python", "writing"],
   },
   {
@@ -355,10 +281,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Foundations and modern methods in RL: MDPs, TD learning, policy gradients, function approximation, and deep RL.",
     prereqs: ["ML or equivalent", "Probability"],
     termsOffered: ["Fall", "Spring"],
-    specs: [
-      { id: "machine-learning", role: "elective" },
-      { id: "interactive-intelligence", role: "elective" },
-    ],
     tags: ["RL", "Python", "papers"],
   },
   {
@@ -369,11 +291,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Modern deep learning: architectures, optimization, regularization, attention, transformers, and generative models.",
     prereqs: ["ML or equivalent", "Linear algebra", "Calculus"],
     termsOffered: ["Fall", "Spring"],
-    specs: [
-      { id: "machine-learning", role: "elective" },
-      { id: "computational-perception", role: "elective" },
-      { id: "interactive-intelligence", role: "elective" },
-    ],
     tags: ["DL", "PyTorch", "papers"],
   },
   {
@@ -384,10 +301,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Applied ML in financial markets: data, indicators, supervised/RL approaches, and portfolio strategies.",
     prereqs: ["Python"],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "machine-learning", role: "elective" },
-      { id: "computing-systems", role: "elective" },
-    ],
     tags: ["ML", "Python", "first course"],
   },
   {
@@ -398,10 +311,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Statistical and neural NLP: language modeling, sequence labeling, parsing, semantics, and modern transformer architectures.",
     prereqs: ["ML helpful"],
     termsOffered: ["Fall", "Spring"],
-    specs: [
-      { id: "interactive-intelligence", role: "core" },
-      { id: "machine-learning", role: "elective" },
-    ],
     tags: ["NLP", "PyTorch", "papers"],
   },
   {
@@ -412,7 +321,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Parallel algorithms and architectures: shared memory, distributed memory, GPUs, and analysis of scalability.",
     prereqs: ["C/C++", "Algorithms"],
     termsOffered: ["Fall", "Spring"],
-    specs: [{ id: "computing-systems", role: "elective" }],
     tags: ["HPC", "C++", "MPI"],
   },
   {
@@ -423,11 +331,6 @@ export const COURSE_SEEDS: Seed[] = [
       "End-to-end data analytics pipeline: scraping, cleaning, modeling, scaling, and interactive D3 visualization.",
     prereqs: [],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "machine-learning", role: "core" },
-      { id: "interactive-intelligence", role: "elective" },
-      { id: "computing-systems", role: "elective" },
-    ],
     tags: ["analytics", "D3", "Python", "team project"],
   },
   {
@@ -437,7 +340,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Bayesian inference, MCMC, hierarchical models, and applied case studies using PyMC/Stan.",
     prereqs: ["Probability", "Statistics"],
     termsOffered: ["Spring"],
-    specs: [{ id: "machine-learning", role: "elective" }],
     tags: ["statistics", "Python", "math-heavy"],
   },
   {
@@ -448,7 +350,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Frontends, IRs, optimizations, and codegen. Build a working compiler over the semester.",
     prereqs: ["Discrete math", "C++"],
     termsOffered: ["Spring"],
-    specs: [{ id: "computing-systems", role: "elective" }],
     tags: ["compilers", "C++", "LLVM"],
   },
   {
@@ -459,13 +360,6 @@ export const COURSE_SEEDS: Seed[] = [
       "Graduate-level algorithm design: dynamic programming, divide-and-conquer, graphs, NP-hardness, randomized and approximation algorithms.",
     prereqs: ["Undergrad algorithms"],
     termsOffered: ["Fall", "Spring", "Summer"],
-    specs: [
-      { id: "computing-systems", role: "core" },
-      { id: "machine-learning", role: "core" },
-      { id: "interactive-intelligence", role: "core" },
-      { id: "computational-perception", role: "core" },
-      { id: "human-computer-interaction", role: "core" },
-    ],
     tags: ["algorithms", "proofs", "exams", "required"],
   },
 ];

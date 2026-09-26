@@ -3,14 +3,17 @@ export type Term = "Fall" | "Spring" | "Summer"
 export type SpecializationId =
   | "computing-systems"
   | "machine-learning"
-  | "interactive-intelligence"
+  | "artificial-intelligence"
   | "computational-perception"
   | "human-computer-interaction"
+  | "computer-graphics"
 
 export type CourseRole =
-  | "core" // counts as foundational/core for many specs
+  | "core" // eligible for a specialization core bucket
   | "elective"
   | "capstone"
+
+export type CourseSpecialization = { id: SpecializationId; role: CourseRole }
 
 export type Course = {
   historical?: boolean
@@ -30,7 +33,6 @@ export type Course = {
   prereqs: string[]
   programNotes?: string
   termsOffered: Term[]
-  specializations: { id: SpecializationId; role: CourseRole }[]
   tags: string[]
   // populated from active review data when available
   stats: {
@@ -68,7 +70,7 @@ export type SpecRequirement = {
   label: string // e.g. "Pick 2 of the following"
   pick: number // how many courses needed from this bucket
   poolCourseIds: string[] // candidates that fulfill this bucket
-  required?: boolean // if true, all courses in pool are required (pick == pool.length)
+  role: "core" | "elective"
   notes?: string
 }
 
@@ -80,7 +82,9 @@ export type Specialization = {
   totalHours: number
   totalCourses: number
   requirements: SpecRequirement[]
-  freeElectiveCount: number // courses that can be any 6XXX/7XXX/8XXX outside the buckets
+  freeElectiveCount: number // current OMSCS courses not used in specialization slots
+  sourceUrl: string
+  lastChecked: string
 }
 
 export type ReviewSortKey =

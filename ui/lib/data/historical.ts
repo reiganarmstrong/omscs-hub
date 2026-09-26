@@ -22,7 +22,6 @@ export const HISTORICAL_COURSES: Course[] = (manifest as HistoricalEntry[]).map(
     foundational: false,
     prereqs: [],
     termsOffered: [],
-    specializations: [],
     tags: [],
     stats: emptyReviewStats(),
   })

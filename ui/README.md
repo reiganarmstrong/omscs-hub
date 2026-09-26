@@ -69,8 +69,8 @@ ui/
 - `/`: Catalog with search, filter rail, sort menu, and card/table view toggle.
 - `/courses/[id]`: Course detail, distribution charts, logistics, reviews, and
   planner actions. Static params cover canonical current codes and verified aliases.
-- `/specializations`: Track list, rules, required/foundational/elective
-  buckets, free-elective search, selected-track state, and planner toggles.
+- `/specializations`: Current sourced rules, core and elective buckets,
+  free-elective search, selected specialization, and planner toggles.
 - `/planner`: 2025-2027 Spring/Summer/Fall grid, unscheduled bucket,
   course picker with unverified future availability, specialization progress, plan health, and clear
   action.
@@ -82,11 +82,12 @@ ui/
 - `lib/data/catalog.json` contains 77 current Courses and 20 former-code aliases,
   checked September 26, 2026. Each Course has official source links, credit hours,
   a short overview excerpt and verified preparation guidance or an unknown label.
-- `lib/data/courses.seed.ts` supplies legacy topic and specialization annotations
-  only; its descriptions, prerequisites and term patterns are not published.
+- `lib/data/courses.seed.ts` supplies legacy topic annotations only; its
+  descriptions, prerequisites and term patterns are not published.
 - Generated review profiles are not used by the published Catalog.
-- `lib/data/specializations.ts` defines specialization requirements and bucket
-  progress helpers.
+- `lib/data/specializations.ts` defines all six sourced OMSCS specialization
+  requirements, source dates, and planned-slot progress under the six-hour
+  non-CS/CSE credit limit.
 - `ReviewsProvider` exposes live API reviews when available. Its compatibility
   fallback is empty; review aggregation and outage-state work follows separately.
 - `PlannerProvider` stores selected courses by term key in local storage.

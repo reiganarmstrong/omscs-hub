@@ -40,6 +40,10 @@ export function SpecializationsClient() {
 
   const spec =
     SPECIALIZATIONS.find((s) => s.id === active) ?? SPECIALIZATIONS[0];
+  const progress = React.useMemo(
+    () => bucketProgress(spec, plannedIds),
+    [spec, plannedIds],
+  );
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 pt-8 pb-16">
@@ -48,11 +52,13 @@ export function SpecializationsClient() {
           Specializations
         </h1>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Pick a track to see its required core, foundational pool, and elective
-          buckets. Click any course to add or remove it from your plan — newly
-          added courses land in the planner&apos;s
+          Pick a path to see its current core and elective buckets. Click any
+          course to add or remove it from your plan — newly added courses land
+          in the planner&apos;s
           <em> Unscheduled </em>
-          area, ready to assign to a semester.
+          area, ready to assign to a semester. This is current-catalog planning
+          guidance, not an official degree audit. If your catalog year differs,
+          check your Degree Works audit and advisor.
         </p>
       </header>
 
@@ -125,7 +131,7 @@ export function SpecializationsClient() {
             isMine={selectedSpec === spec.id}
             onPick={() => setSelectedSpec(spec.id)}
             onUnpick={() => setSelectedSpec(null)}
-            plannedIds={plannedIds}
+            prog={progress}
           />
           <div className="mt-5 space-y-4">
             {spec.requirements.map((req, idx) => (
@@ -134,6 +140,7 @@ export function SpecializationsClient() {
                 index={idx + 1}
                 req={req}
                 plannedIds={plannedIds}
+                matchedIds={progress.byBucket[req.id]?.matched ?? []}
                 onToggle={toggleCourse}
               />
             ))}
@@ -142,6 +149,7 @@ export function SpecializationsClient() {
                 index={spec.requirements.length + 1}
                 spec={spec}
                 plannedIds={plannedIds}
+                freeElectivesUsed={progress.freeElectivesUsed}
                 onToggle={toggleCourse}
               />
             )}
@@ -157,15 +165,14 @@ function SpecHeader({
   isMine,
   onPick,
   onUnpick,
-  plannedIds,
+  prog,
 }: {
   spec: Specialization;
   isMine: boolean;
   onPick: () => void;
   onUnpick: () => void;
-  plannedIds: Set<string>;
+  prog: ReturnType<typeof bucketProgress>;
 }) {
-  const prog = bucketProgress(spec, plannedIds);
   const requiredPct =
     prog.requiredFulfilled === 0
       ? 0
@@ -183,6 +190,11 @@ function SpecHeader({
         <p className="mt-1 text-sm text-muted-foreground">{spec.blurb}</p>
         <p className="reading mt-2 max-w-2xl text-[14px] text-foreground">
           {spec.description}
+        </p>
+        <p className="mt-2 text-xs font-medium text-muted-foreground">
+          {spec.totalHours - spec.freeElectiveCount * 3} specialization hours ·{" "}
+          {spec.freeElectiveCount * 3} free-elective hours · {spec.totalHours}{" "}
+          total hours
         </p>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Mini label="Total courses" value={String(spec.totalCourses)} />
@@ -206,12 +218,53 @@ function SpecHeader({
             note={`${prog.matchedFulfilled} / ${prog.requiredFulfilled} slots`}
           />
           <ProgressBar
-            label="Degree progress"
+            label="Planned course slots"
             value={totalPct}
             note={`${prog.matchedFulfilled + prog.freeElectivesUsed} / ${spec.totalCourses} courses`}
             accent="leaf"
           />
         </div>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Current-catalog guidance · Last checked {spec.lastChecked} ·{" "}
+          <a
+            href={spec.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2"
+          >
+            Official specialization rules
+          </a>
+          {" · "}
+          <a
+            href="https://omscs.gatech.edu/degree-requirements"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2"
+          >
+            OMSCS degree requirements
+          </a>
+          . Planned courses do not establish earned credit or degree completion.
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          At most six credit hours with a subject other than CS or CSE can
+          count. To continue after the first 12 months, complete two
+          foundational courses with B or better; see the{" "}
+          <a
+            href="https://omscs.gatech.edu/current-courses"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2"
+          >
+            current-course list
+          </a>
+          .
+        </p>
+        {prog.nonCsPlannedHours > prog.nonCsCreditLimit && (
+          <p role="status" className="mt-2 text-xs text-rose">
+            {prog.nonCsPlannedHours} non-CS/CSE hours planned; only{" "}
+            {prog.nonCsCreditLimit} hours count in the slot guidance above.
+          </p>
+        )}
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
         {isMine ? (
@@ -245,15 +298,16 @@ function RequirementBlock({
   index,
   req,
   plannedIds,
+  matchedIds,
   onToggle,
 }: {
   index: number;
   req: SpecRequirement;
   plannedIds: Set<string>;
+  matchedIds: string[];
   onToggle: (id: string) => void;
 }) {
-  const matched = req.poolCourseIds.filter((id) => plannedIds.has(id));
-  const filled = Math.min(matched.length, req.pick);
+  const filled = matchedIds.length;
   const fulfilled = filled >= req.pick;
 
   return (
@@ -282,7 +336,7 @@ function RequirementBlock({
                 : "bg-muted text-muted-foreground",
             )}
           >
-            {fulfilled ? "Fulfilled" : req.required ? "Required" : "Pending"}
+            {fulfilled ? "Planned" : "Open"}
           </span>
         </div>
       </header>
@@ -314,26 +368,27 @@ function FreeElectiveBlock({
   index,
   spec,
   plannedIds,
+  freeElectivesUsed,
   onToggle,
 }: {
   index: number;
   spec: Specialization;
   plannedIds: Set<string>;
+  freeElectivesUsed: number;
   onToggle: (id: string) => void;
 }) {
   const count = spec.freeElectiveCount;
-  // Eligible candidates for free electives: any course not in this spec's
-  // bucket pools (the official rule allows any approved 6XXX/7XXX/8XXX).
+  // Courses in a specialization bucket remain free-elective eligible if not
+  // used there, but appear only once in this browser.
   const candidates = React.useMemo(() => {
     const bucketIds = new Set(
-      spec.requirements.flatMap((r) => r.poolCourseIds),
+      spec.requirements.flatMap((req) => req.poolCourseIds),
     );
-    return COURSES.filter((c) => !bucketIds.has(c.id)).sort(
-      (a, b) => a.code.localeCompare(b.code),
+    return COURSES.filter((course) => !bucketIds.has(course.id)).sort((a, b) =>
+      a.code.localeCompare(b.code),
     );
   }, [spec]);
-  const used = candidates.filter((c) => plannedIds.has(c.id));
-  const filled = Math.min(used.length, count);
+  const filled = freeElectivesUsed;
   const fulfilled = filled >= count;
 
   const [q, setQ] = React.useState("");
@@ -371,13 +426,15 @@ function FreeElectiveBlock({
                 : "bg-muted text-muted-foreground",
             )}
           >
-            {fulfilled ? "Fulfilled" : "Pending"}
+            {fulfilled ? "Planned" : "Open"}
           </span>
         </div>
       </header>
       <p className="border-b border-border px-4 py-2 text-xs text-muted-foreground">
-        Any approved 6XXX/7XXX/8XXX OMSCS course outside the buckets above. Pick
-        favourites here; they&apos;ll count toward your remaining slots.
+        Any current OMSCS course not used in a specialization slot may count as
+        a free elective, including unused courses listed above. Courses listed
+        above appear only in their buckets. Check degree requirements for credit
+        limits.
       </p>
       <div className="border-b border-border px-4 py-2">
         <div className="relative">
@@ -487,21 +544,29 @@ function TermBadges({ terms }: { terms: Term[] }) {
   };
   return (
     <span className="inline-flex items-baseline gap-0.5">
-      {terms.length === 0 && <span title="Future term availability unverified" className="text-[10px] text-muted-foreground">Unverified</span>}
-      {terms.length > 0 && all.map((t) => (
+      {terms.length === 0 && (
         <span
-          key={t}
-          title={`${t}${terms.includes(t) ? "" : " — not offered"}`}
-          className={cn(
-            "inline-flex h-4 w-6 items-center justify-center rounded-sm border text-[10px] font-medium",
-            terms.includes(t)
-              ? "border-leaf bg-leaf text-leaf-fg"
-              : "border-border bg-transparent text-muted-foreground/45",
-          )}
+          title="Future term availability unverified"
+          className="text-[10px] text-muted-foreground"
         >
-          {labels[t]}
+          Unverified
         </span>
-      ))}
+      )}
+      {terms.length > 0 &&
+        all.map((t) => (
+          <span
+            key={t}
+            title={`${t}${terms.includes(t) ? "" : " — not offered"}`}
+            className={cn(
+              "inline-flex h-4 w-6 items-center justify-center rounded-sm border text-[10px] font-medium",
+              terms.includes(t)
+                ? "border-leaf bg-leaf text-leaf-fg"
+                : "border-border bg-transparent text-muted-foreground/45",
+            )}
+          >
+            {labels[t]}
+          </span>
+        ))}
     </span>
   );
 }

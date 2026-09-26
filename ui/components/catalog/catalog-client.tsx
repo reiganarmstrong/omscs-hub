@@ -10,6 +10,7 @@ import { CourseCard } from "./course-card"
 import { CourseRow } from "./course-row"
 import { SearchIcon, SortIcon, ChevronDown } from "@/components/icons"
 import { cn } from "@/lib/utils"
+import { courseSpecializations } from "@/lib/data/specializations"
 
 type SortKey =
   | "code"
@@ -130,14 +131,18 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
     const out = coursesWithStats.filter((c) => {
       if (!courseMatchesSearch(c, q)) return false
       if (filter.specs.length) {
-        const has = c.specializations.some((s) => filter.specs.includes(s.id))
+        const has = courseSpecializations(c.id).some((s) =>
+          filter.specs.includes(s.id)
+        )
         if (!has) return false
       }
       if (filter.terms.length) {
         if (!c.termsOffered.some((t) => filter.terms.includes(t))) return false
       }
       if (filter.role !== "any") {
-        const has = c.specializations.some((s) => s.role === filter.role)
+        const has = courseSpecializations(c.id).some(
+          (s) => s.role === filter.role
+        )
         if (!has) return false
       }
       if (reviewStats.state !== "ready") return true
