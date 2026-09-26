@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { courseMatchesSearch } from "@/lib/data"
 import type { Course, CatalogFilter } from "@/lib/types"
 import { FilterRail } from "./filter-rail"
 import { CourseCard } from "./course-card"
@@ -46,7 +47,7 @@ const DEFAULT_FILTER: CatalogFilter = {
 
 export function CatalogClient({ courses }: { courses: Course[] }) {
   const [filter, setFilter] = React.useState<CatalogFilter>(DEFAULT_FILTER)
-  const [sort, setSort] = React.useState<SortKey>("rating-desc")
+  const [sort, setSort] = React.useState<SortKey>("code")
   const [view, setView] = React.useState<"grid" | "table">("grid")
   const [sortOpen, setSortOpen] = React.useState(false)
   const sortMenuRef = React.useRef<HTMLDivElement>(null)
@@ -70,11 +71,7 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
   const filtered = React.useMemo(() => {
     const q = filter.q.trim().toLowerCase()
     const out = courses.filter((c) => {
-      if (q) {
-        const hay =
-          `${c.code} ${c.title} ${c.description} ${c.tags.join(" ")}`.toLowerCase()
-        if (!hay.includes(q)) return false
-      }
+      if (!courseMatchesSearch(c, q)) return false
       if (filter.specs.length) {
         const has = c.specializations.some((s) => filter.specs.includes(s.id))
         if (!has) return false
@@ -87,17 +84,33 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
         if (!has) return false
       }
       const s = c.stats
+      const hasReviews = s.numReviews > 0
       if (
-        s.avgDifficulty < filter.difficulty[0] ||
-        s.avgDifficulty > filter.difficulty[1]
+        hasReviews &&
+        (s.avgDifficulty < filter.difficulty[0] ||
+          s.avgDifficulty > filter.difficulty[1])
       )
         return false
       if (
-        s.avgWorkload < filter.workload[0] ||
-        s.avgWorkload > filter.workload[1]
+        hasReviews &&
+        (s.avgWorkload < filter.workload[0] ||
+          s.avgWorkload > filter.workload[1])
       )
         return false
-      if (s.avgRating < filter.rating[0] || s.avgRating > filter.rating[1])
+      if (
+        hasReviews &&
+        (s.avgRating < filter.rating[0] || s.avgRating > filter.rating[1])
+      )
+        return false
+      if (
+        !hasReviews &&
+        (filter.difficulty[0] !== DEFAULT_FILTER.difficulty[0] ||
+          filter.difficulty[1] !== DEFAULT_FILTER.difficulty[1] ||
+          filter.workload[0] !== DEFAULT_FILTER.workload[0] ||
+          filter.workload[1] !== DEFAULT_FILTER.workload[1] ||
+          filter.rating[0] !== DEFAULT_FILTER.rating[0] ||
+          filter.rating[1] !== DEFAULT_FILTER.rating[1])
+      )
         return false
       if (s.numReviews < filter.minReviews) return false
       return true

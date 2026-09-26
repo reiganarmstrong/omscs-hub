@@ -2,11 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {
-  SPECIALIZATIONS,
-  bucketProgress,
-} from "@/lib/data/specializations";
-import { COURSES, COURSES_BY_ID } from "@/lib/data";
+import { SPECIALIZATIONS, bucketProgress } from "@/lib/data/specializations";
+import { COURSES, COURSES_BY_ID, courseMatchesSearch } from "@/lib/data";
 import { usePlanner } from "@/lib/store/planner-store";
 import { usePrefs } from "@/lib/store/prefs-store";
 import { CheckIcon, ChevronRight, SearchIcon } from "@/components/icons";
@@ -51,9 +48,9 @@ export function SpecializationsClient() {
           Specializations
         </h1>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Pick a track to see its required core, foundational pool, and
-          elective buckets. Click any course to add or remove it from your
-          plan — newly added courses land in the planner&apos;s
+          Pick a track to see its required core, foundational pool, and elective
+          buckets. Click any course to add or remove it from your plan — newly
+          added courses land in the planner&apos;s
           <em> Unscheduled </em>
           area, ready to assign to a semester.
         </p>
@@ -64,12 +61,19 @@ export function SpecializationsClient() {
           <div className="label">Tracks</div>
           <ul className="mt-2 overflow-hidden rounded-lg border border-border bg-card">
             {SPECIALIZATIONS.map((s, i) => {
-              const ids = new Set(s.requirements.flatMap((r) => r.poolCourseIds));
-              const matched = [...ids].filter((id) => plannedIds.has(id)).length;
+              const ids = new Set(
+                s.requirements.flatMap((r) => r.poolCourseIds),
+              );
+              const matched = [...ids].filter((id) =>
+                plannedIds.has(id),
+              ).length;
               const isActive = s.id === spec.id;
               const isMine = s.id === selectedSpec;
               return (
-                <li key={s.id} className={i > 0 ? "border-t border-border" : ""}>
+                <li
+                  key={s.id}
+                  className={i > 0 ? "border-t border-border" : ""}
+                >
                   <button
                     type="button"
                     onClick={() => setActive(s.id)}
@@ -167,7 +171,8 @@ function SpecHeader({
       ? 0
       : (prog.matchedFulfilled / prog.requiredFulfilled) * 100;
   const totalPct =
-    ((prog.matchedFulfilled + prog.freeElectivesUsed) / spec.totalCourses) * 100;
+    ((prog.matchedFulfilled + prog.freeElectivesUsed) / spec.totalCourses) *
+    100;
 
   return (
     <div className="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-border bg-card p-5">
@@ -255,7 +260,7 @@ function RequirementBlock({
     <section className="overflow-hidden rounded-lg border border-border bg-card">
       <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5">
         <div className="flex items-baseline gap-3">
-          <span className="text-xs text-muted-foreground tabular">
+          <span className="tabular text-xs text-muted-foreground">
             #{String(index).padStart(2, "0")}
           </span>
           <h3 className="font-display text-lg tracking-tight">{req.label}</h3>
@@ -335,14 +340,14 @@ function FreeElectiveBlock({
   const ql = q.trim().toLowerCase();
   const filteredCandidates = candidates.filter((c) => {
     if (!ql) return true;
-    return `${c.code} ${c.title} ${c.tags.join(" ")}`.toLowerCase().includes(ql);
+    return courseMatchesSearch(c, ql);
   });
 
   return (
     <section className="overflow-hidden rounded-lg border border-dashed border-border bg-card/60">
       <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5">
         <div className="flex items-baseline gap-3">
-          <span className="text-xs text-muted-foreground tabular">
+          <span className="tabular text-xs text-muted-foreground">
             #{String(index).padStart(2, "0")}
           </span>
           <h3 className="font-display text-lg tracking-tight">
@@ -371,8 +376,8 @@ function FreeElectiveBlock({
         </div>
       </header>
       <p className="border-b border-border px-4 py-2 text-xs text-muted-foreground">
-        Any approved 6XXX/7XXX/8XXX OMSCS course outside the buckets above.
-        Pick favourites here; they&apos;ll count toward your remaining slots.
+        Any approved 6XXX/7XXX/8XXX OMSCS course outside the buckets above. Pick
+        favourites here; they&apos;ll count toward your remaining slots.
       </p>
       <div className="border-b border-border px-4 py-2">
         <div className="relative">
@@ -464,18 +469,18 @@ function CourseRow({
           planned && "font-medium text-foreground",
         )}
       >
-        <span className="sm:hidden text-xs text-muted-foreground">
+        <span className="text-xs text-muted-foreground sm:hidden">
           {course.code} ·{" "}
         </span>
         {course.title}
       </Link>
-      <span className="hidden tabular text-xs text-muted-foreground md:inline">
+      <span className="tabular hidden text-xs text-muted-foreground md:inline">
         {course.stats.avgDifficulty.toFixed(1)}
       </span>
-      <span className="hidden tabular text-xs text-muted-foreground md:inline">
+      <span className="tabular hidden text-xs text-muted-foreground md:inline">
         {course.stats.avgRating.toFixed(1)}
       </span>
-      <span className="hidden tabular text-xs text-muted-foreground md:inline">
+      <span className="tabular hidden text-xs text-muted-foreground md:inline">
         {course.stats.avgWorkload.toFixed(0)}
       </span>
       <span className="hidden justify-start gap-0.5 md:flex">
@@ -494,7 +499,8 @@ function TermBadges({ terms }: { terms: Term[] }) {
   };
   return (
     <span className="inline-flex items-baseline gap-0.5">
-      {all.map((t) => (
+      {terms.length === 0 && <span title="Future term availability unverified" className="text-[10px] text-muted-foreground">Unverified</span>}
+      {terms.length > 0 && all.map((t) => (
         <span
           key={t}
           title={`${t}${terms.includes(t) ? "" : " — not offered"}`}
@@ -547,7 +553,9 @@ function Mini({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <div className="label">{label}</div>
-      <div className="font-display tabular text-xl text-foreground">{value}</div>
+      <div className="tabular font-display text-xl text-foreground">
+        {value}
+      </div>
     </div>
   );
 }

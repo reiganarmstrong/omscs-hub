@@ -1,0 +1,1333 @@
+{
+  "version": "2026-09-26",
+  "sourceUrl": "https://omscs.gatech.edu/current-courses",
+  "courses": [
+    {
+      "id": "CS-6035",
+      "code": "CS 6035",
+      "title": "Introduction to Information Security",
+      "aliases": [],
+      "credits": 3,
+      "description": "Introduction to Information Security is a graduate-level introductory course in information security. It teaches the basic concepts and\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Undergraduate computing background; review the linked security and project preparation guides."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6035-introduction-information-security",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6150",
+      "code": "CS 6150",
+      "title": "Computing for Good",
+      "aliases": [],
+      "credits": 3,
+      "description": "How can computing help make the world a better place? Can we avoid wars, alleviate homelessness and improve\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Prior graduate study in at least two listed areas, including databases, networking, logistics, web development, global health, technology and society, or interface design."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6150-computing-good",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6200",
+      "code": "CS 6200",
+      "title": "Introduction to Operating Systems",
+      "aliases": [
+        "CS 8803 O02"
+      ],
+      "credits": 3,
+      "description": "Introduction to Operating Systems is a graduate-level introductory course in operating systems. This course teaches basic operating system\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Computer organization, C/C++, Linux command line, virtual machines, Makefiles, debugging and GCC."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6200-introduction-operating-systems",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6210",
+      "code": "CS 6210",
+      "title": "Advanced Operating Systems",
+      "aliases": [],
+      "credits": 3,
+      "description": "Advanced Operating Systems is a graduate-level course that addresses a broad range of topics in operating system design\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Undergraduate operating systems or comparable industry experience; use the official readiness assessment."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6210-advanced-operating-systems",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6211",
+      "code": "CS 6211",
+      "title": "System Design for Cloud Computing",
+      "aliases": [
+        "CS 8803 O12"
+      ],
+      "credits": 3,
+      "description": "This is a hands on project-intensive immersive course aimed at senior-level undergraduates and graduate students to give them\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "CS 6210 with A or high B, or an equivalent course."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6211-system-design-cloud-computing",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6238",
+      "code": "CS 6238",
+      "title": "Secure Computer Systems",
+      "aliases": [],
+      "credits": 3,
+      "description": "Applications and services are supported by software platforms such as operating systems and databases. Secure execution of such\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Undergraduate operating systems and Python; C systems programming is desirable."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6238-secure-computer-systems",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6250",
+      "code": "CS 6250",
+      "title": "Computer Networks",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course provides a quick refresh of introductory material, and offers a broad coverage of protocols and algorithms\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Networking background; Python, network programming and virtual machines are helpful."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6250-computer-networks",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6260",
+      "code": "CS 6260",
+      "title": "Applied Cryptography",
+      "aliases": [],
+      "credits": 3,
+      "description": "A graduate-level introduction to modern cryptography, which focuses on the classical goals of cryptography, such as data privacy,\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Discrete mathematics, algorithms, computability and writing mathematical proofs; prior cryptography is unnecessary."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6260-applied-cryptography",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6261",
+      "code": "CS 6261",
+      "title": "Security Operations and Incident Response",
+      "aliases": [
+        "CS 8803 O22"
+      ],
+      "credits": 3,
+      "description": "This course provides students with the background information and skill sets necessary to participate in and lead a\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Understanding system logs, log analysis tools, computer systems and networks."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6261-security-operations-and-incident-response",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6262",
+      "code": "CS 6262",
+      "title": "Network Security",
+      "aliases": [],
+      "credits": 3,
+      "description": "Topics to be covered in CS 6262 include: Introduction and review of networking and security basics Large-scale attacks\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "CS 6035 or equivalent information-security preparation is recommended."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6262-network-security",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6263",
+      "code": "CS 6263",
+      "title": "Intro to Cyber Physical Systems Security",
+      "aliases": [
+        "CS 8803 O07"
+      ],
+      "credits": 3,
+      "description": "This course (formerly CS 8803 O07 Special Topics) provides an introduction to security issues relating to various cyber-physical\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6263-intro-cyber-physical-systems-security",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6264",
+      "code": "CS 6264",
+      "title": "Information Security Lab - System and Network Defenses",
+      "aliases": [
+        "CS 8803 O11"
+      ],
+      "credits": 3,
+      "description": "This course will help students develop both in-depth knowledge and hands-on skills in a number of important cybersecurity\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Information-security basics; network security is desirable; prior C, Java or similar programming is required."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6264-information-security-lab-system-and-network-defenses",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6265",
+      "code": "CS 6265",
+      "title": "Information Security Lab",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course covers advanced techniques for writing exploits and patching vulnerabilities, taught through an intense, hands-on security laboratory.\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Operating systems preparation equivalent to CS 3210."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6265-information-security-lab",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6271",
+      "code": "CS 6271",
+      "title": "Cybersecurity of Drones",
+      "aliases": [
+        "CS 8803 O31"
+      ],
+      "credits": 3,
+      "description": "Cybersecurity of Drones is an in-depth exploration of security and privacy challenges in cyber-physical systems (CPS), with a\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "C/C++, embedded systems, computer architecture and cybersecurity fundamentals; consult the full drone-security preparation guide."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6271-cybersecurity-drones",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6290",
+      "code": "CS 6290",
+      "title": "High Performance Computer Architecture",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course covers modern computer architecture, including branch prediction, out-of-order instruction execution, cache optimizations, multi-level caches, memory and\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Computer organization and architecture, C/C++ and Linux; confidence editing large programs."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6290-high-performance-computer-architecture",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6291",
+      "code": "CS 6291",
+      "title": "Embedded Systems Optimization",
+      "aliases": [
+        "CS 8803 O04"
+      ],
+      "credits": 3,
+      "description": "In the 21st century, embedded systems are the systems of future with cellular phones, smart-phones, and tablets becoming\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Computer architecture and strong C/C++; Python and Git knowledge are required."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6291-embedded-systems-optimization",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6300",
+      "code": "CS 6300",
+      "title": "Software Development Process",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course provides an in-depth study of the process of developing software systems, including: the use of software\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Java, software-engineering concepts and an undergraduate software-engineering course or industry experience."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6300-software-development-process",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6310",
+      "code": "CS 6310",
+      "title": "Software Architecture and Design",
+      "aliases": [],
+      "credits": 3,
+      "description": "Software Architecture and Design will provide students with the principles and concepts involved in the analysis and design\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Software engineering or CS 6300 or substantial industry experience; Java and object-oriented programming."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6310-software-architecture-and-design",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6340",
+      "code": "CS 6340",
+      "title": "Software Analysis",
+      "aliases": [],
+      "credits": 3,
+      "description": "Have you ever wondered how your development environment can determine that you have an unused variable before you\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Fluency in a C-family language; assignments primarily use C++."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6340-software-analysis",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6400",
+      "code": "CS 6400",
+      "title": "Database Systems Concepts and Design",
+      "aliases": [],
+      "credits": 3,
+      "description": "We believe in learning-by-example and learning-by-doing. This course presents an example of applying a database application development methodology\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Programming proficiency; software engineering and Git help; readiness for administration tasks and remote teamwork."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6400-database-systems-concepts-and-design",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6422",
+      "code": "CS 6422",
+      "title": "Database System Implementation",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course offers a hands-on dive into designing and implementing relational database management systems. Students will learn about\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Data structures and computer systems coursework, strong C++; operating systems and databases recommended. See full preparation guidance."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6422-database-system-implementation",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6435",
+      "code": "CS 6435",
+      "title": "Digital Health Equity",
+      "aliases": [
+        "CS 8803 O16"
+      ],
+      "credits": 3,
+      "description": "Digital Health Equity introduces individual, interpersonal, and societal influences on health, and how such influences create health disparities.\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6435-digital-health-equity",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6440",
+      "code": "CS 6440",
+      "title": "Intro to Health Informatics",
+      "aliases": [],
+      "credits": 3,
+      "description": "CS 6440: Introduction to Health Informatics is designed so that students with a variety of backgrounds can gain\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Computing fundamentals and programming proficiency; Java, Python, TypeScript and Docker appear in labs."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6440-intro-health-informatics",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6457",
+      "code": "CS 6457",
+      "title": "Video Game Design",
+      "aliases": [],
+      "credits": 3,
+      "description": "Welcome to CS6457 Video Game Design. The course covers many game design topics including game engine concepts and\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Object-oriented programming, linear algebra and graphics fundamentals; Unity experience is unnecessary."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6457-video-game-design",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6460",
+      "code": "CS 6460",
+      "title": "Educational Technology",
+      "aliases": [],
+      "credits": 3,
+      "description": "CS 6460: Educational Technology will be a heavily project-based class in which students will: deeply investigate the tools,\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Complete program foundational coursework; readiness for essays, discussion and a substantial project."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6460-educational-technology",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6475",
+      "code": "CS 6475",
+      "title": "Computational Photography",
+      "aliases": [],
+      "credits": 3,
+      "description": "This class explores how computation impacts the entire workflow of photography, which is traditionally aimed at capturing light\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Programming, preferably Python; calculus, matrices, vectors, optics and probability."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6475-computational-photography",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6476",
+      "code": "CS 6476",
+      "title": "Computer Vision",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course provides an introduction to computer vision including: fundamentals of image formation; camera imaging geometry; feature detection\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Mathematical programming in Python, OpenCV and mathematical preparation; see the full readiness questions."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6476-computer-vision",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6491",
+      "code": "CS 6491",
+      "title": "Foundations of Computer Graphics",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course explores the mathematical, physical, and perceptual principles behind computer graphics, focusing on techniques for creating, representing,\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6491-foundations-computer-graphics",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6515",
+      "code": "CS 6515",
+      "title": "Intro to Graduate Algorithms",
+      "aliases": [
+        "CS 8803 GA"
+      ],
+      "credits": 3,
+      "description": "This course is a graduate-level course in the theory of algorithm design and analysis. The course introduces several\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Undergraduate algorithms and discrete mathematics, including graphs, dynamic programming, recurrences and complexity analysis."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6515-intro-graduate-algorithms",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6601",
+      "code": "CS 6601",
+      "title": "Artificial Intelligence",
+      "aliases": [],
+      "credits": 3,
+      "description": "Students should be familiar with college-level mathematical concepts (calculus, analytic geometry, linear algebra, and probability) and computer science\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Algorithms, data structures, calculus, probability, linear algebra and Python; confidence editing large programs."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6601-artificial-intelligence",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6603",
+      "code": "CS 6603",
+      "title": "AI, Ethics, and Society",
+      "aliases": [
+        "CS 8803 O10"
+      ],
+      "credits": 3,
+      "description": "Abuse of big data means your worst fears can come true. Being monitored by your employer? Check. Government\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Programming experience with Python and Jupyter; social-media access is needed for parts of the first module."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6603-ai-ethics-and-society",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6675",
+      "code": "CS 6675",
+      "title": "Advanced Internet Systems and Applications",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course introduces a selection of key cutting-edge technologies in Internet computing systems and technologies. The course covers\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Basic computing and communications-network knowledge."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6675-advanced-internet-systems-and-applications",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6747",
+      "code": "CS 6747",
+      "title": "Advanced Malware Analysis",
+      "aliases": [
+        "CS 8813"
+      ],
+      "credits": 3,
+      "description": "This course covers advanced approaches for detecting the presence of vulnerabilities in binary software, the analysis of malicious\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6747-advanced-malware-analysis",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6750",
+      "code": "CS 6750",
+      "title": "Human-Computer Interaction",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course is an introductory course on human-computer interaction. It does not presuppose any earlier knowledge of human-computer\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "No significant entry prerequisites stated; readiness for interface evaluation, user research and design activities."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6750-human-computer-interaction",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-6795",
+      "code": "CS 6795",
+      "title": "Introduction to Cognitive Science",
+      "aliases": [],
+      "credits": 3,
+      "description": "Cognitive science is an interdisciplinary study of mind and intelligence lying at the intersection of artificial intelligence, psychology,\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "No significant entry prerequisites stated; readiness for scholarly reading and cognitive-science analysis."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-6795-introduction-cognitive-science",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7210",
+      "code": "CS 7210",
+      "title": "Distributed Computing",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course will cover both fundamental concepts in distributed computing and discuss system designs enabling distributed applications. The\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "No enforced prerequisites; graduate systems or networking knowledge equivalent to CS 6200, CS 6210 or CS 6250 is expected."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7210-distributed-computing",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7240",
+      "code": "CS 7240",
+      "title": "Modern Internet Research Methods",
+      "aliases": [
+        "CS 8803 O23"
+      ],
+      "credits": 3,
+      "description": "Welcome! This is a research-oriented course that covers new developments in Internet measurement techniques, with an emphasis on\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Preparation depends on the selected research project; consult the official project guidance."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7240-modern-internet-research-methods",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7280",
+      "code": "CS 7280",
+      "title": "Network Science",
+      "aliases": [],
+      "credits": 3,
+      "description": "It is often the case that complex systems , both living and man-made, can be represented as static\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Undergraduate calculus, probability, linear algebra and programming."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7280-network-science",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7295",
+      "code": "CS 7295",
+      "title": "GPU Hardware and Software",
+      "aliases": [
+        "CS 8803 O21"
+      ],
+      "credits": 3,
+      "description": "This course explores the software and hardware aspects of GPU development. Through hands-on projects, you'll gain basic CUDA\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Linux command line, C/C++, Python and computer organization; CS 6200 helps; prior CUDA is unnecessary."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7295-gpu-hardware-and-software",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7400",
+      "code": "CS 7400",
+      "title": "Intro to Quantum Computing",
+      "aliases": [
+        "CS 8803 O13"
+      ],
+      "credits": 3,
+      "description": "Quantum computing promises exponential speedups for a class of important problems. Quantum computers with dozen(s) of qubits have\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7400-intro-quantum-computing",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7470",
+      "code": "CS 7470",
+      "title": "Mobile & Ubiquitous Computing",
+      "aliases": [],
+      "credits": 3,
+      "description": "Mobile and ubiquitous computing are often referred to as the third generation of computing where humans continuously interact\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7470-mobile-ubiquitous-computing",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7496",
+      "code": "CS 7496",
+      "title": "Computer Animation",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course aims to understand the basic principles behind modern kinematic and physics-based animation techniques. This course requires\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Computer graphics, linear algebra, vector calculus and Python are helpful, not mandatory."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7496-computer-animation",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7632",
+      "code": "CS 7632",
+      "title": "Game AI",
+      "aliases": [],
+      "credits": 3,
+      "description": "Welcome to CS 7632 Game AI. As applied to video game development, Artificial Intelligence serves a different purpose\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "CS 6601 strongly recommended; algorithms, data structures and software development, preferably C# or comparable object-oriented programming."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7632-game-ai",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7637",
+      "code": "CS 7637",
+      "title": "Knowledge-Based AI",
+      "aliases": [],
+      "credits": 3,
+      "description": "The twin goals of knowledge-based artificial intelligence (AI) are to build AI agents capable of human-level intelligence and\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Programming and introductory AI are recommended; data structures and object-oriented concepts help."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7637-knowledge-based-ai",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7638",
+      "code": "CS 7638",
+      "title": "Robotics: AI Techniques",
+      "aliases": [
+        "CS 8803 O01"
+      ],
+      "credits": 3,
+      "description": "In Artificial Intelligence for Robotics, learn from Sebastian Thrun, the leader of Google and Stanford's autonomous driving team,\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Python and command-line use; another language plus willingness to learn Python may suffice. See full readiness guidance."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7638-robotics-ai-techniques",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7639",
+      "code": "CS 7639",
+      "title": "Cyber-Physical Design and Analysis",
+      "aliases": [
+        "CS 8803 O09"
+      ],
+      "credits": 3,
+      "description": "Cyber-physical systems are systems comprising both a physical part and a software part, whereby the physical part of\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7639-cyber-physical-design-and-analysis",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7641",
+      "code": "CS 7641",
+      "title": "Machine Learning",
+      "aliases": [],
+      "credits": 3,
+      "description": "This is a graduate Machine Learning Series, initially created by Charles Isbell (Chancellor, University of Illinois Urbana-Champaign) and\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Introductory AI recommended; consult the official preparedness questions."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7641-machine-learning",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7642",
+      "code": "CS 7642",
+      "title": "Reinforcement Learning",
+      "aliases": [
+        "CS 8803 O03"
+      ],
+      "credits": 3,
+      "description": "The course explores automated decision-making from a computational perspective through a combination of classic papers and more recent\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "CS 7641 strongly recommended; neural networks, calculus, statistics, linear algebra and scientific Python tools."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7642-reinforcement-learning",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7643",
+      "code": "CS 7643",
+      "title": "Deep Learning",
+      "aliases": [],
+      "credits": 3,
+      "description": "Deep learning is a sub-field of machine learning that focuses on learning complex, hierarchical feature representations from raw\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Prior ML coursework and strong Python; linear algebra, calculus and probability/statistics. Online self-study alone does not meet the stated preparation."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7643-deep-learning",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7646",
+      "code": "CS 7646",
+      "title": "Machine Learning for Trading",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course introduces students to the real world challenges of implementing machine learning based trading strategies including the\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Students from varied backgrounds welcome; consult readiness questions for programming, statistics and finance."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7646-machine-learning-trading",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7650",
+      "code": "CS 7650",
+      "title": "Natural Language",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course gives an overview of modern data-driven techniques for natural language processing. The course moves from shallow\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Data structures and introductory AI or ML coursework."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7650-natural-language",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-7711",
+      "code": "CS 7711",
+      "title": "Health Sensing and Interventions",
+      "aliases": [
+        "CS 8803 O29"
+      ],
+      "credits": 3,
+      "description": "Health sensing and interventions (HSI) aims to bridge the gap between the medical sciences and computing. At a\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Python familiarity helps; limited programming experience can be sufficient."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-7711-health-sensing-and-interventions",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-8803-O08",
+      "code": "CS 8803 O08",
+      "title": "Compilers - Theory and Practice",
+      "aliases": [],
+      "credits": 3,
+      "description": "The objective of this course is to learn the theory and practice behind building automatic translators (compilers) for\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Data structures, algorithms and substantial Java or C++ programming; Linux use."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cs-8803-o08-compilers-theory-and-practice",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-8803-O15",
+      "code": "CS 8803 O15",
+      "title": "Introduction to Computer Law",
+      "aliases": [],
+      "credits": 3,
+      "description": "An understanding of certain aspects of the law can help computer scientists contribute more to their enterprise. We\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Java and an IDE for the code-analysis project; an introductory Java learning resource is linked."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-8803-o15-introduction-computer-law",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-8803-O17",
+      "code": "CS 8803 O17",
+      "title": "Global Entrepreneurship",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course will provide you with real-world, hands-on learning on what it\u2019s like to create a startup. You\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-8803-o17-global-entrepreneurship",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-8803-O20",
+      "code": "CS 8803 O20",
+      "title": "Quantum Hardware",
+      "aliases": [],
+      "credits": 3,
+      "description": "Quantum computing promises exponential speedups for a class of important problems. Quantum computers with hundreds of qubits have\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Calculus, complex numbers and linear algebra; quantum computing is helpful; physics is not assumed."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-8803-o20-quantum-hardware",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-8803-O24",
+      "code": "CS 8803 O24",
+      "title": "Intro to Research",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course serves as a general introduction to research methods and CS research more specifically. Students will understand\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Word processing and willingness to learn LaTeX; learning resources supplied."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-8803-o24-intro-research",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-8803-O25",
+      "code": "CS 8803 O25",
+      "title": "Advanced Wireless Networks",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course is on the principles and the practice of wireless and mobile networks. Topics covered include wireless\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Introductory networking, high-level programming such as Python, and elementary probability."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-8803-o25-advanced-wireless-networks",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-8803-O27",
+      "code": "CS 8803 O27",
+      "title": "Computer Graphics in the AI Era",
+      "aliases": [],
+      "credits": 3,
+      "description": "The CGAI course offers a comprehensive introduction to modern computer graphics, focusing on techniques that have emerged over\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Computer graphics fundamentals, calculus and linear algebra; introductory graphics lectures are supplied. See full preparation guidance."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-8803-o27-computer-graphics-ai-era",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CS-8803-ORO",
+      "code": "CS 8803 ORO",
+      "title": "Management & Leadership in Computing",
+      "aliases": [],
+      "credits": 3,
+      "description": "CS 8803 ORO: Management & Leadership in Computing is a project-driven, experiential elective that immerses OMSCS students in\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "No suggested preparation stated."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cs-8803-oro-management-leadership-computing",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CSE-6220",
+      "code": "CSE 6220",
+      "title": "Intro to High-Performance Computing",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course is a graduate-level introduction to scalable parallel algorithms. \u201cScale\u201d really refers to two things: efficient as\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Algorithms, C/C++ and command-line experience recommended; use the official readiness survey."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cse-6220-intro-high-performance-computing",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cse/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CSE-6242",
+      "code": "CSE 6242",
+      "title": "Data and Visual Analytics",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course will introduce you to broad classes of techniques and tools for analyzing and visualizing data at\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Strong high-level programming and debugging; consult full readiness guidance and suggested analytics coursework."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cse-6242-data-and-visual-analytics",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cse/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CSE-6250",
+      "code": "CSE 6250",
+      "title": "Big Data for Health Informatics",
+      "aliases": [],
+      "credits": 3,
+      "description": "Data science plays an important role in many industries. In facing massive amounts of heterogeneous data, scalable machine\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "ML, Scala/Python/Java, data processing and statistics; official page lists additional graded-course preparation."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/cse-6250-big-data-health-informatics",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cse/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "CSE-6742",
+      "code": "CSE 6742",
+      "title": "Modeling, Simulation, and Military Gaming",
+      "aliases": [],
+      "credits": 3,
+      "description": "Computer modeling and simulation offers a unique perspective on events because of the ability to hold some variables\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/cse-6742-modeling-simulation-and-military-gaming",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cse/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "ECE-8843",
+      "code": "ECE 8843",
+      "title": "Side-Channels and Their Role in Cybersecurity",
+      "aliases": [],
+      "credits": 3,
+      "description": "The primary objective of this course is to provide an in-depth treatment of digital and analog side-channels and\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Graduate standing, high-performance computer architecture and C/C++ programming recommended."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/ece-8843-side-channels-and-their-role-cybersecurity",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/ece/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "INTA-6450",
+      "code": "INTA 6450",
+      "title": "Data Analytics & Security",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course explores the foundations of big data and data analytics, including its foundations in computing technology and\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "No specific preparation stated; programming and statistics background are not required."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/inta-6450-data-analytics-and-security",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/inta/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "ISYE-6402",
+      "code": "ISYE 6402",
+      "title": "Time Series Analysis",
+      "aliases": [],
+      "credits": 3,
+      "description": "In the 6402 Time Series course, learners will learn standard time series analysis topics such as modeling time\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Statistics, probability, programming, linear algebra, calculus and linear regression."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/isye-6402-time-series-analysis",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/isye/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "ISYE-6414",
+      "code": "ISYE 6414",
+      "title": "Regression Analysis",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course provides an introduction to the principles and practice of regression analysis, covering linear regression, generalized linear\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "No formal OMSCS prerequisites; linear algebra, probability/statistics and programming preparation recommended. See full guidance."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/isye-6414-regression-analysis",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/isye/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "ISYE-6420",
+      "code": "ISYE 6420",
+      "title": "Bayesian Statistics",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course provides an introduction to Bayesian statistical inference and its applications. More information is available on the\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Introductory probability/statistics, programming and calculus."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": true,
+      "sourceUrl": "https://omscs.gatech.edu/isye-6420-bayesian-statistics",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/isye/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "ISYE-6501",
+      "code": "ISYE 6501",
+      "title": "Intro to Analytics Modeling",
+      "aliases": [],
+      "credits": 3,
+      "description": "Analytical models are key to understanding data, generating predictions, and making business decisions. Without models, it\u2019s nearly impossible\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Probability/statistics, programming, linear algebra and calculus; R helps."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/isye-6501-intro-analytics-modeling",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/isye/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "ISYE-6525",
+      "code": "ISYE 6525",
+      "title": "Topics on High-Dimensional Data Analytics",
+      "aliases": [
+        "ISYE 8803"
+      ],
+      "credits": 3,
+      "description": "This course focuses on analysis of high-dimensional structured data including profiles, images, and other types of functional data\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Regression, linear algebra and programming in Python, R or MATLAB."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/isye-6525-topics-high-dimensional-data-analytics",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/isye/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "ISYE-6644",
+      "code": "ISYE 6644",
+      "title": "Simulation and Modeling for Engineering and Science",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course covers modeling of discrete-event dynamic systems and introduces simulation-based methods for using these models to solve\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Calculus, probability and statistics; some programming experience helps; refresher materials supplied."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/isye-6644-simulation-and-modeling-engineering-and-science",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/isye/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "ISYE-6669",
+      "code": "ISYE 6669",
+      "title": "Deterministic Optimization",
+      "aliases": [],
+      "credits": 3,
+      "description": "The course will teach basic concepts, models, and algorithms in linear optimization, integer optimization, and convex optimization. The\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Linear algebra, multivariable calculus, probability and Python."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/isye-6669-deterministic-optimization",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/isye/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "MGT-6311",
+      "code": "MGT 6311",
+      "title": "Digital Marketing",
+      "aliases": [],
+      "credits": 3,
+      "description": "Digital Marketing has evolved from traditional marketing channels (radio, print, television, etc.) to include the online/internet channel and\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [],
+      "prerequisitesStatus": "unverified",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/mgt-6311-digital-marketing",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/mgt/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "MGT-8813",
+      "code": "MGT 8813",
+      "title": "Financial Modeling",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course is intended to prepare students to build financial models and make business decisions based on the\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "MGT 8803/6754 recommended."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/mgt-8813-financial-modeling",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/mgt/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "PUBP-6725",
+      "code": "PUBP 6725",
+      "title": "Information Security Policies",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course introduces students to the policy and management aspects of cybersecurity. It is based on the idea\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "Computer and networking basics; economics, public policy and international-relations coursework helps."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/pubp-6725-information-security-policies",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/pubp/",
+      "lastChecked": "2026-09-26"
+    },
+    {
+      "id": "PUBP-8823",
+      "code": "PUBP 8823",
+      "title": "Geopolitics of Cybersecurity",
+      "aliases": [],
+      "credits": 3,
+      "description": "This course provides students with a framework for interpreting power politics in and through cyberspace. The organizing assumption\u2026",
+      "descriptionStatus": "official-excerpt",
+      "prereqs": [
+        "No formal prerequisites; some technical or strategic cybersecurity preparation is expected."
+      ],
+      "prerequisitesStatus": "published-guidance",
+      "foundational": false,
+      "sourceUrl": "https://omscs.gatech.edu/pubp-8823-geopolitics-cybersecurity",
+      "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/pubp/",
+      "lastChecked": "2026-09-26"
+    }
+  ]
+}

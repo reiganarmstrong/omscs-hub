@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { CourseFacts } from "./course-facts";
 import Link from "next/link";
-import type { Course, Term } from "@/lib/types";
+import type { Course } from "@/lib/types";
 import { WORKLOAD_BUCKETS } from "@/lib/types";
 import { useReviews } from "@/lib/store/reviews-store";
 import { aggregateStats } from "@/lib/data";
@@ -17,17 +18,23 @@ import { cn } from "@/lib/utils";
 
 type Stats = ReturnType<typeof aggregateStats>;
 
-const ALL_TERMS: Term[] = ["Fall", "Spring", "Summer"];
-
 export function CourseDetail({ course }: { course: Course }) {
-  const { reviewsFor, statsFor, loadCourseReviews, loadingCourseIds, reviewErrors } = useReviews();
+  const {
+    reviewsFor,
+    statsFor,
+    loadCourseReviews,
+    loadingCourseIds,
+    reviewErrors,
+  } = useReviews();
   const reviews = reviewsFor(course.id);
   const stats = statsFor(course.id);
   const meanWLBucket = bucketIndexFor(stats.avgWorkload);
   const meanRatingIdx = clampIdx(Math.round(stats.avgRating) - 1, 0, 4);
   const meanDiffIdx = clampIdx(Math.round(stats.avgDifficulty) - 1, 0, 4);
   const reviewError = reviewErrors[course.id];
-  const isReviewFallbackNotice = reviewError?.startsWith("Review API unavailable.");
+  const isReviewFallbackNotice = reviewError?.startsWith(
+    "Review API unavailable.",
+  );
 
   React.useEffect(() => {
     void loadCourseReviews(course.id);
@@ -56,8 +63,17 @@ export function CourseDetail({ course }: { course: Course }) {
             )}
           </h1>
           <p className="reading mt-3 max-w-3xl text-[15px] text-muted-foreground">
+            <span className="block text-xs">Official overview excerpt</span>
             {course.description}
           </p>
+
+          <CourseFacts course={course} />
+          {course.aliases.length > 0 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Former codes: {course.aliases.join(", ")}. These refer to this
+              same Course.
+            </p>
+          )}
 
           <div className="mt-5 flex flex-wrap gap-1.5">
             {course.specializations.map((s) => (
@@ -115,25 +131,11 @@ export function CourseDetail({ course }: { course: Course }) {
       <section className="mt-10">
         <SectionHead title="Logistics" />
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Block heading="Terms offered">
-            <div className="mt-2 grid grid-cols-3 overflow-hidden rounded-md border border-border">
-              {ALL_TERMS.map((t) => (
-                <div
-                  key={t}
-                  className={cn(
-                    "flex items-center justify-center gap-1.5 px-3 py-2 text-center text-xs",
-                    course.termsOffered.includes(t)
-                      ? "bg-neutral-950 text-white dark:bg-white dark:text-black"
-                      : "bg-card text-muted-foreground line-through",
-                  )}
-                >
-                  {t}
-                  {course.termsOffered.includes(t) && (
-                    <CheckIcon size={13} className="shrink-0 text-leaf" />
-                  )}
-                </div>
-              ))}
-            </div>
+          <Block heading="Term availability">
+            <p className="text-sm text-muted-foreground">
+              Unverified for future terms. Current-list inclusion does not
+              guarantee a term offering.
+            </p>
           </Block>
           <Block heading="Prerequisites">
             {course.prereqs.length ? (
@@ -143,7 +145,9 @@ export function CourseDetail({ course }: { course: Course }) {
                 ))}
               </ul>
             ) : (
-              <span className="text-sm text-muted-foreground">None listed.</span>
+              <span className="text-sm text-muted-foreground">
+                Unverified. Consult the official course page.
+              </span>
             )}
           </Block>
           <Block heading="Counts toward">
@@ -151,7 +155,9 @@ export function CourseDetail({ course }: { course: Course }) {
               {course.specializations.map((s) => (
                 <li key={s.id} className="flex items-center justify-between">
                   <span>{SPECIALIZATIONS_BY_ID[s.id]?.name}</span>
-                  <span className="text-xs text-muted-foreground">{s.role}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {s.role}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -165,7 +171,9 @@ export function CourseDetail({ course }: { course: Course }) {
           note="OMSCentral imports are public. OMSCS Hub reviews require a verified gatech.edu account."
         />
         {loadingCourseIds.has(course.id) && (
-          <p className="mt-3 text-xs text-muted-foreground">Loading review archive…</p>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Loading review archive…
+          </p>
         )}
         {reviewError && (
           <p
@@ -213,13 +221,7 @@ function Crumbs({ course }: { course: Course }) {
   );
 }
 
-function SidebarSummary({
-  course,
-  stats,
-}: {
-  course: Course;
-  stats: Stats;
-}) {
+function SidebarSummary({ course, stats }: { course: Course; stats: Stats }) {
   const { add, remove, has } = usePlanner();
   const inTerm = has(course.id);
   const [picker, setPicker] = React.useState(false);
@@ -227,7 +229,7 @@ function SidebarSummary({
   const yearOptions = ["2025", "2026", "2027"];
   const termOptions = ["Fall", "Spring", "Summer"] as const;
   const [year, setYear] = React.useState(yearOptions[0]);
-  const [term, setTerm] = React.useState<typeof termOptions[number]>(
+  const [term, setTerm] = React.useState<(typeof termOptions)[number]>(
     course.termsOffered[0] ?? "Fall",
   );
 
@@ -238,7 +240,11 @@ function SidebarSummary({
         <Stars value={stats.avgRating} />
       </div>
       <dl className="mt-3 grid grid-cols-3 gap-3">
-        <Mini label="Difficulty" value={stats.avgDifficulty.toFixed(1)} unit="/5" />
+        <Mini
+          label="Difficulty"
+          value={stats.avgDifficulty.toFixed(1)}
+          unit="/5"
+        />
         <Mini
           label="Workload"
           value={stats.avgWorkload.toFixed(0)}
@@ -284,11 +290,12 @@ function SidebarSummary({
           </div>
         ) : (
           <div className="mt-2 space-y-1.5">
+            <p className="text-xs text-muted-foreground">Future term availability unverified. Choose your intended term.</p>
             <div className="grid grid-cols-[1fr_1fr_auto] gap-1.5">
               <select
                 value={term}
                 onChange={(e) =>
-                  setTerm(e.target.value as typeof termOptions[number])
+                  setTerm(e.target.value as (typeof termOptions)[number])
                 }
                 className="rounded-md border border-border bg-background px-2 py-1.5 text-sm dark:border-white dark:bg-white dark:text-black"
               >
@@ -296,7 +303,6 @@ function SidebarSummary({
                   <option
                     key={t}
                     value={t}
-                    disabled={!course.termsOffered.includes(t)}
                   >
                     {t}
                   </option>
@@ -356,8 +362,8 @@ function Mini({
 }) {
   return (
     <div>
-      <span className="block label">{label}</span>
-      <span className="font-display tabular text-2xl text-foreground">
+      <span className="label block">{label}</span>
+      <span className="tabular font-display text-2xl text-foreground">
         {value}
         {unit && (
           <span className="ml-1 text-[10px] font-normal text-muted-foreground">
@@ -369,13 +375,7 @@ function Mini({
   );
 }
 
-function SectionHead({
-  title,
-  note,
-}: {
-  title: string;
-  note?: string;
-}) {
+function SectionHead({ title, note }: { title: string; note?: string }) {
   return (
     <div className="flex items-end justify-between border-b border-border pb-2">
       <h2 className="font-display text-2xl tracking-tight">{title}</h2>

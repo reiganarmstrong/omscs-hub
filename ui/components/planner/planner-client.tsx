@@ -2,19 +2,14 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { COURSES, COURSES_BY_ID } from "@/lib/data";
+import { COURSES, COURSES_BY_ID, courseMatchesSearch } from "@/lib/data";
 import type { SpecializationId } from "@/lib/types";
 import { SPECIALIZATIONS, bucketProgress } from "@/lib/data/specializations";
 import { usePlanner } from "@/lib/store/planner-store";
 import { usePrefs } from "@/lib/store/prefs-store";
 import { cn } from "@/lib/utils";
 import { Stars } from "@/components/badges";
-import {
-  PlusIcon,
-  TrashIcon,
-  SearchIcon,
-  CheckIcon,
-} from "@/components/icons";
+import { PlusIcon, TrashIcon, SearchIcon, CheckIcon } from "@/components/icons";
 
 type TermLabel = { term: "Fall" | "Spring" | "Summer"; year: string };
 
@@ -121,6 +116,7 @@ export function PlannerClient() {
                             {c.code}
                           </span>{" "}
                           <span>{c.title}</span>
+                          <span className="block text-[10px] text-muted-foreground">Term availability unverified</span>
                           {role && (
                             <span
                               className={cn(
@@ -157,7 +153,8 @@ export function PlannerClient() {
                   onClick={() => setPicker(picker === key ? null : key)}
                   className="border-t border-border px-3 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground dark:hover:bg-leaf dark:hover:text-leaf-fg"
                 >
-                  <PlusIcon size={12} className="-mt-0.5 mr-1 inline" /> Add course
+                  <PlusIcon size={12} className="-mt-0.5 mr-1 inline" /> Add
+                  course
                 </button>
                 {picker === key && (
                   <CoursePicker
@@ -181,11 +178,7 @@ export function PlannerClient() {
       <aside className="self-start xl:sticky xl:top-[80px]">
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="label">Plan health</div>
-          <Health
-            courses={allPicked.length}
-            avgDiff={avgDiff}
-            avgWL={avgWL}
-          />
+          <Health courses={allPicked.length} avgDiff={avgDiff} avgWL={avgWL} />
         </div>
         {spec && progress && (
           <div className="mt-4 rounded-xl border border-border bg-card p-4">
@@ -316,7 +309,7 @@ function SpecSelector({
               )}
             >
               {s.name.replace(" & Robotics", "")}
-              <span className="ml-1 opacity-70 tabular">{matched}</span>
+              <span className="tabular ml-1 opacity-70">{matched}</span>
             </button>
           );
         })}
@@ -384,7 +377,7 @@ function Stat({
   return (
     <div>
       <div className="label">{label}</div>
-      <div className="font-display tabular text-xl text-foreground">
+      <div className="tabular font-display text-xl text-foreground">
         {value}
         {unit && (
           <span className="ml-1 text-[10px] font-normal text-muted-foreground">
@@ -482,7 +475,7 @@ function UnscheduledPanel({
         <div>
           <div className="text-sm font-medium text-foreground">
             Unscheduled
-            <span className="ml-2 tabular text-xs text-muted-foreground">
+            <span className="tabular ml-2 text-xs text-muted-foreground">
               {ids.length} {ids.length === 1 ? "course" : "courses"}
             </span>
           </div>
@@ -518,7 +511,12 @@ function UnscheduledRow({
   onAssign,
   onRemove,
 }: {
-  course: { id: string; code: string; title: string; termsOffered: ("Fall" | "Spring" | "Summer")[] };
+  course: {
+    id: string;
+    code: string;
+    title: string;
+    termsOffered: ("Fall" | "Spring" | "Summer")[];
+  };
   role: "required" | "bucket" | "free" | null;
   onAssign: (termKey: string) => void;
   onRemove: () => void;
@@ -531,17 +529,14 @@ function UnscheduledRow({
   return (
     <li className="grid items-center gap-3 px-4 py-2.5 text-sm sm:grid-cols-[minmax(0,1fr)_auto]">
       <div className="min-w-0 truncate">
-        <Link
-          href={`/courses/${course.id}`}
-          className="hover:underline"
-        >
+        <Link href={`/courses/${course.id}`} className="hover:underline">
           <span className="text-xs text-muted-foreground">{course.code}</span>{" "}
           <span className="text-foreground">{course.title}</span>
         </Link>
         {role && (
           <span
             className={cn(
-              "ml-2 inline-block rounded-full px-1.5 py-px text-[10px] font-medium align-middle",
+              "ml-2 inline-block rounded-full px-1.5 py-px align-middle text-[10px] font-medium",
               role === "required"
                 ? "bg-leaf/12 text-leaf"
                 : role === "bucket"
@@ -549,12 +544,16 @@ function UnscheduledRow({
                   : "bg-rose/12 text-rose",
             )}
           >
-            {role === "required" ? "Required" : role === "bucket" ? "Bucket" : "Free"}
+            {role === "required"
+              ? "Required"
+              : role === "bucket"
+                ? "Bucket"
+                : "Free"}
           </span>
         )}
         {course.termsOffered.length < 3 && (
           <span className="ml-2 text-[11px] text-muted-foreground">
-            offered: {course.termsOffered.join(", ")}
+            Future term availability unverified
           </span>
         )}
       </div>
@@ -568,11 +567,7 @@ function UnscheduledRow({
           className="rounded-md border border-border bg-background px-2 py-1 text-xs"
         >
           {(["Fall", "Spring", "Summer"] as const).map((t) => (
-            <option
-              key={t}
-              value={t}
-              disabled={!course.termsOffered.includes(t)}
-            >
+            <option key={t} value={t}>
               {t}
             </option>
           ))}
@@ -622,13 +617,13 @@ function CoursePicker({
 }) {
   const ql = q.trim().toLowerCase();
   const matches = COURSES.filter((c) => {
-    if (!c.termsOffered.includes(term)) return false;
     if (!ql) return true;
-    return `${c.code} ${c.title}`.toLowerCase().includes(ql);
+    return courseMatchesSearch(c, ql);
   }).slice(0, 16);
 
   return (
     <div className="border-t border-border bg-background p-2">
+      <p className="mb-2 text-xs text-muted-foreground">Future term availability unverified. Choose a current Course for your intended term.</p>
       <div className="relative">
         <span className="absolute top-1/2 left-2 -translate-y-1/2 text-muted-foreground">
           <SearchIcon size={12} />

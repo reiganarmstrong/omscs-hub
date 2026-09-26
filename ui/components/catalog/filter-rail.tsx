@@ -110,8 +110,12 @@ export function FilterRail({ filter, setFilter, count, total }: Props) {
           </div>
         </Section>
 
-        <Section title="Term offered">
+        <Section title="Verified term offerings">
           <div className="flex flex-wrap gap-1">
+            <p className="mb-1 text-xs text-muted-foreground">
+              No future terms verified yet. Selecting a term shows only verified
+              offerings.
+            </p>
             {TERMS.map((t) => (
               <Pill
                 key={t}

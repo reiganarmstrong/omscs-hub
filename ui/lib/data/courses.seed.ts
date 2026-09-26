@@ -1,4 +1,4 @@
-import type { Course, Term, SpecializationId, CourseRole } from "@/lib/types";
+import type { Term, SpecializationId, CourseRole } from "@/lib/types";
 
 type Seed = {
   code: string;
@@ -12,8 +12,8 @@ type Seed = {
   tags: string[];
 };
 
-// Curated subset of the OMSCS catalog. Stats are seeded later from
-// generated reviews so distributions and averages stay consistent.
+// Legacy topic and specialization annotations, pending sourced rule replacement.
+// Course facts and identities come exclusively from catalog.json.
 export const COURSE_SEEDS: Seed[] = [
   {
     code: "CS 6200",
@@ -469,28 +469,3 @@ export const COURSE_SEEDS: Seed[] = [
     tags: ["algorithms", "proofs", "exams", "required"],
   },
 ];
-
-export function buildBaseCourse(seed: Seed): Course {
-  const id = seed.code.replace(/\s+/g, "-");
-  return {
-    id,
-    code: seed.code,
-    title: seed.title,
-    shortTitle: seed.shortTitle,
-    credits: seed.credits ?? 3,
-    description: seed.description,
-    prereqs: seed.prereqs ?? [],
-    termsOffered: seed.termsOffered,
-    specializations: seed.specs,
-    tags: seed.tags,
-    stats: {
-      avgDifficulty: 0,
-      avgWorkload: 0,
-      avgRating: 0,
-      numReviews: 0,
-      distDifficulty: [0, 0, 0, 0, 0],
-      distRating: [0, 0, 0, 0, 0],
-      distWorkload: [0, 0, 0, 0, 0, 0, 0, 0],
-    },
-  };
-}

@@ -17,6 +17,13 @@ export type Course = {
   code: string; // "CS 6200"
   title: string;
   shortTitle?: string;
+  aliases: string[];
+  sourceUrl: string;
+  creditsSourceUrl: string;
+  lastChecked: string;
+  descriptionStatus: "official-excerpt" | "unverified";
+  prerequisitesStatus: "published-guidance" | "unverified";
+  foundational: boolean;
   credits: number;
   description: string;
   prereqs: string[];
@@ -27,12 +34,12 @@ export type Course = {
   // aggregate stats baked from seeded reviews
   stats: {
     avgDifficulty: number; // 1-5
-    avgWorkload: number;   // hours/week
-    avgRating: number;     // 1-5 (overall)
+    avgWorkload: number; // hours/week
+    avgRating: number; // 1-5 (overall)
     numReviews: number;
     distDifficulty: number[]; // length 5, count per [1..5]
-    distRating: number[];     // length 5, count per [1..5]
-    distWorkload: number[];   // length 8, buckets [<5, 5-9, 10-14, 15-19, 20-24, 25-29, 30-34, 35+]
+    distRating: number[]; // length 5, count per [1..5]
+    distWorkload: number[]; // length 8, buckets [<5, 5-9, 10-14, 15-19, 20-24, 25-29, 30-34, 35+]
   };
 };
 
@@ -41,9 +48,9 @@ export type Review = {
   courseId: string;
   source?: "omscentral" | "app";
   semester: string; // "Fall 2024"
-  difficulty: number | null;   // 1-5
-  workload: number | null;     // hours/week
-  rating: number | null;       // 1-5
+  difficulty: number | null; // 1-5
+  workload: number | null; // hours/week
+  rating: number | null; // 1-5
   programStage: "First" | "Mid" | "Late" | null;
   body: string;
   pros: string[];
@@ -56,10 +63,10 @@ export type Review = {
 
 export type SpecRequirement = {
   id: string;
-  label: string;       // e.g. "Pick 2 of the following"
-  pick: number;        // how many courses needed from this bucket
+  label: string; // e.g. "Pick 2 of the following"
+  pick: number; // how many courses needed from this bucket
   poolCourseIds: string[]; // candidates that fulfill this bucket
-  required?: boolean;  // if true, all courses in pool are required (pick == pool.length)
+  required?: boolean; // if true, all courses in pool are required (pick == pool.length)
   notes?: string;
 };
 
@@ -96,8 +103,8 @@ export type CatalogFilter = {
   specs: SpecializationId[];
   terms: Term[];
   difficulty: [number, number]; // 1-5
-  workload: [number, number];   // 0-50
-  rating: [number, number];     // 1-5
+  workload: [number, number]; // 0-50
+  rating: [number, number]; // 1-5
   minReviews: number;
   role: CourseRole | "any";
 };

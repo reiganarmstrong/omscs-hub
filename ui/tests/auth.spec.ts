@@ -19,7 +19,7 @@ test("guest browses Catalog and adds, assigns, reloads, and removes a local Stud
     .getByPlaceholder("Search by code, title, tag, keyword…")
     .fill("6200")
   await page
-    .getByRole("link", { name: /Graduate Introduction to Operating Systems/ })
+    .getByRole("link", { name: /Introduction to Operating Systems/ })
     .first()
     .click()
   await page.getByRole("button", { name: "Add unscheduled" }).click()
@@ -57,7 +57,7 @@ test("verified primary Georgia Tech user signs in and gains review controls", as
     .getByPlaceholder("Search by code, title, tag, keyword…")
     .fill("6200")
   await page
-    .getByRole("link", { name: /Graduate Introduction to Operating Systems/ })
+    .getByRole("link", { name: /Introduction to Operating Systems/ })
     .first()
     .click()
   await expect(

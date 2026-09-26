@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { canonicalCourseId } from "@/lib/data";
 import { readStorage, subscribeStorage, writeStorage } from "./storage";
 
 export type PlannerTermKey = string;
@@ -21,16 +22,31 @@ const EMPTY: Plan = {};
 const PlannerCtx = React.createContext<Ctx | null>(null);
 
 export function PlannerProvider({ children }: { children: React.ReactNode }) {
-  const plan = React.useSyncExternalStore(
+  const storedPlan = React.useSyncExternalStore(
     (cb) => subscribeStorage(STORAGE_KEY, cb),
     () => readStorage<Plan>(STORAGE_KEY, EMPTY),
     () => EMPTY,
   );
 
+  const plan = React.useMemo(() => {
+    const seen = new Set<string>();
+    return Object.fromEntries(
+      Object.entries(storedPlan).map(([term, ids]) => [
+        term,
+        ids.map(canonicalCourseId).filter((id) => {
+          if (seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        }),
+      ]),
+    );
+  }, [storedPlan]);
+
   const value: Ctx = React.useMemo(
     () => ({
       plan,
       add(term, courseId) {
+        courseId = canonicalCourseId(courseId);
         const next: Plan = { ...plan };
         for (const k of Object.keys(next)) {
           next[k] = next[k].filter((c) => c !== courseId);
@@ -39,6 +55,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         writeStorage(STORAGE_KEY, next);
       },
       remove(term, courseId) {
+        courseId = canonicalCourseId(courseId);
         const next: Plan = {
           ...plan,
           [term]: (plan[term] ?? []).filter((c) => c !== courseId),
@@ -46,6 +63,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         writeStorage(STORAGE_KEY, next);
       },
       move(from, to, courseId) {
+        courseId = canonicalCourseId(courseId);
         const next: Plan = { ...plan };
         next[from] = (next[from] ?? []).filter((c) => c !== courseId);
         next[to] = Array.from(new Set([...(next[to] ?? []), courseId]));
@@ -55,6 +73,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         writeStorage(STORAGE_KEY, EMPTY);
       },
       has(courseId) {
+        courseId = canonicalCourseId(courseId);
         for (const [k, v] of Object.entries(plan)) {
           if (v.includes(courseId)) return k;
         }

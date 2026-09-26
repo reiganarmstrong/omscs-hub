@@ -11,7 +11,7 @@ navigation, theme controls, and static deployment bundle.
 - Builds as a static export with `output: "export"`.
 - Deploys through Cloudflare Workers Assets from `out/`.
 - Uses Clerk for sign-in/sign-up and review author identity.
-- Uses local seed data as the base catalog and fallback review source.
+- Uses a dated official-source Catalog shared by browsing and planning.
 - Loads live reviews from the API only when `NEXT_PUBLIC_API_BASE_URL` is set.
 - Stores planner state and selected specialization in browser local storage.
 - Uses a two-level mobile navbar: brand/theme/auth on row one, visible nav tabs
@@ -56,7 +56,7 @@ ui/
     site-footer.tsx
   lib/
     api/reviews.ts          # Browser API client
-    data/                   # Course seeds, review seeds, specialization rules
+    data/                   # Published Catalog, legacy annotations, rules
     store/                  # Reviews, planner, and preference providers
     types.ts
   scripts/deploy-remote.mjs # Env-aware remote build/deploy helper
@@ -68,25 +68,27 @@ ui/
 
 - `/`: Catalog with search, filter rail, sort menu, and card/table view toggle.
 - `/courses/[id]`: Course detail, distribution charts, logistics, reviews, and
-  planner actions. Static params are generated from the seeded course list.
+  planner actions. Static params cover canonical current codes and verified aliases.
 - `/specializations`: Track list, rules, required/foundational/elective
   buckets, free-elective search, selected-track state, and planner toggles.
 - `/planner`: 2025-2027 Spring/Summer/Fall grid, unscheduled bucket,
-  term-aware course picker, specialization progress, plan health, and clear
+  course picker with unverified future availability, specialization progress, plan health, and clear
   action.
 - `/about`: Project context and goals.
 - `/sign-in`, `/sign-up`: Clerk email-code auth pages.
 
 ## Data And State
 
-- `lib/data/courses.seed.ts` contains the local catalog; current count is 68
-  courses.
-- `lib/data/reviews.seed.ts` generates deterministic fallback reviews for 36
-  profiled courses; current fallback total is 561 reviews.
+- `lib/data/catalog.json` contains 77 current Courses and 20 former-code aliases,
+  checked September 26, 2026. Each Course has official source links, credit hours,
+  a short overview excerpt and verified preparation guidance or an unknown label.
+- `lib/data/courses.seed.ts` supplies legacy topic and specialization annotations
+  only; its descriptions, prerequisites and term patterns are not published.
+- Generated review profiles are not used by the published Catalog.
 - `lib/data/specializations.ts` defines specialization requirements and bucket
   progress helpers.
-- `ReviewsProvider` exposes live API reviews when available and seeded reviews
-  as fallback.
+- `ReviewsProvider` exposes live API reviews when available. Its compatibility
+  fallback is empty; review aggregation and outage-state work follows separately.
 - `PlannerProvider` stores selected courses by term key in local storage.
 - `PrefsProvider` stores selected specialization in local storage.
 
@@ -99,9 +101,10 @@ Course pages call `loadCourseReviews(course.id)` after mount. If
 GET /courses/:courseId/reviews?source=all
 ```
 
-When the API URL is missing, the UI skips remote loading and uses seeded data.
-When the API is configured but unreachable, course pages show a fallback notice
-and keep displaying seeded data.
+When the API URL is missing, the UI skips remote loading. The published Catalog
+never supplies generated reviews. Published course facts remain available if the
+review service fails; explicit unavailable-versus-zero review states are follow-on
+work. See [Catalog provenance](../docs/catalog/current-courses.md).
 
 Review writes require:
 

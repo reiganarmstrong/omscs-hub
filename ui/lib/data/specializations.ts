@@ -1,3 +1,4 @@
+import { canonicalCourseId, COURSES_BY_ID } from "./index";
 import type { Specialization } from "@/lib/types";
 
 // Modeled after the public OMSCS specialization rules, shaped as buckets so
@@ -6,7 +7,7 @@ import type { Specialization } from "@/lib/types";
 // Every track is 10 courses (30 credit hours). Graduate Algorithms is required
 // for all tracks (modeled as a one-course bucket).
 
-export const SPECIALIZATIONS: Specialization[] = [
+const modeledSpecializations: Specialization[] = [
   {
     id: "computing-systems",
     name: "Computing Systems",
@@ -170,13 +171,7 @@ export const SPECIALIZATIONS: Specialization[] = [
         id: "cp-electives",
         label: "Pick 3 CP&R electives",
         pick: 3,
-        poolCourseIds: [
-          "CS-6635",
-          "CS-7641",
-          "CS-7643",
-          "CS-6200",
-          "CS-7650",
-        ],
+        poolCourseIds: ["CS-6635", "CS-7641", "CS-7643", "CS-6200", "CS-7650"],
       },
     ],
   },
@@ -215,19 +210,31 @@ export const SPECIALIZATIONS: Specialization[] = [
   },
 ];
 
+// Keep existing modeled rules in scope until the sourced-rule ticket replaces them,
+// but expose only canonical current Course identities to public course choices.
+export const SPECIALIZATIONS: Specialization[] = modeledSpecializations.map(
+  (specialization) => ({
+    ...specialization,
+    requirements: specialization.requirements.map((requirement) => ({
+      ...requirement,
+      poolCourseIds: Array.from(
+        new Set(requirement.poolCourseIds.map(canonicalCourseId)),
+      ).filter((id) => Boolean(COURSES_BY_ID[id])),
+    })),
+  }),
+);
+
 export const SPECIALIZATIONS_BY_ID = Object.fromEntries(
   SPECIALIZATIONS.map((s) => [s.id, s]),
 );
 
-export function bucketProgress(
-  spec: Specialization,
-  plannedIds: Set<string>,
-) {
-  const usedByBucket: { bucketId: string; count: number; matched: string[] }[] = [];
+export function bucketProgress(spec: Specialization, plannedIds: Set<string>) {
+  const usedByBucket: { bucketId: string; count: number; matched: string[] }[] =
+    [];
   const used = new Set<string>(); // ids already counted
   // Greedy: required buckets first.
-  const order = [...spec.requirements].sort((a, b) =>
-    Number(!!b.required) - Number(!!a.required),
+  const order = [...spec.requirements].sort(
+    (a, b) => Number(!!b.required) - Number(!!a.required),
   );
   for (const req of order) {
     const matched: string[] = [];
@@ -245,12 +252,14 @@ export function bucketProgress(
       matched,
     });
   }
-  const requiredFulfilled = spec.requirements.reduce(
-    (a, r) => a + r.pick,
-    0,
-  );
+  const requiredFulfilled = spec.requirements.reduce((a, r) => a + r.pick, 0);
   const matchedFulfilled = usedByBucket.reduce(
-    (a, b) => a + Math.min(b.count, spec.requirements.find((r) => r.id === b.bucketId)?.pick ?? 0),
+    (a, b) =>
+      a +
+      Math.min(
+        b.count,
+        spec.requirements.find((r) => r.id === b.bucketId)?.pick ?? 0,
+      ),
     0,
   );
   const totalFreeNeeded = spec.freeElectiveCount;

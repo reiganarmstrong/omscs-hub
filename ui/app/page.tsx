@@ -1,4 +1,4 @@
-import { COURSES } from "@/lib/data";
+import { COURSES, CATALOG_SOURCE_URL, CATALOG_VERSION } from "@/lib/data";
 import { CatalogClient } from "@/components/catalog/catalog-client";
 
 export default function Page() {
@@ -11,12 +11,20 @@ export default function Page() {
               OMSCS course catalog
             </h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              {COURSES.length} courses indexed. Filter, sort, and open any
-              course for distributions and reviews.
+              {COURSES.length} current courses. Browse official course facts and
+              student reviews.
             </p>
           </div>
           <span className="text-xs text-muted-foreground">
-            Public OMSCentral archive + verified OMSCS Hub reviews
+            <a
+              href={CATALOG_SOURCE_URL}
+              className="underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Official current-course list
+            </a>
+            {" · "}Last checked {CATALOG_VERSION}
           </span>
         </div>
       </div>
