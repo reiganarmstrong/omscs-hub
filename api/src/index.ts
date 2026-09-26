@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { reviews } from "./reviews";
+import { requireGatechUser } from "./auth";
 import type { Bindings, Variables } from "./types";
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
@@ -22,6 +23,11 @@ app.get("/health", (c) =>
 );
 
 app.route("/", reviews);
+
+app.get("/auth/session", requireGatechUser, (c) => {
+  c.header("Cache-Control", "no-store");
+  return c.json({ eligible: true });
+});
 
 app.notFound((c) => c.json({ error: "Not found." }, 404));
 

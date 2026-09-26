@@ -37,3 +37,9 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Browser journey output
+/.next-browser-tests/
+/test-results/
+/playwright-report/
+/.tsconfig-browser-tests.json

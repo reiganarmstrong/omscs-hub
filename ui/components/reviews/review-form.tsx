@@ -1,49 +1,67 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useAuth, useUser } from "@clerk/react";
-import Link from "next/link";
-import { useReviews } from "@/lib/store/reviews-store";
-import { createReview, hasApiBaseUrl } from "@/lib/api/reviews";
-import { cn } from "@/lib/utils";
-import { CheckIcon, PlusIcon } from "@/components/icons";
+import * as React from "react"
+import { useAuth } from "@clerk/react"
+import Link from "next/link"
+import { useReviews } from "@/lib/store/reviews-store"
+import { createReview, hasApiBaseUrl } from "@/lib/api/reviews"
+import { useGatechSession } from "@/components/auth/gatech-session"
+import { cn } from "@/lib/utils"
+import { CheckIcon, PlusIcon } from "@/components/icons"
 
-const MIN_REVIEW_BODY_LENGTH = 20;
+const MIN_REVIEW_BODY_LENGTH = 20
 
 export function ReviewForm({ courseId }: { courseId: string }) {
-  const { loadCourseReviews } = useReviews();
-  const { isSignedIn, getToken } = useAuth();
-  const { user } = useUser();
-  const [open, setOpen] = React.useState(false);
-  const [submitted, setSubmitted] = React.useState(false);
-  const [submitting, setSubmitting] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const { authConfigured } = useGatechSession()
+  if (!authConfigured)
+    return (
+      <p className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
+        Sign-in is unavailable. You can still browse the Catalog and keep a
+        local Study Plan.
+      </p>
+    )
+  return <AuthenticatedReviewForm courseId={courseId} />
+}
 
-  const [rating, setRating] = React.useState(4);
-  const [difficulty, setDifficulty] = React.useState(3);
-  const [workload, setWorkload] = React.useState(15);
-  const [recommend, setRecommend] = React.useState(true);
-  const [stage, setStage] = React.useState<"First" | "Mid" | "Late">("Mid");
-  const [semester, setSemester] = React.useState("Fall 2025");
-  const [body, setBody] = React.useState("");
+function AuthenticatedReviewForm({ courseId }: { courseId: string }) {
+  const { loadCourseReviews } = useReviews()
+  const { getToken } = useAuth()
+  const { isSignedIn, checking } = useGatechSession()
+  const [open, setOpen] = React.useState(false)
+  const [submitted, setSubmitted] = React.useState(false)
+  const [submitting, setSubmitting] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
 
-  const primaryEmail = user?.primaryEmailAddress?.emailAddress ?? "";
-  const canWrite = isSignedIn && primaryEmail.toLowerCase().endsWith("@gatech.edu");
-  const apiConfigured = hasApiBaseUrl();
+  const [rating, setRating] = React.useState(4)
+  const [difficulty, setDifficulty] = React.useState(3)
+  const [workload, setWorkload] = React.useState(15)
+  const [recommend, setRecommend] = React.useState(true)
+  const [stage, setStage] = React.useState<"First" | "Mid" | "Late">("Mid")
+  const [semester, setSemester] = React.useState("Fall 2025")
+  const [body, setBody] = React.useState("")
+
+  const canWrite = isSignedIn
+  const apiConfigured = hasApiBaseUrl()
 
   const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmedBody = body.trim();
+    e.preventDefault()
+    if (!canWrite) {
+      setError(
+        "Sign in with a verified primary @gatech.edu email before submitting."
+      )
+      return
+    }
+    const trimmedBody = body.trim()
     if (trimmedBody.length < MIN_REVIEW_BODY_LENGTH) {
-      setError(`Review must be at least ${MIN_REVIEW_BODY_LENGTH} characters.`);
-      return;
+      setError(`Review must be at least ${MIN_REVIEW_BODY_LENGTH} characters.`)
+      return
     }
 
-    setSubmitting(true);
-    setError(null);
+    setSubmitting(true)
+    setError(null)
     try {
-      const token = await getToken();
-      if (!token) throw new Error("Sign in again before submitting.");
+      const token = await getToken()
+      if (!token) throw new Error("Sign in again before submitting.")
       await createReview(
         courseId,
         {
@@ -55,21 +73,21 @@ export function ReviewForm({ courseId }: { courseId: string }) {
           semester: semester.trim() || "Unspecified",
           body: trimmedBody,
         },
-        token,
-      );
-      await loadCourseReviews(courseId);
-      setSubmitted(true);
-      setBody("");
-      setTimeout(() => setSubmitted(false), 2400);
-      setOpen(false);
+        token
+      )
+      await loadCourseReviews(courseId)
+      setSubmitted(true)
+      setBody("")
+      setTimeout(() => setSubmitted(false), 2400)
+      setOpen(false)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to submit review.");
+      setError(err instanceof Error ? err.message : "Unable to submit review.")
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
-  if (!open) {
+  if (!open || !canWrite) {
     return (
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3">
         <div>
@@ -85,19 +103,21 @@ export function ReviewForm({ courseId }: { courseId: string }) {
               <CheckIcon size={13} /> Posted.
             </span>
           )}
-          {!isSignedIn ? (
+          {checking ? (
+            <span className="text-xs text-muted-foreground">
+              Verifying sign-in…
+            </span>
+          ) : !isSignedIn ? (
             <Link
               href="/sign-in"
               className="inline-flex items-center gap-2 rounded-md bg-leaf px-4 py-2 text-sm text-leaf-fg hover:opacity-90"
             >
               Sign in to review
             </Link>
-          ) : !canWrite ? (
-            <span className="max-w-xs text-xs text-rose">
-              Use a verified @gatech.edu account to write reviews.
-            </span>
           ) : !apiConfigured ? (
-            <span className="max-w-xs text-xs text-rose">API URL not configured.</span>
+            <span className="max-w-xs text-xs text-rose">
+              API URL not configured.
+            </span>
           ) : (
             <button
               type="button"
@@ -109,7 +129,7 @@ export function ReviewForm({ courseId }: { courseId: string }) {
           )}
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -175,7 +195,7 @@ export function ReviewForm({ courseId }: { courseId: string }) {
                   "rounded-full border px-3 py-1 text-xs transition",
                   stage === s
                     ? "border-leaf bg-leaf text-leaf-fg"
-                    : "border-border text-muted-foreground hover:border-leaf/60 hover:text-leaf",
+                    : "border-border text-muted-foreground hover:border-leaf/60 hover:text-leaf"
                 )}
               >
                 {s} of program
@@ -218,11 +238,11 @@ export function ReviewForm({ courseId }: { courseId: string }) {
         </button>
       </div>
     </form>
-  );
+  )
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <label className="block label">{children}</label>;
+  return <label className="label block">{children}</label>
 }
 
 function Numeric({
@@ -234,13 +254,13 @@ function Numeric({
   step,
   hints,
 }: {
-  label: string;
-  value: number;
-  onChange: (n: number) => void;
-  min: number;
-  max: number;
-  step: number;
-  hints: [string, string];
+  label: string
+  value: number
+  onChange: (n: number) => void
+  min: number
+  max: number
+  step: number
+  hints: [string, string]
 }) {
   return (
     <div>
@@ -255,7 +275,7 @@ function Numeric({
           onChange={(e) => onChange(Number(e.target.value))}
           className="flex-1 cursor-pointer accent-[color:var(--leaf)]"
         />
-        <span className="w-12 text-right font-display tabular text-2xl">
+        <span className="tabular w-12 text-right font-display text-2xl">
           {value}
         </span>
       </div>
@@ -264,5 +284,5 @@ function Numeric({
         <span>{hints[1]}</span>
       </div>
     </div>
-  );
+  )
 }

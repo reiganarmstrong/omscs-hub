@@ -8,60 +8,48 @@ export const requireGatechUser: MiddlewareHandler<{
   Bindings: Bindings;
   Variables: Variables;
 }> = async (c, next) => {
+  c.header("Cache-Control", "no-store");
   const user = await authenticate(c).catch((error) => {
     if (error instanceof Response) return error;
     throw error;
   });
   if (user instanceof Response) return user;
 
-  if (user.emailDomain !== "gatech.edu") {
-    return c.json({ error: "Only verified @gatech.edu accounts can write reviews." }, 403);
-  }
-
   c.set("authUser", user);
   await next();
 };
 
 async function authenticate(c: AppContext): Promise<AuthUser> {
-  const authHeader = c.req.header("authorization");
-  const token = authHeader?.match(/^Bearer\s+(.+)$/i)?.[1];
+  const token = c.req.header("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
   if (!token) throwUnauthorized();
-
-  if (c.env.CLERK_SECRET_KEY === "test") {
-    const primaryEmail = c.req.header("x-test-email");
-    const id = c.req.header("x-test-user-id") ?? "user_test";
-    if (!primaryEmail) throwUnauthorized();
-    return toAuthUser(id, primaryEmail);
-  }
 
   const payload = await verifyToken(token, {
     secretKey: c.env.CLERK_SECRET_KEY,
-  });
-
-  const userId = payload.sub;
-  if (!userId) throwUnauthorized();
+  }).catch(() => throwUnauthorized());
+  if (!payload.sub) throwUnauthorized();
 
   const client = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY });
-  const user = await client.users.getUser(userId);
-  const primaryEmailId = user.primaryEmailAddressId;
-  const primaryEmail =
-    user.emailAddresses.find((email) => email.id === primaryEmailId) ??
-    user.emailAddresses.find((email) => email.verification?.status === "verified");
-
-  if (!primaryEmail || primaryEmail.verification?.status !== "verified") {
-    throwUnauthorized("Verified primary email required.");
+  const user = await client.users.getUser(payload.sub);
+  // A verified secondary address never substitutes for the primary address.
+  const primaryEmail = user.emailAddresses.find(
+    (email) => email.id === user.primaryEmailAddressId,
+  );
+  if (
+    !primaryEmail ||
+    primaryEmail.verification?.status !== "verified" ||
+    !/^[^\s@]+@gatech\.edu$/i.test(primaryEmail.emailAddress)
+  ) {
+    throw new Response(
+      JSON.stringify({ error: "Sign-in requires a verified primary @gatech.edu email." }),
+      { status: 403, headers: { "content-type": "application/json" } },
+    );
   }
 
-  return toAuthUser(user.id, primaryEmail.emailAddress);
+  return { id: user.id, primaryEmail: primaryEmail.emailAddress, emailDomain: "gatech.edu" };
 }
 
-function toAuthUser(id: string, primaryEmail: string): AuthUser {
-  const emailDomain = primaryEmail.split("@").at(1)?.toLowerCase() ?? "";
-  return { id, primaryEmail, emailDomain };
-}
-
-function throwUnauthorized(message = "Authentication required."): never {
-  throw new Response(JSON.stringify({ error: message }), {
+function throwUnauthorized(): never {
+  throw new Response(JSON.stringify({ error: "Authentication required." }), {
     status: 401,
     headers: { "content-type": "application/json" },
   });

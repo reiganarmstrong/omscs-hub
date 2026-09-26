@@ -1,4 +1,16 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@clerk/backend", () => ({
+  verifyToken: async (token: string) => {
+    if (!token.startsWith("fixture:")) throw new Error("Invalid token");
+    return { sub: token.slice(8) };
+  },
+  createClerkClient: () => ({ users: { getUser: async (id: string) => ({
+    id: "user_1",
+    primaryEmailAddressId: "primary",
+    emailAddresses: [{ id: "primary", emailAddress: id, verification: { status: "verified" } }],
+  }) } }),
+}));
 import app from "../src/index";
 
 describe("review API", () => {
@@ -143,15 +155,13 @@ function jsonHeaders() {
 function authHeaders(email: string) {
   return {
     ...jsonHeaders(),
-    authorization: "Bearer test",
-    "x-test-user-id": "user_1",
-    "x-test-email": email,
+    authorization: `Bearer fixture:${email}`,
   };
 }
 
 function testEnv(overrides: Partial<Env> = {}): Env {
   return {
-    CLERK_SECRET_KEY: "test",
+    CLERK_SECRET_KEY: "sk_test_fixture",
     DB: new FakeD1() as unknown as D1Database,
     ...overrides,
   };
