@@ -132,10 +132,11 @@ async function resolveCourseId(db: D1Database, value: string) {
       `SELECT c.id
        FROM courses c
        LEFT JOIN course_codes cc ON cc.course_id = c.id
-       WHERE c.id = ? OR c.slug = ? OR cc.code = ?
+       LEFT JOIN course_source_slugs css ON css.course_id = c.id
+       WHERE c.id = ? OR c.slug = ? OR cc.code = ? OR css.slug = ?
        LIMIT 1`,
     )
-    .bind(decoded, decoded, normalizedCode)
+    .bind(decoded, decoded, normalizedCode, decoded)
     .first<{ id: string }>();
 
   return row?.id ?? null;

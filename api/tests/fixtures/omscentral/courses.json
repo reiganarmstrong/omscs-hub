@@ -1,0 +1,6 @@
+[
+  {"name":"Former Graduate Algorithms","slug":"graduate-algorithms","codes":["CS-8803-GA"]},
+  {"name":"Intro to Graduate Algorithms","slug":"introduction-to-graduate-algorithms","codes":["CS-6515"]},
+  {"name":"Historical fixture course","slug":"historical-fixture","codes":["CS-9999"],"description":"Archived source description, not current official guidance."},
+  {"name":"No reviews fixture","slug":"empty-history","codes":["CS-9998"]}
+]

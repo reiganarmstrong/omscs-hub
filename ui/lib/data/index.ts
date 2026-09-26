@@ -101,10 +101,6 @@ export const COURSES: Course[] = catalog.courses.map((course) => {
 export const COURSES_BY_ID: Record<string, Course> = Object.fromEntries(
   COURSES.map((course) => [course.id, course]),
 );
-// Compatibility for the review store until its outage handling is replaced.
-// Published Catalog data never supplies generated reviews.
-export const SEEDED_REVIEWS: Record<string, Review[]> = {};
-
 export function listCourses() {
   return COURSES;
 }

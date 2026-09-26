@@ -7,6 +7,21 @@ export function CourseFacts({
   course: Course
   compact?: boolean
 }) {
+  if (course.historical)
+    return (
+      <p className="mt-3 border-t border-border pt-3 text-sm text-muted-foreground">
+        Historical course. Absent from the current OMSCS list; excluded from
+        future Study Plan picks.{" "}
+        <a
+          href={course.sourceUrl}
+          className="underline"
+          target="_blank"
+          rel="noreferrer"
+        >
+          OMSCentral source
+        </a>
+      </p>
+    )
   return (
     <div className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
       <p>{course.credits} credit hours · Current OMSCS course</p>

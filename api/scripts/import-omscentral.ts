@@ -40,63 +40,65 @@ type Args = {
   dataDir: string;
   local: boolean;
   sqlOut: string;
+  historicalOut: string;
 };
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const courses = readJson<CourseJson[]>(resolve(args.dataDir, "courses.json"));
 const reviews = readJson<ReviewJson[]>(resolve(args.dataDir, "reviews.json"));
-const courseIdsBySlug = new Map(courses.map((course) => [course.slug, normalizeCourseId(course)]));
+const reviewIdentityCounts = new Map<string, number>();
+for (const review of reviews) {
+  if (review.author && review.createdAt) {
+    const key = sourceIdentityFor(review);
+    reviewIdentityCounts.set(key, (reviewIdentityCounts.get(key) ?? 0) + 1);
+  }
+}
+const catalog = readJson<{ courses: { id: string; code: string; title: string; aliases: string[]; credits: number; description: string; foundational: boolean; sourceUrl: string }[] }>(resolve(scriptDir, "../../ui/lib/data/catalog.json"));
+const canonicalByCode = new Map(catalog.courses.flatMap(course => [course.code, ...course.aliases].map(code => [normalizeCode(code), course.id] as const)));
+const courseIdsBySlug = new Map<string, string>();
+for (const course of courses) {
+  const matches = new Set((course.codes ?? []).map(code => canonicalByCode.get(normalizeCode(code))).filter(Boolean));
+  if (matches.size > 1) throw new Error(`Ambiguous course mapping: ${course.slug}`);
+  courseIdsBySlug.set(course.slug, [...matches][0] ?? normalizeCourseId(course));
+}
 const statements: string[] = ["PRAGMA foreign_keys = ON;"];
 
+// Official facts belong to the curated Catalog, never the review source.
+for (const course of catalog.courses) {
+  statements.push(`INSERT INTO courses (id, slug, title, credits, description, is_foundational)
+    VALUES (${q(course.id)}, ${q(course.id.toLowerCase())}, ${q(course.title)}, ${course.credits}, ${q(course.description)}, ${b(course.foundational)})
+    ON CONFLICT(id) DO UPDATE SET title=excluded.title, credits=excluded.credits, description=excluded.description, is_deprecated=0, is_foundational=excluded.is_foundational;`);
+  for (const code of [course.code, ...course.aliases]) {
+    statements.push(`INSERT INTO course_codes (course_id, code) VALUES (${q(course.id)}, ${q(normalizeCode(code))}) ON CONFLICT(course_id, code) DO NOTHING;`);
+  }
+}
+
+// Reconcile stored identities even when the latest scraper no longer lists old codes.
+for (const [code, courseId] of canonicalByCode) {
+  if (code !== courseId) statements.push(reconcileCourseSql(code, courseId));
+}
+const historical = [];
 for (const course of courses) {
-  const courseId = normalizeCourseId(course);
-  statements.push(
-    `INSERT INTO courses (
-      id, slug, title, credits, description, is_deprecated, is_foundational,
-      official_url, syllabus_url, source_created_at, source_updated_at, updated_at
-    ) VALUES (
-      ${q(courseId)}, ${q(course.slug)}, ${q(course.name)}, ${n(course.creditHours ?? 0)},
-      ${q(course.description ?? "")}, ${b(course.isDeprecated)}, ${b(course.isFoundational)},
-      ${q(course.officialURL)}, ${q(course.syllabus?.url)}, ${q(course._createdAt)},
-      ${q(course._updatedAt)}, ${q(new Date().toISOString())}
-    )
-    ON CONFLICT(id) DO UPDATE SET
-      slug = excluded.slug,
-      title = excluded.title,
-      credits = excluded.credits,
-      description = excluded.description,
-      is_deprecated = excluded.is_deprecated,
-      is_foundational = excluded.is_foundational,
-      official_url = excluded.official_url,
-      syllabus_url = excluded.syllabus_url,
-      source_created_at = excluded.source_created_at,
-      source_updated_at = excluded.source_updated_at,
-      updated_at = excluded.updated_at;`,
-  );
-
-  for (const [position, code] of (course.codes ?? []).entries()) {
-    statements.push(
-      `INSERT INTO course_codes (course_id, code, position)
-       VALUES (${q(courseId)}, ${q(normalizeCode(code))}, ${position})
-       ON CONFLICT(course_id, code) DO UPDATE SET position = excluded.position;`,
-    );
+  const courseId = courseIdsBySlug.get(course.slug)!;
+  const oldId = normalizeCourseId(course);
+  const current = catalog.courses.some(item => item.id === courseId);
+  if (!current) {
+    statements.push(`INSERT INTO courses (id, slug, title, credits, description, is_deprecated)
+      VALUES (${q(courseId)}, ${q(course.slug)}, ${q(course.name)}, 0, ${q(course.description ?? "")}, 1)
+      ON CONFLICT(id) DO UPDATE SET title=excluded.title, is_deprecated=1;`);
+    if (reviews.some(review => review.courseSlug === course.slug)) {
+      historical.push({ id: courseId, code: course.codes?.[0]?.replaceAll("-", " ") ?? course.slug, title: course.name,
+        aliases: (course.codes ?? []).slice(1), description: course.description ?? "",
+        sourceUrl: `https://www.omscentral.com/courses/${encodeURIComponent(course.slug)}/reviews` });
+    }
   }
-
-  for (const [position, tag] of (course.tags ?? []).entries()) {
-    statements.push(
-      `INSERT INTO course_tags (course_id, tag, position)
-       VALUES (${q(courseId)}, ${q(tag)}, ${position})
-       ON CONFLICT(course_id, tag) DO UPDATE SET position = excluded.position;`,
-    );
+  if (oldId !== courseId) {
+    statements.push(reconcileCourseSql(oldId, courseId));
   }
-
-  for (const programRef of (course.programs ?? []).map((program) => program._ref).filter(Boolean)) {
-    statements.push(
-      `INSERT INTO course_programs (course_id, program_ref)
-       VALUES (${q(courseId)}, ${q(programRef)})
-       ON CONFLICT(course_id, program_ref) DO NOTHING;`,
-    );
+  statements.push(`INSERT INTO course_source_slugs (slug, course_id) VALUES (${q(course.slug)}, ${q(courseId)}) ON CONFLICT(slug) DO UPDATE SET course_id=excluded.course_id;`);
+  for (const code of course.codes ?? []) {
+    statements.push(`INSERT INTO course_codes (course_id, code) VALUES (${q(courseId)}, ${q(normalizeCode(code))}) ON CONFLICT(course_id, code) DO NOTHING;`);
   }
 }
 
@@ -111,6 +113,13 @@ for (const review of reviews) {
   const term = normalizeTerm(review.semester);
   const importKey = importKeyFor(review);
   const reviewId = `omscentral-${importKey.slice(0, 24)}`;
+  const uniqueSourceIdentity = review.author && review.createdAt && reviewIdentityCounts.get(sourceIdentityFor(review)) === 1;
+  const storedReviewId = `COALESCE(
+    (SELECT review_id FROM omscentral_review_metadata WHERE import_key=${q(importKey)}),
+    ${uniqueSourceIdentity ? `(SELECT orm.review_id FROM omscentral_review_metadata orm JOIN reviews r ON r.id=orm.review_id
+      WHERE orm.course_slug=${q(review.courseSlug)} AND orm.source_author_hash=${q(review.author)} AND r.created_at=${q(review.createdAt)}
+      GROUP BY orm.course_slug, orm.source_author_hash, r.created_at HAVING COUNT(*)=1),` : ""}
+    ${q(reviewId)})`;
   const createdAt = review.createdAt ?? new Date().toISOString();
 
   statements.push(
@@ -124,8 +133,8 @@ for (const review of reviews) {
       id, course_id, source, term_id, semester_label, body, difficulty,
       workload, rating, recommend, program_stage, created_at, updated_at, deleted_at
     ) VALUES (
-      ${q(reviewId)}, ${q(courseId)}, 'omscentral', ${q(term.id)}, ${q(term.label)},
-      ${q(review.body?.trim() ?? "")}, ${n(review.difficulty)}, ${n(review.workload)}, ${n(review.rating)},
+      ${storedReviewId}, ${q(courseId)}, 'omscentral', ${q(term.id)}, ${q(term.label)},
+      ${q(review.body ?? "")}, ${n(review.difficulty)}, ${n(review.workload)}, ${n(review.rating)},
       NULL, NULL, ${q(createdAt)}, ${q(createdAt)}, NULL
     )
     ON CONFLICT(id) DO UPDATE SET
@@ -144,16 +153,22 @@ for (const review of reviews) {
     `INSERT INTO omscentral_review_metadata (
       review_id, import_key, course_slug, source_author_hash, source_url
     ) VALUES (
-      ${q(reviewId)}, ${q(importKey)}, ${q(review.courseSlug)}, ${q(review.author)}, ${q(review.sourceUrl)}
+      ${storedReviewId}, ${q(importKey)}, ${q(review.courseSlug)}, ${q(review.author)}, ${q(review.sourceUrl ?? `https://www.omscentral.com/courses/${encodeURIComponent(review.courseSlug)}/reviews`)}
     )
-    ON CONFLICT(import_key) DO UPDATE SET
-      review_id = excluded.review_id,
+    ON CONFLICT(review_id) DO UPDATE SET
+      import_key = excluded.import_key,
       course_slug = excluded.course_slug,
       source_author_hash = excluded.source_author_hash,
       source_url = excluded.source_url;`,
   );
 }
 
+if (skippedReviews) throw new Error(`${skippedReviews} reviews have unknown source slugs; import stopped.`);
+if (args.historicalOut) {
+  const out = resolve(args.historicalOut);
+  mkdirSync(dirname(out), { recursive: true });
+  writeFileSync(out, JSON.stringify([...new Map(historical.map(course => [course.id, course])).values()], null, 2) + "\n");
+}
 const sql = statements.join("\n\n");
 if (args.sqlOut) {
   const out = resolve(args.sqlOut);
@@ -200,6 +215,7 @@ function parseArgs(raw: string[]): Args {
     dataDir: "../omscentral-scraper/data",
     local: true,
     sqlOut: "",
+    historicalOut: "",
   };
 
   for (let i = 0; i < raw.length; i++) {
@@ -210,6 +226,7 @@ function parseArgs(raw: string[]): Args {
     else if (arg === "--remote") args.local = false;
     else if (arg === "--database") args.database = mustValue(raw[++i], arg);
     else if (arg === "--data-dir") args.dataDir = mustValue(raw[++i], arg);
+    else if (arg === "--historical-out") args.historicalOut = mustValue(raw[++i], arg);
     else if (arg === "--sql-out") args.sqlOut = mustValue(raw[++i], arg);
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -220,6 +237,15 @@ function parseArgs(raw: string[]): Args {
 
 function readJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
+}
+
+function reconcileCourseSql(oldId: string, courseId: string) {
+  // Unique Hub Review conflicts stop the import for human reconciliation.
+  return `UPDATE app_review_metadata SET course_id=${q(courseId)} WHERE course_id=${q(oldId)};
+    UPDATE reviews SET course_id=${q(courseId)} WHERE course_id=${q(oldId)};
+    UPDATE course_source_slugs SET course_id=${q(courseId)} WHERE course_id=${q(oldId)};
+    INSERT INTO course_codes (course_id,code,position) SELECT ${q(courseId)},code,position FROM course_codes WHERE course_id=${q(oldId)} ON CONFLICT(course_id,code) DO NOTHING;
+    DELETE FROM courses WHERE id=${q(oldId)};`;
 }
 
 function normalizeCourseId(course: CourseJson) {
@@ -243,6 +269,10 @@ function importKeyFor(review: ReviewJson) {
       ].join("\0"),
     )
     .digest("hex");
+}
+
+function sourceIdentityFor(review: ReviewJson) {
+  return [review.courseSlug, review.author, review.createdAt].join("\0");
 }
 
 function q(value: string | null | undefined) {

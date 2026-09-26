@@ -1,0 +1,167 @@
+[
+  {
+    "id": "CS-6465",
+    "code": "CS 6465",
+    "title": "Computational Journalism",
+    "aliases": [],
+    "description": "Technology is rapidly affecting how news information is gathered, reported, visualized, aggregated, summarized, distributed, and consumed. This class studies the computational technologies that impact journalism.",
+    "sourceUrl": "https://www.omscentral.com/courses/computational-journalism/reviews"
+  },
+  {
+    "id": "CS-8001-OCS",
+    "code": "CS 8001 OCS",
+    "title": "Seminar: Computing in Python",
+    "aliases": [],
+    "description": "",
+    "sourceUrl": "https://www.omscentral.com/courses/seminar-computing-in-python/reviews"
+  },
+  {
+    "id": "CS-8001-ORI",
+    "code": "CS 8001 ORI",
+    "title": "Seminar: Robotics and Human-Robot Interaction",
+    "aliases": [
+      "COMP-1003P-AU4"
+    ],
+    "description": "In this seminar course, students will delve into recent papers and explore current cutting-edge research in robotics. Esteemed robotics professionals from Georgia Tech, other prestigious institutions, and leading industry players will contribute to the learning experience through several guest lectures each semester. Participants are expected to engage actively, participating in biweekly presentations delivered to the robotics community by top researchers from both academia and industry. They are designed for students eager to explore the latest technological advancements and their applications across various topics, including artificial intelligence, medical robotics, soft robotics, sensing, healthcare, and human-robot interactions.",
+    "sourceUrl": "https://www.omscentral.com/courses/seminar-robotics-and-human-robot-interaction/reviews"
+  },
+  {
+    "id": "CS-8803",
+    "code": "CS 8803",
+    "title": "Computer Graphics in AI Era",
+    "aliases": [],
+    "description": "This course surveys modern computer graphics with emphasis on AI-enabled methods for modeling,\nrendering, simulation, and animation, focusing on implicit neural representations, neural rendering,\nGaussian splatting, differentiable physics simulation, and generative models. The course positions\nthese topics within classical graphics pipelines and provides both theoretical foundations and practical skills for building interactive and realistic content in contemporary AI-driven workflows.",
+    "sourceUrl": "https://www.omscentral.com/courses/computer-graphics-in-ai-era/reviews"
+  },
+  {
+    "id": "CSE-6040",
+    "code": "CSE 6040",
+    "title": "Computing for Data Analysis: Methods and Tools",
+    "aliases": [],
+    "description": "Computational techniques needed for data analysis; programming, accessing databases, multidimensional arrays, basic numerical computing, and visualization; hands-on applications and case studies.",
+    "sourceUrl": "https://www.omscentral.com/courses/computing-for-data-analysis-methods-and-tools/reviews"
+  },
+  {
+    "id": "CSE-8803-OAN",
+    "code": "CSE 8803 OAN",
+    "title": "Special Topics: Applied Natural Language Processing",
+    "aliases": [],
+    "description": "The primary objective of this course is to introduce you to broad classes of techniques and tools for analyzing text data using Natural Language Processing (NLP) algorithms and techniques. It emphasizes on how to apply pre-processing, processing, and post processing NLP techniques to analyze and develop NLP models.",
+    "sourceUrl": "https://www.omscentral.com/courses/special-topics-applied-natural-language-processing/reviews"
+  },
+  {
+    "id": "ECE-8803",
+    "code": "ECE 8803",
+    "title": "Introduction to Cyber-Physical Electric Energy Systems",
+    "aliases": [],
+    "description": "This course provides an introduction to cyber-physical infrastructure for electric power systems, the protection, control and operation of electrical facilities, communication protocols and standardization and present practices for cybersecurity.",
+    "sourceUrl": "https://www.omscentral.com/courses/introduction-to-cyber-physical-electric-energy-systems/reviews"
+  },
+  {
+    "id": "INTA-6103",
+    "code": "INTA 6103",
+    "title": "International Security",
+    "aliases": [],
+    "description": "Examines traditional and nontraditional issues in international security, including the uses of military force, military strategy and policy, arms control, peacekeeping, the environment, and migration.",
+    "sourceUrl": "https://www.omscentral.com/courses/international-security/reviews"
+  },
+  {
+    "id": "ISYE-6416",
+    "code": "ISYE 6416",
+    "title": "Computational Statistics",
+    "aliases": [],
+    "description": "This class describes the available knowledge regarding statistical computing. Topics include random deviates generation, importance sampling, Monte Carlo Markov chain (MCMC), EM algorithms, bootstrapping, model selection criteria, (e.g. C-p, AIC, etc.) splines, wavelets, and Fourier transform.",
+    "sourceUrl": "https://www.omscentral.com/courses/computational-statistics/reviews"
+  },
+  {
+    "id": "ISYE-6650",
+    "code": "ISYE 6650",
+    "title": "Probabilistic Models and Their Applications",
+    "aliases": [],
+    "description": "An introduction to basic stochastic processes such as Poisson and Markov processes and their applications in areas such as inventory, reliability, and queueing.",
+    "sourceUrl": "https://www.omscentral.com/courses/probabilistic-models-and-their-applications/reviews"
+  },
+  {
+    "id": "ISYE-6740",
+    "code": "ISYE 6740",
+    "title": "Computational Data Analysis: Learning, Mining, and Computation",
+    "aliases": [],
+    "description": "Theoretical/computational foundations of analyzing large/complex modern datasets, including the fundamental concepts of machine learning and data mining needed for both resesarch and practice.",
+    "sourceUrl": "https://www.omscentral.com/courses/computational-data-analysis-learning-mining-and-computation/reviews"
+  },
+  {
+    "id": "ISYE-7406",
+    "code": "ISYE 7406",
+    "title": "Data Mining and Statistical Learning",
+    "aliases": [],
+    "description": "Topics include neural networks, support vector machines, classification trees, boosting and discriminant analyses. Intended for Ph.D. students and those seeking the M.S. in Statistics.",
+    "sourceUrl": "https://www.omscentral.com/courses/data-mining-and-statistical-learning/reviews"
+  },
+  {
+    "id": "MGT-6203",
+    "code": "MGT 6203",
+    "title": "Data Analytics in Business",
+    "aliases": [],
+    "description": "This course teaches the scientific process of transforming data into insights for making better business decisions. The use of examples places business analytics techniques in context and teaches students how to avoid the common pitfalls, emphasizing the importance of building proper models.",
+    "sourceUrl": "https://www.omscentral.com/courses/data-analytics-in-business/reviews"
+  },
+  {
+    "id": "MGT-6727",
+    "code": "MGT 6727",
+    "title": "Privacy for Professionals",
+    "aliases": [],
+    "description": "This course takes a multi-disciplinary approach to the study of privacy––a current topic of international interest for those in technology, policy, law, and/or business.",
+    "sourceUrl": "https://www.omscentral.com/courses/privacy-for-professionals/reviews"
+  },
+  {
+    "id": "MGT-6748",
+    "code": "MGT 6748",
+    "title": "Applied Analytics Practicum",
+    "aliases": [
+      "CSE-6748",
+      "ISYE-6748"
+    ],
+    "description": "Practical analytics project experience applying ideas from the classroom to a significant project of interest to a business, government agency, or other organization.",
+    "sourceUrl": "https://www.omscentral.com/courses/applied-analytics-practicum/reviews"
+  },
+  {
+    "id": "MGT-8803",
+    "code": "MGT 8803",
+    "title": "Special Topics: Business Fundamentals for Analytics",
+    "aliases": [],
+    "description": "An accelerated introduction to the basics of management and the language of business. The course provides a framework that will enhance a person's effectiveness in the business world.",
+    "sourceUrl": "https://www.omscentral.com/courses/special-topics-business-fundamentals-for-analytics/reviews"
+  },
+  {
+    "id": "MGT-8823",
+    "code": "MGT 8823",
+    "title": "Special Topics: Data Analysis for Continuous Improvement",
+    "aliases": [],
+    "description": "",
+    "sourceUrl": "https://www.omscentral.com/courses/special-topics-data-analysis-for-continuous-improvement/reviews"
+  },
+  {
+    "id": "PUBP-6111",
+    "code": "PUBP 6111",
+    "title": "Internet and Public Policy",
+    "aliases": [],
+    "description": "Analyzes policy implications of Internet architecture (Internet protocols, domain name system, packet switching, peer-to-peer) and surveys policy issues about content, privacy, intellectual property, and governance.",
+    "sourceUrl": "https://www.omscentral.com/courses/internet-and-public-policy/reviews"
+  },
+  {
+    "id": "PUBP-6501",
+    "code": "PUBP 6501",
+    "title": "Information Policy and Management",
+    "aliases": [],
+    "description": "An introduction to the role of information and knowledge in modern private and public organizations. It covers theoretical and practical aspects of information seeking, gathering and use in organizations as well as knowledge creation and its role in private and public management.",
+    "sourceUrl": "https://www.omscentral.com/courses/information-policy-and-management/reviews"
+  },
+  {
+    "id": "PUBP-6502",
+    "code": "PUBP 6502",
+    "title": "Information and Communications Technology Policy",
+    "aliases": [],
+    "description": "Examination of the convergence of information technology, communications and telecommunication, policymaking within the executive/regulatory branches, special interest group role, and key domestic and international issues.",
+    "sourceUrl": "https://www.omscentral.com/courses/information-and-communications-technology-policy/reviews"
+  }
+]

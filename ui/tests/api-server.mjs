@@ -1,10 +1,12 @@
 // Serve the real Hono application, replacing only external Clerk and D1 boundaries.
 import { build } from 'esbuild';
 import { createServer } from 'node:http';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { DatabaseSync } from 'node:sqlite';
+import { execFileSync } from 'node:child_process';
 
 const directory = await mkdtemp(join(tmpdir(), 'omscs-browser-api-'));
 const outfile = join(directory, 'api.mjs');
@@ -15,9 +17,21 @@ await build({
   } }],
 });
 const { default: app } = await import(pathToFileURL(outfile).href);
+// Import saved source fixtures into SQLite, then exercise the real Hono SQL.
+execFileSync(process.execPath, ['--import', 'tsx', 'scripts/import-omscentral.ts', '--data-dir', resolve('../api/tests/fixtures/omscentral'), '--sql-out', join(directory, 'import.sql'), '--historical-out', resolve('tests/fixtures/historical-courses.json')], { cwd: resolve('../api') });
+const sqlite = new DatabaseSync(':memory:');
+for (const migration of ['0001_reviews.sql', '0002_course_source_slugs.sql']) sqlite.exec(await readFile(resolve('../api/migrations', migration), 'utf8'));
+sqlite.exec(await readFile(join(directory, 'import.sql'), 'utf8'));
 const env = {
   CLERK_SECRET_KEY: 'browser-fixture', CORS_ORIGIN: 'http://127.0.0.1:3101',
-  DB: { prepare: () => ({ bind() { return this; }, first: async () => ({ id: 'CS-6200' }), all: async () => ({ results: [] }) }) },
+  DB: { prepare(sql) {
+    let params = [];
+    return { bind(...values) { params = values; return this; },
+      first: async () => sqlite.prepare(sql).get(...params) ?? null,
+      all: async () => ({ results: sqlite.prepare(sql).all(...params) }),
+      run: async () => sqlite.prepare(sql).run(...params),
+    };
+  } },
 };
 const server = createServer(async (request, response) => {
   const chunks = [];

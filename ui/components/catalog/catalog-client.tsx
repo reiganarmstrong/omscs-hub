@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { courseMatchesSearch } from "@/lib/data"
 import type { Course, CatalogFilter } from "@/lib/types"
 import { FilterRail } from "./filter-rail"
@@ -251,6 +252,12 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
             </div>
           </div>
         )}
+        <Link
+          href="/historical"
+          className="mt-6 inline-block text-sm underline underline-offset-4"
+        >
+          Historical review archive
+        </Link>
       </div>
     </div>
   )

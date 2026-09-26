@@ -1,22 +1,21 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { CourseFacts } from "./course-facts";
-import Link from "next/link";
-import type { Course } from "@/lib/types";
-import { WORKLOAD_BUCKETS } from "@/lib/types";
-import { useReviews } from "@/lib/store/reviews-store";
-import { aggregateStats } from "@/lib/data";
-import { usePlanner } from "@/lib/store/planner-store";
-import { SPECIALIZATIONS_BY_ID } from "@/lib/data/specializations";
-import { DistributionChart } from "@/components/distribution-chart";
-import { ReviewList } from "@/components/reviews/review-list";
-import { ReviewForm } from "@/components/reviews/review-form";
-import { Tag, Stars } from "@/components/badges";
-import { ArrowLeft, ArrowRight, CheckIcon, PlusIcon } from "@/components/icons";
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import { CourseFacts } from "./course-facts"
+import Link from "next/link"
+import type { Course } from "@/lib/types"
+import { WORKLOAD_BUCKETS } from "@/lib/types"
+import { useReviews } from "@/lib/store/reviews-store"
+import { aggregateStats } from "@/lib/data"
+import { usePlanner } from "@/lib/store/planner-store"
+import { SPECIALIZATIONS_BY_ID } from "@/lib/data/specializations"
+import { DistributionChart } from "@/components/distribution-chart"
+import { ReviewList } from "@/components/reviews/review-list"
+import { ReviewForm } from "@/components/reviews/review-form"
+import { Tag, Stars } from "@/components/badges"
+import { ArrowLeft, ArrowRight, CheckIcon, PlusIcon } from "@/components/icons"
 
-type Stats = ReturnType<typeof aggregateStats>;
+type Stats = ReturnType<typeof aggregateStats>
 
 export function CourseDetail({ course }: { course: Course }) {
   const {
@@ -25,20 +24,29 @@ export function CourseDetail({ course }: { course: Course }) {
     loadCourseReviews,
     loadingCourseIds,
     reviewErrors,
-  } = useReviews();
-  const reviews = reviewsFor(course.id);
-  const stats = statsFor(course.id);
-  const meanWLBucket = bucketIndexFor(stats.avgWorkload);
-  const meanRatingIdx = clampIdx(Math.round(stats.avgRating) - 1, 0, 4);
-  const meanDiffIdx = clampIdx(Math.round(stats.avgDifficulty) - 1, 0, 4);
-  const reviewError = reviewErrors[course.id];
-  const isReviewFallbackNotice = reviewError?.startsWith(
-    "Review API unavailable.",
-  );
+  } = useReviews()
+  const reviews = reviewsFor(course.id)
+  const stats = statsFor(course.id)
+  const meanWLBucket = bucketIndexFor(stats.avgWorkload)
+  const meanRatingIdx = clampIdx(Math.round(stats.avgRating) - 1, 0, 4)
+  const meanDiffIdx = clampIdx(Math.round(stats.avgDifficulty) - 1, 0, 4)
+  const reviewError = reviewErrors[course.id]
+  const [loadedCourseId, setLoadedCourseId] = React.useState<string | null>(
+    null
+  )
+  const reviewLoading =
+    loadedCourseId !== course.id || loadingCourseIds.has(course.id)
+  const reviewsAvailable = !reviewError && !reviewLoading
 
   React.useEffect(() => {
-    void loadCourseReviews(course.id);
-  }, [course.id, loadCourseReviews]);
+    let active = true
+    void loadCourseReviews(course.id).then(() => {
+      if (active) setLoadedCourseId(course.id)
+    })
+    return () => {
+      active = false
+    }
+  }, [course.id, loadCourseReviews])
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 pt-8 pb-16">
@@ -51,7 +59,9 @@ export function CourseDetail({ course }: { course: Course }) {
               {course.code}
             </span>
             <span className="text-xs text-muted-foreground">
-              {course.credits} credit hours
+              {course.historical
+                ? "Historical review archive"
+                : `${course.credits} credit hours`}
             </span>
           </div>
           <h1 className="mt-1 font-display text-3xl leading-tight tracking-tight md:text-[2.6rem]">
@@ -63,7 +73,11 @@ export function CourseDetail({ course }: { course: Course }) {
             )}
           </h1>
           <p className="reading mt-3 max-w-3xl text-[15px] text-muted-foreground">
-            <span className="block text-xs">Official overview excerpt</span>
+            <span className="block text-xs">
+              {course.historical
+                ? "Archived source description · Unverified"
+                : "Official overview excerpt"}
+            </span>
             {course.description}
           </p>
 
@@ -88,45 +102,51 @@ export function CourseDetail({ course }: { course: Course }) {
         </div>
 
         <aside className="col-span-12 lg:col-span-4">
-          <SidebarSummary course={course} stats={stats} />
+          <SidebarSummary
+            course={course}
+            stats={stats}
+            available={reviewsAvailable}
+          />
         </aside>
       </header>
 
-      <section className="mt-10">
-        <SectionHead
-          title="Distributions"
-          note={`${stats.numReviews} reviews — mean bin highlighted.`}
-        />
-        <div className="mt-5 grid grid-cols-1 gap-8 rounded-xl border border-border bg-card p-6 lg:grid-cols-3">
-          <DistributionChart
-            label="Difficulty"
-            unit="of 5"
-            bins={stats.distDifficulty}
-            binLabels={["1", "2", "3", "4", "5"]}
-            mean={stats.avgDifficulty}
-            meanIndex={meanDiffIdx}
-            accent="rose"
+      {reviewsAvailable && (
+        <section className="mt-10">
+          <SectionHead
+            title="Distributions"
+            note={`${stats.numReviews} reviews — mean bin highlighted.`}
           />
-          <DistributionChart
-            label="Weekly workload"
-            unit="hrs/wk"
-            bins={stats.distWorkload}
-            binLabels={WORKLOAD_BUCKETS.map((b) => b.label)}
-            mean={stats.avgWorkload}
-            meanIndex={meanWLBucket}
-            accent="leaf"
-          />
-          <DistributionChart
-            label="Overall rating"
-            unit="of 5"
-            bins={stats.distRating}
-            binLabels={["1★", "2★", "3★", "4★", "5★"]}
-            mean={stats.avgRating}
-            meanIndex={meanRatingIdx}
-            accent="ink"
-          />
-        </div>
-      </section>
+          <div className="mt-5 grid grid-cols-1 gap-8 rounded-xl border border-border bg-card p-6 lg:grid-cols-3">
+            <DistributionChart
+              label="Difficulty"
+              unit="of 5"
+              bins={stats.distDifficulty}
+              binLabels={["1", "2", "3", "4", "5"]}
+              mean={stats.avgDifficulty}
+              meanIndex={meanDiffIdx}
+              accent="rose"
+            />
+            <DistributionChart
+              label="Weekly workload"
+              unit="hrs/wk"
+              bins={stats.distWorkload}
+              binLabels={WORKLOAD_BUCKETS.map((b) => b.label)}
+              mean={stats.avgWorkload}
+              meanIndex={meanWLBucket}
+              accent="leaf"
+            />
+            <DistributionChart
+              label="Overall rating"
+              unit="of 5"
+              bins={stats.distRating}
+              binLabels={["1★", "2★", "3★", "4★", "5★"]}
+              mean={stats.avgRating}
+              meanIndex={meanRatingIdx}
+              accent="ink"
+            />
+          </div>
+        </section>
+      )}
 
       <section className="mt-10">
         <SectionHead title="Logistics" />
@@ -167,47 +187,49 @@ export function CourseDetail({ course }: { course: Course }) {
 
       <section className="mt-10">
         <SectionHead
-          title={`Reviews (${reviews.length})`}
+          title={reviewsAvailable ? `Reviews (${reviews.length})` : "Reviews"}
           note="OMSCentral imports are public. OMSCS Hub reviews require a verified gatech.edu account."
         />
-        {loadingCourseIds.has(course.id) && (
-          <p className="mt-3 text-xs text-muted-foreground">
-            Loading review archive…
+        {(reviewLoading || reviewError) && (
+          <p role="status" className="mt-3 text-sm text-muted-foreground">
+            {reviewLoading
+              ? "Loading reviews…"
+              : "Reviews unavailable. Course facts remain available. Try again."}
           </p>
         )}
-        {reviewError && (
-          <p
-            className={cn(
-              "mt-3 text-xs",
-              isReviewFallbackNotice ? "text-muted-foreground" : "text-rose",
-            )}
-          >
-            {reviewError}
-          </p>
+        <button
+          type="button"
+          disabled={reviewLoading}
+          onClick={() => void loadCourseReviews(course.id)}
+          className="mt-3 rounded-md border border-border px-3 py-2 text-xs disabled:opacity-50"
+        >
+          {reviewError ? "Retry reviews" : "Refresh reviews"}
+        </button>
+        {reviewsAvailable && (
+          <>
+            <div className="mt-4">
+              <ReviewForm courseId={course.id} />
+            </div>
+            <div className="mt-4">
+              <ReviewList reviews={reviews} />
+            </div>
+          </>
         )}
-
-        <div className="mt-4">
-          <ReviewForm courseId={course.id} />
-        </div>
-
-        <div className="mt-4">
-          <ReviewList reviews={reviews} />
-        </div>
       </section>
     </div>
-  );
+  )
 }
 
 function bucketIndexFor(hours: number) {
   for (let i = 0; i < WORKLOAD_BUCKETS.length; i++) {
-    const b = WORKLOAD_BUCKETS[i];
-    if (hours >= b.min && hours <= b.max) return i;
+    const b = WORKLOAD_BUCKETS[i]
+    if (hours >= b.min && hours <= b.max) return i
   }
-  return WORKLOAD_BUCKETS.length - 1;
+  return WORKLOAD_BUCKETS.length - 1
 }
 
 function clampIdx(n: number, lo: number, hi: number) {
-  return Math.max(lo, Math.min(hi, n));
+  return Math.max(lo, Math.min(hi, n))
 }
 
 function Crumbs({ course }: { course: Course }) {
@@ -218,127 +240,141 @@ function Crumbs({ course }: { course: Course }) {
       </Link>{" "}
       / <span className="text-foreground">{course.code}</span>
     </nav>
-  );
+  )
 }
 
-function SidebarSummary({ course, stats }: { course: Course; stats: Stats }) {
-  const { add, remove, has } = usePlanner();
-  const inTerm = has(course.id);
-  const [picker, setPicker] = React.useState(false);
+function SidebarSummary({
+  course,
+  stats,
+  available,
+}: {
+  course: Course
+  stats: Stats
+  available: boolean
+}) {
+  const { add, remove, has } = usePlanner()
+  const inTerm = has(course.id)
+  const [picker, setPicker] = React.useState(false)
 
-  const yearOptions = ["2025", "2026", "2027"];
-  const termOptions = ["Fall", "Spring", "Summer"] as const;
-  const [year, setYear] = React.useState(yearOptions[0]);
+  const yearOptions = ["2025", "2026", "2027"]
+  const termOptions = ["Fall", "Spring", "Summer"] as const
+  const [year, setYear] = React.useState(yearOptions[0])
   const [term, setTerm] = React.useState<(typeof termOptions)[number]>(
-    course.termsOffered[0] ?? "Fall",
-  );
+    course.termsOffered[0] ?? "Fall"
+  )
 
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <div className="flex items-baseline justify-between">
         <span className="label">At a glance</span>
-        <Stars value={stats.avgRating} />
+        {available && <Stars value={stats.avgRating} />}
       </div>
-      <dl className="mt-3 grid grid-cols-3 gap-3">
-        <Mini
-          label="Difficulty"
-          value={stats.avgDifficulty.toFixed(1)}
-          unit="/5"
-        />
-        <Mini
-          label="Workload"
-          value={stats.avgWorkload.toFixed(0)}
-          unit="hr/wk"
-        />
-        <Mini label="Reviews" value={String(stats.numReviews)} />
-      </dl>
+      {available ? (
+        <dl className="mt-3 grid grid-cols-3 gap-3">
+          <Mini
+            label="Difficulty"
+            value={stats.avgDifficulty.toFixed(1)}
+            unit="/5"
+          />
+          <Mini
+            label="Workload"
+            value={stats.avgWorkload.toFixed(0)}
+            unit="hr/wk"
+          />
+          <Mini label="Reviews" value={String(stats.numReviews)} />
+        </dl>
+      ) : (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Review summary unavailable.
+        </p>
+      )}
 
-      <div className="mt-4 border-t border-border pt-3">
-        <div className="label">Planner</div>
-        {inTerm ? (
-          <div className="mt-2 flex items-center justify-between rounded-md bg-leaf/12 px-3 py-2 text-leaf">
-            <span className="text-sm">
-              {inTerm === "unassigned"
-                ? "Planned (Unscheduled)"
-                : `Planned · ${inTerm.replace("-", " ")}`}
-              <CheckIcon size={13} className="-mt-0.5 ml-1 inline" />
-            </span>
-            <button
-              type="button"
-              onClick={() => remove(inTerm, course.id)}
-              className="text-xs underline hover:no-underline"
-            >
-              Remove
-            </button>
-          </div>
-        ) : !picker ? (
-          <div className="mt-2 grid grid-cols-2 gap-1.5">
-            <button
-              type="button"
-              onClick={() => setPicker(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm transition-colors hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
-            >
-              <PlusIcon size={14} /> Schedule…
-            </button>
-            <button
-              type="button"
-              onClick={() => add("unassigned", course.id)}
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm transition-colors hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
-            >
-              Add unscheduled
-            </button>
-          </div>
-        ) : (
-          <div className="mt-2 space-y-1.5">
-            <p className="text-xs text-muted-foreground">Future term availability unverified. Choose your intended term.</p>
-            <div className="grid grid-cols-[1fr_1fr_auto] gap-1.5">
-              <select
-                value={term}
-                onChange={(e) =>
-                  setTerm(e.target.value as (typeof termOptions)[number])
-                }
-                className="rounded-md border border-border bg-background px-2 py-1.5 text-sm dark:border-white dark:bg-white dark:text-black"
-              >
-                {termOptions.map((t) => (
-                  <option
-                    key={t}
-                    value={t}
-                  >
-                    {t}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                className="rounded-md border border-border bg-background px-2 py-1.5 text-sm dark:border-white dark:bg-white dark:text-black"
-              >
-                {yearOptions.map((y) => (
-                  <option key={y}>{y}</option>
-                ))}
-              </select>
+      {!course.historical && (
+        <div className="mt-4 border-t border-border pt-3">
+          <div className="label">Planner</div>
+          {inTerm ? (
+            <div className="mt-2 flex items-center justify-between rounded-md bg-leaf/12 px-3 py-2 text-leaf">
+              <span className="text-sm">
+                {inTerm === "unassigned"
+                  ? "Planned (Unscheduled)"
+                  : `Planned · ${inTerm.replace("-", " ")}`}
+                <CheckIcon size={13} className="-mt-0.5 ml-1 inline" />
+              </span>
               <button
                 type="button"
-                onClick={() => {
-                  add(`${term}-${year}`, course.id);
-                  setPicker(false);
-                }}
-                className="rounded-md bg-leaf px-3 py-1.5 text-xs text-leaf-fg hover:opacity-90"
+                onClick={() => remove(inTerm, course.id)}
+                className="text-xs underline hover:no-underline"
               >
-                Save
+                Remove
               </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setPicker(false)}
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background py-1.5 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground dark:border-white dark:bg-white dark:text-black"
-            >
-              <ArrowLeft size={12} /> Back
-            </button>
-          </div>
-        )}
-      </div>
-
+          ) : !picker ? (
+            <div className="mt-2 grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                onClick={() => setPicker(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm transition-colors hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
+              >
+                <PlusIcon size={14} /> Schedule…
+              </button>
+              <button
+                type="button"
+                onClick={() => add("unassigned", course.id)}
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background py-2 text-sm transition-colors hover:border-foreground/30 dark:border-white dark:bg-white dark:text-black"
+              >
+                Add unscheduled
+              </button>
+            </div>
+          ) : (
+            <div className="mt-2 space-y-1.5">
+              <p className="text-xs text-muted-foreground">
+                Future term availability unverified. Choose your intended term.
+              </p>
+              <div className="grid grid-cols-[1fr_1fr_auto] gap-1.5">
+                <select
+                  value={term}
+                  onChange={(e) =>
+                    setTerm(e.target.value as (typeof termOptions)[number])
+                  }
+                  className="rounded-md border border-border bg-background px-2 py-1.5 text-sm dark:border-white dark:bg-white dark:text-black"
+                >
+                  {termOptions.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="rounded-md border border-border bg-background px-2 py-1.5 text-sm dark:border-white dark:bg-white dark:text-black"
+                >
+                  {yearOptions.map((y) => (
+                    <option key={y}>{y}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => {
+                    add(`${term}-${year}`, course.id)
+                    setPicker(false)
+                  }}
+                  className="rounded-md bg-leaf px-3 py-1.5 text-xs text-leaf-fg hover:opacity-90"
+                >
+                  Save
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPicker(false)}
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background py-1.5 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground dark:border-white dark:bg-white dark:text-black"
+              >
+                <ArrowLeft size={12} /> Back
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       <div className="mt-3 border-t border-border pt-3">
         <Link
           href="/planner"
@@ -348,7 +384,7 @@ function SidebarSummary({ course, stats }: { course: Course; stats: Stats }) {
         </Link>
       </div>
     </div>
-  );
+  )
 }
 
 function Mini({
@@ -356,9 +392,9 @@ function Mini({
   value,
   unit,
 }: {
-  label: string;
-  value: string;
-  unit?: string;
+  label: string
+  value: string
+  unit?: string
 }) {
   return (
     <div>
@@ -372,7 +408,7 @@ function Mini({
         )}
       </span>
     </div>
-  );
+  )
 }
 
 function SectionHead({ title, note }: { title: string; note?: string }) {
@@ -385,20 +421,20 @@ function SectionHead({ title, note }: { title: string; note?: string }) {
         </span>
       )}
     </div>
-  );
+  )
 }
 
 function Block({
   heading,
   children,
 }: {
-  heading: string;
-  children: React.ReactNode;
+  heading: string
+  children: React.ReactNode
 }) {
   return (
     <div className="rounded-lg border border-border bg-card p-4">
       <div className="label">{heading}</div>
       <div className="mt-2">{children}</div>
     </div>
-  );
+  )
 }

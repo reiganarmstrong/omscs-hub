@@ -285,3 +285,40 @@ Options:
 
 When the expected scraper data is present, the documented import dry run reports
 134 courses and 9298 reviews.
+
+
+### Canonical identities and historical pages
+
+Apply both migrations before importing. The importer uses the curated
+`ui/lib/data/catalog.json` codes and verified aliases. All matching source slugs
+resolve to one Course through `course_source_slugs`; source titles never replace
+published course facts. Existing Imported Reviews and Hub Reviews move from old
+codes to the canonical Course. Conflicting Hub Reviews for one author and Course
+stop the import with a uniqueness error. Resolve the conflict before retrying;
+neither review is discarded. Back up the target database before migration.
+
+Publish the historical archive alongside the static UI build:
+
+```bash
+pnpm import:omscentral --sql-out .wrangler/tmp/omscentral-import.sql --historical-out ../ui/lib/data/historical-courses.json
+pnpm wrangler d1 execute omscs-hub-reviews-dev --file .wrangler/tmp/omscentral-import.sql --remote
+cd ../ui
+pnpm build
+```
+
+Review the generated manifest before deployment. It includes only source courses
+with real reviews and no verified current equivalent. The checked-in manifest was
+generated from the September 26, 2026 OMSCentral scrape (136 courses, 9,578
+reviews); regenerate it when importing a newer source snapshot. Historical pages
+retain their archived descriptions during review service outages, mark academic
+facts unverified, and offer no future plan picks.
+
+Imports preserve full body text and supplied original URLs. OMSCentral currently
+exposes course review archives rather than individual review permalinks. When an
+original URL is missing, the importer records that source archive URL, which the
+UI labels as an archive instead of claiming it is a permalink. With source author
+and timestamp uniquely identify one review for a source course, edited text
+retains its existing review identity, including identities created by earlier
+imports. Reviews sharing those fields stay separate through their full text.
+Unknown or ambiguous source mappings stop SQL generation rather than silently
+dropping reviews.

@@ -1,85 +1,87 @@
-export type Term = "Fall" | "Spring" | "Summer";
+export type Term = "Fall" | "Spring" | "Summer"
 
 export type SpecializationId =
   | "computing-systems"
   | "machine-learning"
   | "interactive-intelligence"
   | "computational-perception"
-  | "human-computer-interaction";
+  | "human-computer-interaction"
 
 export type CourseRole =
   | "core" // counts as foundational/core for many specs
   | "elective"
-  | "capstone";
+  | "capstone"
 
 export type Course = {
-  id: string; // "CS-6200"
-  code: string; // "CS 6200"
-  title: string;
-  shortTitle?: string;
-  aliases: string[];
-  sourceUrl: string;
-  creditsSourceUrl: string;
-  lastChecked: string;
-  descriptionStatus: "official-excerpt" | "unverified";
-  prerequisitesStatus: "published-guidance" | "unverified";
-  foundational: boolean;
-  credits: number;
-  description: string;
-  prereqs: string[];
-  programNotes?: string;
-  termsOffered: Term[];
-  specializations: { id: SpecializationId; role: CourseRole }[];
-  tags: string[];
+  historical?: boolean
+  id: string // "CS-6200"
+  code: string // "CS 6200"
+  title: string
+  shortTitle?: string
+  aliases: string[]
+  sourceUrl: string
+  creditsSourceUrl: string
+  lastChecked: string
+  descriptionStatus: "official-excerpt" | "unverified"
+  prerequisitesStatus: "published-guidance" | "unverified"
+  foundational: boolean
+  credits: number
+  description: string
+  prereqs: string[]
+  programNotes?: string
+  termsOffered: Term[]
+  specializations: { id: SpecializationId; role: CourseRole }[]
+  tags: string[]
   // aggregate stats baked from seeded reviews
   stats: {
-    avgDifficulty: number; // 1-5
-    avgWorkload: number; // hours/week
-    avgRating: number; // 1-5 (overall)
-    numReviews: number;
-    distDifficulty: number[]; // length 5, count per [1..5]
-    distRating: number[]; // length 5, count per [1..5]
-    distWorkload: number[]; // length 8, buckets [<5, 5-9, 10-14, 15-19, 20-24, 25-29, 30-34, 35+]
-  };
-};
+    avgDifficulty: number // 1-5
+    avgWorkload: number // hours/week
+    avgRating: number // 1-5 (overall)
+    numReviews: number
+    distDifficulty: number[] // length 5, count per [1..5]
+    distRating: number[] // length 5, count per [1..5]
+    distWorkload: number[] // length 8, buckets [<5, 5-9, 10-14, 15-19, 20-24, 25-29, 30-34, 35+]
+  }
+}
 
 export type Review = {
-  id: string;
-  courseId: string;
-  source?: "omscentral" | "app";
-  semester: string; // "Fall 2024"
-  difficulty: number | null; // 1-5
-  workload: number | null; // hours/week
-  rating: number | null; // 1-5
-  programStage: "First" | "Mid" | "Late" | null;
-  body: string;
-  pros: string[];
-  cons: string[];
-  recommend: boolean | null;
-  createdAt: string; // ISO
-  updatedAt?: string;
-  deletedAt?: string | null;
-};
+  id: string
+  courseId: string
+  source?: "omscentral" | "app"
+  semester: string // "Fall 2024"
+  difficulty: number | null // 1-5
+  workload: number | null // hours/week
+  rating: number | null // 1-5
+  programStage: "First" | "Mid" | "Late" | null
+  body: string
+  pros: string[]
+  cons: string[]
+  recommend: boolean | null
+  createdAt: string // ISO
+  metadata?: { sourceUrl?: string | null }
+  updatedAt?: string
+  deletedAt?: string | null
+}
 
 export type SpecRequirement = {
-  id: string;
-  label: string; // e.g. "Pick 2 of the following"
-  pick: number; // how many courses needed from this bucket
-  poolCourseIds: string[]; // candidates that fulfill this bucket
-  required?: boolean; // if true, all courses in pool are required (pick == pool.length)
-  notes?: string;
-};
+  id: string
+  label: string // e.g. "Pick 2 of the following"
+  pick: number // how many courses needed from this bucket
+  poolCourseIds: string[] // candidates that fulfill this bucket
+  required?: boolean // if true, all courses in pool are required (pick == pool.length)
+  notes?: string
+}
 
 export type Specialization = {
-  id: SpecializationId;
-  name: string;
-  blurb: string;
-  description: string;
-  totalHours: number;
-  totalCourses: number;
-  requirements: SpecRequirement[];
-  freeElectiveCount: number; // courses that can be any 6XXX/7XXX/8XXX outside the buckets
-};
+  id: SpecializationId
+  name: string
+  blurb: string
+  description: string
+  totalHours: number
+  totalCourses: number
+  requirements: SpecRequirement[]
+  freeElectiveCount: number // courses that can be any 6XXX/7XXX/8XXX outside the buckets
+}
 
 export type ReviewSortKey =
   | "newest"
@@ -89,25 +91,25 @@ export type ReviewSortKey =
   | "hardest"
   | "easiest"
   | "longest"
-  | "shortest";
+  | "shortest"
 
 export type ReviewFilter = {
-  minRating?: number;
-  maxDifficulty?: number;
-  recommendOnly?: boolean;
-  semester?: string; // contains
-};
+  minRating?: number
+  maxDifficulty?: number
+  recommendOnly?: boolean
+  semester?: string // contains
+}
 
 export type CatalogFilter = {
-  q: string;
-  specs: SpecializationId[];
-  terms: Term[];
-  difficulty: [number, number]; // 1-5
-  workload: [number, number]; // 0-50
-  rating: [number, number]; // 1-5
-  minReviews: number;
-  role: CourseRole | "any";
-};
+  q: string
+  specs: SpecializationId[]
+  terms: Term[]
+  difficulty: [number, number] // 1-5
+  workload: [number, number] // 0-50
+  rating: [number, number] // 1-5
+  minReviews: number
+  role: CourseRole | "any"
+}
 
 export const WORKLOAD_BUCKETS = [
   { label: "<5", min: 0, max: 4.999 },
@@ -118,4 +120,4 @@ export const WORKLOAD_BUCKETS = [
   { label: "25–29", min: 25, max: 29.999 },
   { label: "30–34", min: 30, max: 34.999 },
   { label: "35+", min: 35, max: Infinity },
-];
+]

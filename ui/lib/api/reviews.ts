@@ -1,53 +1,93 @@
-import type { Review } from "@/lib/types";
+import type { Review } from "@/lib/types"
+import { z } from "zod"
 
 export type ReviewInput = {
-  semester: string;
-  difficulty: number;
-  workload: number;
-  rating: number;
-  recommend: boolean;
-  programStage: "First" | "Mid" | "Late";
-  body: string;
-};
+  semester: string
+  difficulty: number
+  workload: number
+  rating: number
+  recommend: boolean
+  programStage: "First" | "Mid" | "Late"
+  body: string
+}
 
 type ApiReview = Omit<Review, "createdAt"> & {
-  createdAt: string;
-};
+  createdAt: string
+}
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
+const reviewResponseSchema = z.object({
+  reviews: z.array(
+    z.object({
+      id: z.string(),
+      courseId: z.string(),
+      source: z.enum(["omscentral", "app"]),
+      semester: z.string(),
+      difficulty: z.number().nullable(),
+      workload: z.number().nullable(),
+      rating: z.number().nullable(),
+      recommend: z.boolean().nullable(),
+      programStage: z.enum(["First", "Mid", "Late"]).nullable(),
+      body: z.string(),
+      pros: z.array(z.string()),
+      cons: z.array(z.string()),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      deletedAt: z.string().nullable(),
+      metadata: z.object({
+        sourceUrl: z.string().url().regex(/^https?:\/\//).nullable().optional(),
+      }).optional(),
+    })
+  ),
+})
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "")
 
 export function hasApiBaseUrl() {
-  return Boolean(API_BASE_URL);
+  return Boolean(API_BASE_URL)
 }
 
 export async function fetchCourseReviews(courseId: string) {
-  const data = await request<{ reviews: ApiReview[] }>(
+  const data = await request<unknown>(
     `/courses/${encodeURIComponent(courseId)}/reviews?source=all`,
     {
-      unavailableMessage: "Review API unavailable. Showing seeded review data.",
-    },
-  );
-  return data.reviews;
+      unavailableMessage: "Reviews unavailable. Try again.",
+    }
+  )
+  return reviewResponseSchema.parse(data).reviews satisfies ApiReview[]
 }
 
-export async function createReview(courseId: string, input: ReviewInput, token: string) {
-  return request<{ reviewId: string }>(`/courses/${encodeURIComponent(courseId)}/reviews`, {
-    method: "POST",
-    token,
-    body: input,
-    unavailableMessage:
-      "Review API unavailable. Check NEXT_PUBLIC_API_BASE_URL or CORS settings before submitting.",
-  });
+export async function createReview(
+  courseId: string,
+  input: ReviewInput,
+  token: string
+) {
+  return request<{ reviewId: string }>(
+    `/courses/${encodeURIComponent(courseId)}/reviews`,
+    {
+      method: "POST",
+      token,
+      body: input,
+      unavailableMessage:
+        "Review API unavailable. Check NEXT_PUBLIC_API_BASE_URL or CORS settings before submitting.",
+    }
+  )
 }
 
-export async function updateMyReview(courseId: string, input: ReviewInput, token: string) {
-  return request<{ reviewId: string }>(`/courses/${encodeURIComponent(courseId)}/reviews/me`, {
-    method: "PUT",
-    token,
-    body: input,
-    unavailableMessage:
-      "Review API unavailable. Check NEXT_PUBLIC_API_BASE_URL or CORS settings before submitting.",
-  });
+export async function updateMyReview(
+  courseId: string,
+  input: ReviewInput,
+  token: string
+) {
+  return request<{ reviewId: string }>(
+    `/courses/${encodeURIComponent(courseId)}/reviews/me`,
+    {
+      method: "PUT",
+      token,
+      body: input,
+      unavailableMessage:
+        "Review API unavailable. Check NEXT_PUBLIC_API_BASE_URL or CORS settings before submitting.",
+    }
+  )
 }
 
 export async function deleteMyReview(courseId: string, token: string) {
@@ -58,15 +98,21 @@ export async function deleteMyReview(courseId: string, token: string) {
       token,
       unavailableMessage:
         "Review API unavailable. Check NEXT_PUBLIC_API_BASE_URL or CORS settings before submitting.",
-    },
-  );
+    }
+  )
 }
 
 async function request<T>(
   path: string,
-  options: { method?: string; token?: string; body?: unknown; unavailableMessage?: string } = {},
+  options: {
+    method?: string
+    token?: string
+    body?: unknown
+    unavailableMessage?: string
+  } = {}
 ) {
-  if (!API_BASE_URL) throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured.");
+  if (!API_BASE_URL)
+    throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured.")
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method ?? "GET",
@@ -77,29 +123,32 @@ async function request<T>(
     body: options.body ? JSON.stringify(options.body) : undefined,
   }).catch((error: unknown) => {
     if (error instanceof TypeError) {
-      throw new Error(options.unavailableMessage ?? "Review API unavailable.");
+      throw new Error(options.unavailableMessage ?? "Review API unavailable.")
     }
-    throw error;
-  });
+    throw error
+  })
 
   const data = (await res.json().catch(() => ({}))) as T & {
-    error?: unknown;
-    issues?: { message?: string }[];
-  };
-  if (!res.ok) throw new Error(apiErrorMessage(data, res.status));
-  return data;
+    error?: unknown
+    issues?: { message?: string }[]
+  }
+  if (!res.ok) throw new Error(apiErrorMessage(data, res.status))
+  return data
 }
 
-function apiErrorMessage(data: { error?: unknown; issues?: { message?: string }[] }, status: number) {
-  if (typeof data.error === "string") return data.error;
+function apiErrorMessage(
+  data: { error?: unknown; issues?: { message?: string }[] },
+  status: number
+) {
+  if (typeof data.error === "string") return data.error
 
-  const issueMessage = data.issues?.find((issue) => issue.message)?.message;
-  if (issueMessage) return issueMessage;
+  const issueMessage = data.issues?.find((issue) => issue.message)?.message
+  if (issueMessage) return issueMessage
 
   if (data.error && typeof data.error === "object" && "message" in data.error) {
-    const message = (data.error as { message?: unknown }).message;
-    if (typeof message === "string") return message;
+    const message = (data.error as { message?: unknown }).message
+    if (typeof message === "string") return message
   }
 
-  return `Request failed with ${status}`;
+  return `Request failed with ${status}`
 }

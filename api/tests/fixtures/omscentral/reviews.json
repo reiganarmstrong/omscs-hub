@@ -1,0 +1,4 @@
+[
+  {"courseSlug":"graduate-algorithms","author":"fixture-author","createdAt":"2024-12-01T00:00:00Z","semester":"Fall 2024","body":"First paragraph of the imported review.\nFinal paragraph stays intact, with details beyond any preview.","rating":4,"difficulty":3,"workload":12,"sourceUrl":"https://www.omscentral.com/courses/graduate-algorithms/reviews#fixture-review"},
+  {"courseSlug":"historical-fixture","author":"fixture-author-2","createdAt":"2020-12-01T00:00:00Z","semester":"Fall 2020","body":"Historical imported review remains discoverable.","rating":null,"difficulty":null,"workload":null}
+]

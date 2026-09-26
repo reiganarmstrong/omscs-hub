@@ -18,6 +18,7 @@ const configForPhase = (phase) => {
       typescript: { tsconfigPath: ".tsconfig-browser-tests.json" },
       webpack(config) {
         config.resolve.alias["@clerk/react"] = fileURLToPath(new URL("./tests/fixtures/clerk-react.tsx", import.meta.url));
+        config.resolve.alias["./historical-courses.json$"] = fileURLToPath(new URL("./tests/fixtures/historical-courses.json", import.meta.url));
         return config;
       },
     };
