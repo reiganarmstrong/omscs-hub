@@ -9,7 +9,8 @@ test("current zero-review course remains discoverable with default filters and d
     .fill("6422")
   const card = page.locator("article").filter({ hasText: "CS 6422" })
   await expect(card).toBeVisible()
-  await expect(card).toContainText("0")
+  await expect(card).toContainText("No reviews")
+  await expect(card).toContainText("Reviews0")
   await expect(card).toContainText("3 credit hours")
   await expect(
     card.getByRole("link", { name: "Official course" })
@@ -36,6 +37,54 @@ test("current zero-review course remains discoverable with default filters and d
   await expect(
     page.getByText("Last checked 2026-09-26", { exact: true })
   ).toBeVisible()
+})
+
+test("Catalog uses real imported aggregates and minimum-review filtering", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await page
+    .getByPlaceholder("Search by code, title, tag, keyword…")
+    .fill("6515")
+  const card = page.locator("article").filter({ hasText: "CS 6515" })
+  await expect(card).toContainText("Reviews1")
+  await expect(card).toContainText("4.0")
+  await expect(card).toContainText("Difficulty3.0")
+  await expect(card).toContainText("Workload12")
+  await page.getByRole("spinbutton").fill("2")
+  await expect(card).toHaveCount(0)
+})
+
+test("Catalog review outage stays distinct from zero and leaves courses visible", async ({
+  page,
+}) => {
+  await page.route("**/reviews/catalog-stats", (route) => route.abort())
+  await page.goto("/")
+  await page
+    .getByPlaceholder("Search by code, title, tag, keyword…")
+    .fill("6422")
+  const card = page.locator("article").filter({ hasText: "CS 6422" })
+  await expect(card).toBeVisible()
+  await expect(page.getByRole("status")).toContainText(
+    "Review statistics unavailable"
+  )
+  await expect(card).toContainText("Unavailable")
+  await expect(card).not.toContainText("No reviews")
+  await expect(card).not.toContainText("Reviews0")
+  await page.unrouteAll()
+  await page.getByRole("button", { name: "Retry statistics" }).click()
+  await expect(card).toContainText("Reviews0")
+})
+
+test("Specializations and Study Plan omit seeded review statistics", async ({
+  page,
+}) => {
+  await page.goto("/specializations")
+  await expect(page.getByText("Diff", { exact: true })).toHaveCount(0)
+  await expect(page.getByText("hr/wk", { exact: true })).toHaveCount(0)
+  await page.goto("/planner")
+  await expect(page.getByText("Avg difficulty", { exact: true })).toHaveCount(0)
+  await expect(page.getByText("Avg workload", { exact: true })).toHaveCount(0)
 })
 
 test("former course codes find one canonical course across detail, Specializations and Study Plan", async ({
@@ -131,11 +180,15 @@ test("existing local alias placements deduplicate while preserving the planned C
   await expect(course).toHaveCount(1)
 })
 
-test("course detail schedules an unverified Summer choice", async ({ page }) => {
+test("course detail schedules an unverified Summer choice", async ({
+  page,
+}) => {
   await page.goto("/courses/CS-6422")
   await page.getByRole("button", { name: "Schedule…" }).click()
   await page.locator("select").first().selectOption("Summer")
   await page.locator("select").nth(1).selectOption("2027")
   await page.getByRole("button", { name: "Save", exact: true }).click()
-  await expect(page.getByText("Planned · Summer 2027", { exact: true })).toBeVisible()
+  await expect(
+    page.getByText("Planned · Summer 2027", { exact: true })
+  ).toBeVisible()
 })

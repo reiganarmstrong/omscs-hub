@@ -32,11 +32,11 @@ export type Course = {
   termsOffered: Term[]
   specializations: { id: SpecializationId; role: CourseRole }[]
   tags: string[]
-  // aggregate stats baked from seeded reviews
+  // populated from active review data when available
   stats: {
-    avgDifficulty: number // 1-5
-    avgWorkload: number // hours/week
-    avgRating: number // 1-5 (overall)
+    avgDifficulty: number | null // 1-5 when reported
+    avgWorkload: number | null // hours/week when reported
+    avgRating: number | null // 1-5 when reported
     numReviews: number
     distDifficulty: number[] // length 5, count per [1..5]
     distRating: number[] // length 5, count per [1..5]

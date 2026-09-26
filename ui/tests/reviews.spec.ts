@@ -88,3 +88,57 @@ test("failed review reload preserves published facts, clears stale reviews and s
     page.getByRole("link", { name: "Read original review" })
   ).toBeVisible()
 })
+
+test("Course summary labels loading separately from zero and unavailable", async ({
+  page,
+}) => {
+  let release: (() => void) | undefined
+  const held = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  await page.route("**/courses/CS-6515/reviews?source=all", async (route) => {
+    await held
+    await route.continue()
+  })
+  await page.goto("/courses/CS-6515")
+  await expect(page.getByText("Loading review summary…")).toBeVisible()
+  await expect(page.getByRole("status")).toContainText("Loading reviews…")
+  release?.()
+  await expect(page.getByText("Loading review summary…")).toHaveCount(0)
+  await expect(page.getByText("Reviews (1)")).toBeVisible()
+})
+
+test("distributions count same eligible reviews shown after filters", async ({
+  page,
+}) => {
+  await page.route("**/courses/CS-6515/reviews?source=all", async (route) => {
+    const response = await route.fetch()
+    const data = await response.json()
+    data.reviews.push({
+      ...data.reviews[0],
+      id: "second-fixture-review",
+      semester: "Spring 2025",
+      rating: 5,
+      difficulty: 4,
+      workload: 20,
+      body: "Second imported review with distinct ratings and workload.",
+    })
+    await route.fulfill({ response, json: data })
+  })
+  await page.goto("/courses/CS-6515")
+  await expect(page.getByText("2 of 2")).toBeVisible()
+  await expect(
+    page.getByText("2 displayed reviews.", { exact: false })
+  ).toBeVisible()
+  const distributions = page.getByRole("region", { name: "Distributions" })
+  await expect(distributions.getByText("n = 2")).toHaveCount(3)
+  await page.getByPlaceholder("Filter by semester").fill("Spring")
+  await expect(page.getByText("1 of 2")).toBeVisible()
+  await expect(distributions.getByText("n = 1")).toHaveCount(3)
+  await expect(
+    page.getByText("Second imported review with distinct ratings and workload.")
+  ).toBeVisible()
+  await expect(
+    page.getByText("First paragraph of the imported review.", { exact: false })
+  ).toHaveCount(0)
+})

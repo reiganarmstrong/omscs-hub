@@ -12,6 +12,24 @@ import {
 
 export const reviews = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
+reviews.get("/reviews/catalog-stats", async (c) => {
+  const result = await c.env.DB.prepare(
+    `SELECT course_id AS courseId, COUNT(*) AS numReviews,
+            AVG(difficulty) AS avgDifficulty, AVG(workload) AS avgWorkload,
+            AVG(rating) AS avgRating
+     FROM reviews
+     WHERE deleted_at IS NULL AND source IN ('omscentral', 'app')
+     GROUP BY course_id`,
+  ).all<{
+    courseId: string;
+    numReviews: number;
+    avgDifficulty: number | null;
+    avgWorkload: number | null;
+    avgRating: number | null;
+  }>();
+  return c.json({ courses: result.results ?? [] });
+});
+
 reviews.get(
   "/courses/:courseId/reviews",
   zValidator("query", sourceQuerySchema, (result, c) => {

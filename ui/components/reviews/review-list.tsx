@@ -5,6 +5,9 @@ import type { Review, ReviewSortKey } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Stars } from "@/components/badges"
 import { ChevronDown, SortIcon } from "@/components/icons"
+import { DistributionChart } from "@/components/distribution-chart"
+import { aggregateStats } from "@/lib/data"
+import { WORKLOAD_BUCKETS } from "@/lib/types"
 
 const SORTS: { v: ReviewSortKey; label: string }[] = [
   { v: "newest", label: "Newest first" },
@@ -64,6 +67,11 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
     }
     return [...filtered].sort(cmp[sort])
   }, [reviews, sort, minRating, recommendOnly, semQuery])
+  const stats = React.useMemo(() => aggregateStats(sorted), [sorted])
+  const meanWLBucket = WORKLOAD_BUCKETS.findIndex(
+    (bucket) =>
+      stats.avgWorkload >= bucket.min && stats.avgWorkload <= bucket.max
+  )
 
   return (
     <div>
@@ -134,6 +142,62 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
           </div>
         </div>
       </div>
+
+      {sorted.length > 0 && (
+        <section className="mt-5" aria-label="Distributions">
+          <h3 className="font-display text-xl">Distributions</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {sorted.length} displayed reviews. Mean bin highlighted.
+          </p>
+          <div className="mt-4 grid grid-cols-1 gap-8 rounded-xl border border-border bg-card p-6 lg:grid-cols-3">
+            <DistributionChart
+              label="Difficulty"
+              unit="of 5"
+              bins={stats.distDifficulty}
+              binLabels={["1", "2", "3", "4", "5"]}
+              mean={
+                stats.distDifficulty.some(Boolean)
+                  ? stats.avgDifficulty
+                  : undefined
+              }
+              meanIndex={
+                stats.distDifficulty.some(Boolean)
+                  ? Math.round(stats.avgDifficulty) - 1
+                  : undefined
+              }
+              accent="rose"
+            />
+            <DistributionChart
+              label="Weekly workload"
+              unit="hrs/wk"
+              bins={stats.distWorkload}
+              binLabels={WORKLOAD_BUCKETS.map((bucket) => bucket.label)}
+              mean={
+                stats.distWorkload.some(Boolean) ? stats.avgWorkload : undefined
+              }
+              meanIndex={
+                stats.distWorkload.some(Boolean) ? meanWLBucket : undefined
+              }
+              accent="leaf"
+            />
+            <DistributionChart
+              label="Overall rating"
+              unit="of 5"
+              bins={stats.distRating}
+              binLabels={["1★", "2★", "3★", "4★", "5★"]}
+              mean={
+                stats.distRating.some(Boolean) ? stats.avgRating : undefined
+              }
+              meanIndex={
+                stats.distRating.some(Boolean)
+                  ? Math.round(stats.avgRating) - 1
+                  : undefined
+              }
+              accent="ink"
+            />
+          </div>
+        </section>
+      )}
 
       <ol className="mt-4 space-y-4">
         {sorted.map((r) => (
@@ -214,7 +278,9 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
         ))}
         {sorted.length === 0 && (
           <li className="rounded-lg border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
-            No reviews match these filters.
+            {reviews.length === 0
+              ? "No reviews yet."
+              : "No reviews match these filters."}
           </li>
         )}
       </ol>

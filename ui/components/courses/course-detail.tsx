@@ -4,12 +4,10 @@ import * as React from "react"
 import { CourseFacts } from "./course-facts"
 import Link from "next/link"
 import type { Course } from "@/lib/types"
-import { WORKLOAD_BUCKETS } from "@/lib/types"
 import { useReviews } from "@/lib/store/reviews-store"
 import { aggregateStats } from "@/lib/data"
 import { usePlanner } from "@/lib/store/planner-store"
 import { SPECIALIZATIONS_BY_ID } from "@/lib/data/specializations"
-import { DistributionChart } from "@/components/distribution-chart"
 import { ReviewList } from "@/components/reviews/review-list"
 import { ReviewForm } from "@/components/reviews/review-form"
 import { Tag, Stars } from "@/components/badges"
@@ -27,9 +25,6 @@ export function CourseDetail({ course }: { course: Course }) {
   } = useReviews()
   const reviews = reviewsFor(course.id)
   const stats = statsFor(course.id)
-  const meanWLBucket = bucketIndexFor(stats.avgWorkload)
-  const meanRatingIdx = clampIdx(Math.round(stats.avgRating) - 1, 0, 4)
-  const meanDiffIdx = clampIdx(Math.round(stats.avgDifficulty) - 1, 0, 4)
   const reviewError = reviewErrors[course.id]
   const [loadedCourseId, setLoadedCourseId] = React.useState<string | null>(
     null
@@ -105,48 +100,12 @@ export function CourseDetail({ course }: { course: Course }) {
           <SidebarSummary
             course={course}
             stats={stats}
-            available={reviewsAvailable}
+            reviewState={
+              reviewLoading ? "loading" : reviewError ? "unavailable" : "ready"
+            }
           />
         </aside>
       </header>
-
-      {reviewsAvailable && (
-        <section className="mt-10">
-          <SectionHead
-            title="Distributions"
-            note={`${stats.numReviews} reviews — mean bin highlighted.`}
-          />
-          <div className="mt-5 grid grid-cols-1 gap-8 rounded-xl border border-border bg-card p-6 lg:grid-cols-3">
-            <DistributionChart
-              label="Difficulty"
-              unit="of 5"
-              bins={stats.distDifficulty}
-              binLabels={["1", "2", "3", "4", "5"]}
-              mean={stats.avgDifficulty}
-              meanIndex={meanDiffIdx}
-              accent="rose"
-            />
-            <DistributionChart
-              label="Weekly workload"
-              unit="hrs/wk"
-              bins={stats.distWorkload}
-              binLabels={WORKLOAD_BUCKETS.map((b) => b.label)}
-              mean={stats.avgWorkload}
-              meanIndex={meanWLBucket}
-              accent="leaf"
-            />
-            <DistributionChart
-              label="Overall rating"
-              unit="of 5"
-              bins={stats.distRating}
-              binLabels={["1★", "2★", "3★", "4★", "5★"]}
-              mean={stats.avgRating}
-              meanIndex={meanRatingIdx}
-              accent="ink"
-            />
-          </div>
-        </section>
-      )}
 
       <section className="mt-10">
         <SectionHead title="Logistics" />
@@ -220,18 +179,6 @@ export function CourseDetail({ course }: { course: Course }) {
   )
 }
 
-function bucketIndexFor(hours: number) {
-  for (let i = 0; i < WORKLOAD_BUCKETS.length; i++) {
-    const b = WORKLOAD_BUCKETS[i]
-    if (hours >= b.min && hours <= b.max) return i
-  }
-  return WORKLOAD_BUCKETS.length - 1
-}
-
-function clampIdx(n: number, lo: number, hi: number) {
-  return Math.max(lo, Math.min(hi, n))
-}
-
 function Crumbs({ course }: { course: Course }) {
   return (
     <nav className="text-xs text-muted-foreground">
@@ -246,11 +193,11 @@ function Crumbs({ course }: { course: Course }) {
 function SidebarSummary({
   course,
   stats,
-  available,
+  reviewState,
 }: {
   course: Course
   stats: Stats
-  available: boolean
+  reviewState: "loading" | "ready" | "unavailable"
 }) {
   const { add, remove, has } = usePlanner()
   const inTerm = has(course.id)
@@ -267,25 +214,37 @@ function SidebarSummary({
     <div className="rounded-xl border border-border bg-card p-5">
       <div className="flex items-baseline justify-between">
         <span className="label">At a glance</span>
-        {available && <Stars value={stats.avgRating} />}
+        {reviewState === "ready" && stats.avgRating > 0 && (
+          <Stars value={stats.avgRating} />
+        )}
       </div>
-      {available ? (
+      {reviewState === "ready" && stats.numReviews > 0 ? (
         <dl className="mt-3 grid grid-cols-3 gap-3">
           <Mini
             label="Difficulty"
-            value={stats.avgDifficulty.toFixed(1)}
-            unit="/5"
+            value={
+              stats.avgDifficulty ? stats.avgDifficulty.toFixed(1) : "Unknown"
+            }
+            unit={stats.avgDifficulty ? "/5" : undefined}
           />
           <Mini
             label="Workload"
-            value={stats.avgWorkload.toFixed(0)}
-            unit="hr/wk"
+            value={
+              stats.distWorkload.some(Boolean)
+                ? stats.avgWorkload.toFixed(0)
+                : "Unknown"
+            }
+            unit={stats.distWorkload.some(Boolean) ? "hr/wk" : undefined}
           />
           <Mini label="Reviews" value={String(stats.numReviews)} />
         </dl>
+      ) : reviewState === "ready" ? (
+        <p className="mt-3 text-sm text-muted-foreground">No reviews yet.</p>
       ) : (
         <p className="mt-3 text-sm text-muted-foreground">
-          Review summary unavailable.
+          {reviewState === "loading"
+            ? "Loading review summary…"
+            : "Review summary unavailable."}
         </p>
       )}
 

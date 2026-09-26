@@ -17,6 +17,7 @@ type Props = {
   setFilter: React.Dispatch<React.SetStateAction<CatalogFilter>>
   count: number
   total: number
+  reviewStatsAvailable: boolean
 }
 
 const TERMS: Term[] = ["Fall", "Spring", "Summer"]
@@ -26,7 +27,7 @@ const ROLES: { v: CourseRole | "any"; label: string }[] = [
   { v: "elective", label: "Elective" },
 ]
 
-export function FilterRail({ filter, setFilter, count, total }: Props) {
+export function FilterRail({ filter, setFilter, count, total, reviewStatsAvailable }: Props) {
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const reset = () =>
     setFilter({
@@ -135,6 +136,7 @@ export function FilterRail({ filter, setFilter, count, total }: Props) {
           </div>
         </Section>
 
+        <fieldset disabled={!reviewStatsAvailable} className="disabled:opacity-50">
         <Section title="Difficulty">
           <Range
             label="Difficulty"
@@ -184,6 +186,7 @@ export function FilterRail({ filter, setFilter, count, total }: Props) {
             className="tabular w-24 rounded-md border border-border bg-background px-2 py-1 text-sm focus:border-foreground/40 focus:outline-none dark:bg-card"
           />
         </Section>
+        </fieldset>
       </div>
     </aside>
   )

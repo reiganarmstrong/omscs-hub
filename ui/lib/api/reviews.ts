@@ -33,9 +33,28 @@ const reviewResponseSchema = z.object({
       createdAt: z.string(),
       updatedAt: z.string(),
       deletedAt: z.string().nullable(),
-      metadata: z.object({
-        sourceUrl: z.string().url().regex(/^https?:\/\//).nullable().optional(),
-      }).optional(),
+      metadata: z
+        .object({
+          sourceUrl: z
+            .string()
+            .url()
+            .regex(/^https?:\/\//)
+            .nullable()
+            .optional(),
+        })
+        .optional(),
+    })
+  ),
+})
+
+const catalogStatsSchema = z.object({
+  courses: z.array(
+    z.object({
+      courseId: z.string(),
+      numReviews: z.number().int().nonnegative(),
+      avgDifficulty: z.number().nullable(),
+      avgWorkload: z.number().nullable(),
+      avgRating: z.number().nullable(),
     })
   ),
 })
@@ -44,6 +63,13 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "")
 
 export function hasApiBaseUrl() {
   return Boolean(API_BASE_URL)
+}
+
+export async function fetchCatalogStats() {
+  const data = await request<unknown>("/reviews/catalog-stats", {
+    unavailableMessage: "Review statistics unavailable. Try again.",
+  })
+  return catalogStatsSchema.parse(data).courses
 }
 
 export async function fetchCourseReviews(courseId: string) {

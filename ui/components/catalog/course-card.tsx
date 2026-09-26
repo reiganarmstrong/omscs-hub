@@ -1,12 +1,20 @@
-import Link from "next/link";
-import { CourseFacts } from "@/components/courses/course-facts";
-import type { Course } from "@/lib/types";
-import { Tag, Stars } from "@/components/badges";
-import { SPECIALIZATIONS_BY_ID } from "@/lib/data/specializations";
+import Link from "next/link"
+import { CourseFacts } from "@/components/courses/course-facts"
+import type { Course } from "@/lib/types"
+import { Tag, Stars } from "@/components/badges"
+import { SPECIALIZATIONS_BY_ID } from "@/lib/data/specializations"
 
-export function CourseCard({ course }: { course: Course }) {
-  const s = course.stats;
-  const tagSpecs = course.specializations.slice(0, 3);
+export function CourseCard({
+  course,
+  reviewStatsState,
+}: {
+  course: Course
+  reviewStatsState: "loading" | "ready" | "unavailable"
+}) {
+  const s = course.stats
+  const statsReady = reviewStatsState === "ready"
+  const status = reviewStatsState === "loading" ? "Loading…" : "Unavailable"
+  const tagSpecs = course.specializations.slice(0, 3)
 
   return (
     <article className="group fade-up relative block rounded-xl border border-border bg-card p-5 transition hover:border-foreground/30 hover:shadow-sm">
@@ -15,9 +23,17 @@ export function CourseCard({ course }: { course: Course }) {
           {course.code}
         </div>
         <div className="flex items-center gap-1.5">
-          {s.numReviews > 0 && <Stars value={s.avgRating} />}
+          {statsReady && s.avgRating !== null && s.avgRating > 0 && (
+            <Stars value={s.avgRating} />
+          )}
           <span className="tabular text-xs text-muted-foreground">
-            {s.numReviews ? s.avgRating.toFixed(1) : "No reviews"}
+            {statsReady
+              ? s.numReviews
+                ? s.avgRating !== null
+                  ? s.avgRating.toFixed(1)
+                  : "Unrated"
+                : "No reviews"
+              : status}
           </span>
         </div>
       </div>
@@ -30,21 +46,37 @@ export function CourseCard({ course }: { course: Course }) {
         </Link>
       </h3>
       <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-        <span className="sr-only">Official overview excerpt: </span>{course.description}
+        <span className="sr-only">Official overview excerpt: </span>
+        {course.description}
       </p>
 
       <div className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-3">
         <Mini
           label="Difficulty"
-          value={s.numReviews ? s.avgDifficulty.toFixed(1) : "Unknown"}
-          suffix={s.numReviews ? "/5" : undefined}
+          value={
+            statsReady
+              ? s.avgDifficulty !== null
+                ? s.avgDifficulty.toFixed(1)
+                : "Unknown"
+              : status
+          }
+          suffix={statsReady && s.avgDifficulty !== null ? "/5" : undefined}
         />
         <Mini
           label="Workload"
-          value={s.numReviews ? s.avgWorkload.toFixed(0) : "Unknown"}
-          suffix={s.numReviews ? "hr/wk" : undefined}
+          value={
+            statsReady
+              ? s.avgWorkload !== null
+                ? s.avgWorkload.toFixed(0)
+                : "Unknown"
+              : status
+          }
+          suffix={statsReady && s.avgWorkload !== null ? "hr/wk" : undefined}
         />
-        <Mini label="Reviews" value={s.numReviews.toString()} />
+        <Mini
+          label="Reviews"
+          value={statsReady ? s.numReviews.toString() : status}
+        />
       </div>
 
       <div className="mt-3 flex flex-wrap gap-1">
@@ -60,7 +92,7 @@ export function CourseCard({ course }: { course: Course }) {
         <CourseFacts course={course} compact />
       </div>
     </article>
-  );
+  )
 }
 
 function Mini({
@@ -68,9 +100,9 @@ function Mini({
   value,
   suffix,
 }: {
-  label: string;
-  value: string;
-  suffix?: string;
+  label: string
+  value: string
+  suffix?: string
 }) {
   return (
     <div>
@@ -84,5 +116,5 @@ function Mini({
         )}
       </div>
     </div>
-  );
+  )
 }

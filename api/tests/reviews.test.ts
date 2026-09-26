@@ -44,6 +44,90 @@ describe("review API", () => {
     expect(body.reviews[0].source).toBe("omscentral");
   });
 
+  it("catalog statistics use active imported and Hub Reviews only", async () => {
+    const env = testEnv();
+    const before = await app.request("/reviews/catalog-stats", {}, env);
+    const initial = (await before.json()) as {
+      courses: { courseId: string; numReviews: number; avgRating: number }[];
+    };
+    expect(initial.courses).toEqual([
+      expect.objectContaining({
+        courseId: "CS-6200",
+        numReviews: 1,
+        avgRating: 4,
+      }),
+    ]);
+
+    await app.request(
+      "/courses/CS-6200/reviews",
+      {
+        method: "POST",
+        body: JSON.stringify(validReview()),
+        headers: authHeaders("student@gatech.edu"),
+      },
+      env,
+    );
+    const added = (await (
+      await app.request("/reviews/catalog-stats", {}, env)
+    ).json()) as typeof initial;
+    expect(added.courses).toEqual([
+      expect.objectContaining({
+        courseId: "CS-6200",
+        numReviews: 2,
+        avgRating: 4.5,
+        avgDifficulty: 3,
+        avgWorkload: 11,
+      }),
+    ]);
+
+    await app.request(
+      "/courses/CS-6200/reviews/me",
+      {
+        method: "DELETE",
+        headers: authHeaders("student@gatech.edu"),
+      },
+      env,
+    );
+    const deleted = (await (
+      await app.request("/reviews/catalog-stats", {}, env)
+    ).json()) as typeof initial;
+    expect(deleted.courses).toEqual(initial.courses);
+  });
+
+  it("returns no fabricated statistics for a course with no reviews", async () => {
+    const db = new FakeD1();
+    db.reviews.clear();
+    const response = await app.request(
+      "/reviews/catalog-stats",
+      {},
+      testEnv({ DB: db as unknown as D1Database }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ courses: [] });
+  });
+
+  it("reports a database failure instead of returning zero statistics", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const db = {
+        prepare: () => {
+          throw new Error("database unavailable");
+        },
+      } as unknown as D1Database;
+      const response = await app.request(
+        "/reviews/catalog-stats",
+        {},
+        testEnv({ DB: db }),
+      );
+      expect(response.status).toBe(500);
+      expect(await response.json()).toEqual({
+        error: "Internal server error.",
+      });
+    } finally {
+      log.mockRestore();
+    }
+  });
+
   it("requires auth for review writes", async () => {
     const res = await app.request(
       "/courses/CS-6200/reviews",
@@ -251,6 +335,26 @@ class FakeStatement {
   }
 
   async all<T>() {
+    if (this.query.includes("GROUP BY course_id")) {
+      const grouped = new Map<string, Review[]>();
+      for (const review of this.db.reviews.values()) {
+        if (review.deleted_at || !["omscentral", "app"].includes(review.source))
+          continue;
+        grouped.set(review.course_id, [
+          ...(grouped.get(review.course_id) ?? []),
+          review,
+        ]);
+      }
+      return {
+        results: [...grouped].map(([courseId, rows]) => ({
+          courseId,
+          numReviews: rows.length,
+          avgDifficulty: mean(rows.map((row) => row.difficulty)),
+          avgWorkload: mean(rows.map((row) => row.workload)),
+          avgRating: mean(rows.map((row) => row.rating)),
+        })) as T[],
+      };
+    }
     if (this.query.includes("FROM reviews r")) {
       const [courseId, source] = this.params as [string, string | undefined];
       const includeDeleted = !this.query.includes("r.deleted_at IS NULL");
@@ -340,4 +444,11 @@ class FakeStatement {
 
     return { success: true };
   }
+}
+
+function mean(values: (number | null)[]) {
+  const present = values.filter((value): value is number => value !== null);
+  return present.length
+    ? present.reduce((sum, value) => sum + value, 0) / present.length
+    : null;
 }

@@ -8,7 +8,6 @@ import { SPECIALIZATIONS, bucketProgress } from "@/lib/data/specializations";
 import { usePlanner } from "@/lib/store/planner-store";
 import { usePrefs } from "@/lib/store/prefs-store";
 import { cn } from "@/lib/utils";
-import { Stars } from "@/components/badges";
 import { PlusIcon, TrashIcon, SearchIcon, CheckIcon } from "@/components/icons";
 
 type TermLabel = { term: "Fall" | "Spring" | "Summer"; year: string };
@@ -35,12 +34,7 @@ export function PlannerClient() {
   const allPicked = Object.values(plan).flat();
   const plannedIds = React.useMemo(() => new Set(allPicked), [allPicked]);
   const unscheduled = plan[UNSCHEDULED] ?? [];
-  const allPickedCourses = allPicked
-    .map((id) => COURSES_BY_ID[id])
-    .filter(Boolean);
   const totalHours = allPicked.length * 3;
-  const avgDiff = avg(allPickedCourses.map((c) => c.stats.avgDifficulty));
-  const avgWL = avg(allPickedCourses.map((c) => c.stats.avgWorkload));
 
   const spec = SPECIALIZATIONS.find((s) => s.id === selectedSpec);
   const progress = spec ? bucketProgress(spec, plannedIds) : null;
@@ -57,8 +51,6 @@ export function PlannerClient() {
         <SummaryStrip
           courses={allPicked.length}
           hours={totalHours}
-          avgDiff={avgDiff}
-          avgWL={avgWL}
           required={
             spec
               ? `${progress?.matchedFulfilled ?? 0}/${progress?.requiredFulfilled ?? 0}`
@@ -178,7 +170,7 @@ export function PlannerClient() {
       <aside className="self-start xl:sticky xl:top-[80px]">
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="label">Plan health</div>
-          <Health courses={allPicked.length} avgDiff={avgDiff} avgWL={avgWL} />
+          <Health courses={allPicked.length} />
         </div>
         {spec && progress && (
           <div className="mt-4 rounded-xl border border-border bg-card p-4">
@@ -245,11 +237,6 @@ export function PlannerClient() {
       </aside>
     </div>
   );
-}
-
-function avg(xs: number[]) {
-  if (xs.length === 0) return 0;
-  return xs.reduce((a, b) => a + b, 0) / xs.length;
 }
 
 function roleInSpec(
@@ -327,32 +314,18 @@ function SpecSelector({
 function SummaryStrip({
   courses,
   hours,
-  avgDiff,
-  avgWL,
   required,
   onClear,
 }: {
   courses: number;
   hours: number;
-  avgDiff: number;
-  avgWL: number;
   required?: string;
   onClear: () => void;
 }) {
   return (
-    <div className="mt-3 grid grid-cols-2 items-center gap-4 rounded-lg border border-border bg-card px-4 py-3 sm:grid-cols-3 md:grid-cols-6">
+    <div className="mt-3 grid grid-cols-2 items-center gap-4 rounded-lg border border-border bg-card px-4 py-3 sm:grid-cols-4">
       <Stat label="Courses" value={String(courses)} />
       <Stat label="Credit hours" value={String(hours)} unit="/30" />
-      <Stat
-        label="Avg difficulty"
-        value={courses ? avgDiff.toFixed(1) : "—"}
-        unit="/5"
-      />
-      <Stat
-        label="Avg workload"
-        value={courses ? avgWL.toFixed(0) : "—"}
-        unit="hr/wk"
-      />
       <Stat label="Bucket slots" value={required ?? "—"} />
       <button
         type="button"
@@ -389,15 +362,7 @@ function Stat({
   );
 }
 
-function Health({
-  courses,
-  avgDiff,
-  avgWL,
-}: {
-  courses: number;
-  avgDiff: number;
-  avgWL: number;
-}) {
+function Health({ courses }: { courses: number }) {
   const remaining = Math.max(0, 10 - courses);
   return (
     <div className="mt-3 space-y-3">
@@ -405,18 +370,6 @@ function Health({
         label="Courses"
         value={(courses / 10) * 100}
         note={`${courses} / 10`}
-      />
-      <Bar
-        label="Avg difficulty"
-        value={(avgDiff / 5) * 100}
-        note={courses ? `${avgDiff.toFixed(1)} / 5` : "—"}
-        accent="rose"
-      />
-      <Bar
-        label="Avg workload"
-        value={Math.min(100, (avgWL / 35) * 100)}
-        note={courses ? `${avgWL.toFixed(0)} hrs/wk` : "—"}
-        accent="leaf"
       />
       <div className="text-xs text-muted-foreground">
         {remaining ? `${remaining} courses to go.` : "All 10 courses planned."}
@@ -655,10 +608,6 @@ function CoursePicker({
                   </span>{" "}
                   {c.title}
                 </span>
-                <Stars
-                  value={c.stats.avgRating}
-                  className="dark:group-hover:text-black"
-                />
               </button>
             </li>
           );

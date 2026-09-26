@@ -49,6 +49,18 @@ export function aggregateStats(reviews: Review[]) {
   };
 }
 
+export function emptyReviewStats(): Course["stats"] {
+  return {
+    avgDifficulty: null,
+    avgWorkload: null,
+    avgRating: null,
+    numReviews: 0,
+    distDifficulty: [0, 0, 0, 0, 0],
+    distRating: [0, 0, 0, 0, 0],
+    distWorkload: new Array(WORKLOAD_BUCKETS.length).fill(0),
+  };
+}
+
 export const CATALOG_VERSION = catalog.version;
 export const CATALOG_SOURCE_URL = catalog.sourceUrl;
 
@@ -95,7 +107,7 @@ export const COURSES: Course[] = catalog.courses.map((course) => {
         (tag) => tag !== "required" && tag !== "foundational",
       ) ?? []),
     ],
-    stats: aggregateStats([]),
+    stats: emptyReviewStats(),
   };
 });
 export const COURSES_BY_ID: Record<string, Course> = Object.fromEntries(

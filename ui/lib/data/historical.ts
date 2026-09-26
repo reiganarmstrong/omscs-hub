@@ -1,5 +1,5 @@
 import manifest from "./historical-courses.json"
-import { aggregateStats } from "./index"
+import { emptyReviewStats } from "./index"
 import type { Course } from "@/lib/types"
 
 type HistoricalEntry = {
@@ -24,7 +24,7 @@ export const HISTORICAL_COURSES: Course[] = (manifest as HistoricalEntry[]).map(
     termsOffered: [],
     specializations: [],
     tags: [],
-    stats: aggregateStats([]),
+    stats: emptyReviewStats(),
   })
 )
 export const HISTORICAL_BY_ID = Object.fromEntries(

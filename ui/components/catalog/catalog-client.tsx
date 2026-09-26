@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { courseMatchesSearch } from "@/lib/data"
+import { emptyReviewStats, courseMatchesSearch } from "@/lib/data"
+import { fetchCatalogStats } from "@/lib/api/reviews"
 import type { Course, CatalogFilter } from "@/lib/types"
 import { FilterRail } from "./filter-rail"
 import { CourseCard } from "./course-card"
@@ -47,11 +48,66 @@ const DEFAULT_FILTER: CatalogFilter = {
 }
 
 export function CatalogClient({ courses }: { courses: Course[] }) {
+  const [reviewStats, setReviewStats] = React.useState<
+    | { state: "loading" | "unavailable"; courses?: never }
+    | { state: "ready"; courses: Record<string, Course["stats"]> }
+  >({ state: "loading" })
   const [filter, setFilter] = React.useState<CatalogFilter>(DEFAULT_FILTER)
   const [sort, setSort] = React.useState<SortKey>("code")
   const [view, setView] = React.useState<"grid" | "table">("grid")
   const [sortOpen, setSortOpen] = React.useState(false)
   const sortMenuRef = React.useRef<HTMLDivElement>(null)
+
+  const loadStats = React.useCallback(async () => {
+    try {
+      const rows = await fetchCatalogStats()
+      setReviewStats({ state: "ready", courses: statsByCourse(rows) })
+    } catch {
+      setReviewStats({ state: "unavailable" })
+    }
+  }, [])
+
+  const retryStats = () => {
+    setFilter((current) => ({
+      ...current,
+      difficulty: DEFAULT_FILTER.difficulty,
+      workload: DEFAULT_FILTER.workload,
+      rating: DEFAULT_FILTER.rating,
+      minReviews: 0,
+    }))
+    setSort((current) =>
+      ["code", "title", "title-desc"].includes(current) ? current : "code"
+    )
+    setReviewStats({ state: "loading" })
+    void loadStats()
+  }
+
+  React.useEffect(() => {
+    let active = true
+    void fetchCatalogStats().then(
+      (rows) => {
+        if (active)
+          setReviewStats({ state: "ready", courses: statsByCourse(rows) })
+      },
+      () => {
+        if (active) setReviewStats({ state: "unavailable" })
+      }
+    )
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const coursesWithStats = React.useMemo(
+    () =>
+      reviewStats.state === "ready"
+        ? courses.map((course) => ({
+            ...course,
+            stats: reviewStats.courses[course.id] ?? emptyReviewStats(),
+          }))
+        : courses,
+    [courses, reviewStats]
+  )
 
   React.useEffect(() => {
     if (!sortOpen) return
@@ -71,7 +127,7 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
 
   const filtered = React.useMemo(() => {
     const q = filter.q.trim().toLowerCase()
-    const out = courses.filter((c) => {
+    const out = coursesWithStats.filter((c) => {
       if (!courseMatchesSearch(c, q)) return false
       if (filter.specs.length) {
         const has = c.specializations.some((s) => filter.specs.includes(s.id))
@@ -84,23 +140,26 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
         const has = c.specializations.some((s) => s.role === filter.role)
         if (!has) return false
       }
+      if (reviewStats.state !== "ready") return true
       const s = c.stats
       const hasReviews = s.numReviews > 0
       if (
         hasReviews &&
-        (s.avgDifficulty < filter.difficulty[0] ||
-          s.avgDifficulty > filter.difficulty[1])
+        !matchesAverage(
+          s.avgDifficulty,
+          filter.difficulty,
+          DEFAULT_FILTER.difficulty
+        )
       )
         return false
       if (
         hasReviews &&
-        (s.avgWorkload < filter.workload[0] ||
-          s.avgWorkload > filter.workload[1])
+        !matchesAverage(s.avgWorkload, filter.workload, DEFAULT_FILTER.workload)
       )
         return false
       if (
         hasReviews &&
-        (s.avgRating < filter.rating[0] || s.avgRating > filter.rating[1])
+        !matchesAverage(s.avgRating, filter.rating, DEFAULT_FILTER.rating)
       )
         return false
       if (
@@ -117,7 +176,7 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
       return true
     })
     out.sort((a, b) => {
-      switch (sort) {
+      switch (reviewStats.state === "ready" ? sort : "code") {
         case "code":
           return a.code.localeCompare(b.code)
         case "title":
@@ -125,17 +184,29 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
         case "title-desc":
           return b.title.localeCompare(a.title)
         case "rating-desc":
-          return b.stats.avgRating - a.stats.avgRating
+          return compareAverage(a.stats.avgRating, b.stats.avgRating, "desc")
         case "rating-asc":
-          return a.stats.avgRating - b.stats.avgRating
+          return compareAverage(a.stats.avgRating, b.stats.avgRating, "asc")
         case "difficulty-desc":
-          return b.stats.avgDifficulty - a.stats.avgDifficulty
+          return compareAverage(
+            a.stats.avgDifficulty,
+            b.stats.avgDifficulty,
+            "desc"
+          )
         case "difficulty-asc":
-          return a.stats.avgDifficulty - b.stats.avgDifficulty
+          return compareAverage(
+            a.stats.avgDifficulty,
+            b.stats.avgDifficulty,
+            "asc"
+          )
         case "workload-desc":
-          return b.stats.avgWorkload - a.stats.avgWorkload
+          return compareAverage(
+            a.stats.avgWorkload,
+            b.stats.avgWorkload,
+            "desc"
+          )
         case "workload-asc":
-          return a.stats.avgWorkload - b.stats.avgWorkload
+          return compareAverage(a.stats.avgWorkload, b.stats.avgWorkload, "asc")
         case "reviews-desc":
           return b.stats.numReviews - a.stats.numReviews
         default:
@@ -143,7 +214,7 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
       }
     })
     return out
-  }, [courses, filter, sort])
+  }, [coursesWithStats, filter, sort, reviewStats.state])
 
   return (
     <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-4 px-4 pt-4 pb-10 sm:px-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8 lg:pt-5 lg:pb-12">
@@ -152,8 +223,28 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
         setFilter={setFilter}
         count={filtered.length}
         total={courses.length}
+        reviewStatsAvailable={reviewStats.state === "ready"}
       />
       <div className="min-w-0">
+        {reviewStats.state !== "ready" && (
+          <div
+            role="status"
+            className="mb-3 rounded-md border border-border bg-card px-4 py-3 text-sm text-muted-foreground"
+          >
+            {reviewStats.state === "loading"
+              ? "Loading review statistics…"
+              : "Review statistics unavailable. Course facts remain available."}
+            {reviewStats.state === "unavailable" && (
+              <button
+                type="button"
+                onClick={retryStats}
+                className="ml-3 underline underline-offset-4"
+              >
+                Retry statistics
+              </button>
+            )}
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-2 pb-3">
           <div className="relative flex min-w-full flex-1 items-center sm:min-w-72">
             <span className="absolute left-3 text-muted-foreground">
@@ -187,6 +278,10 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
                   <button
                     key={s.v}
                     type="button"
+                    disabled={
+                      reviewStats.state !== "ready" &&
+                      !["code", "title", "title-desc"].includes(s.v)
+                    }
                     onClick={() => {
                       setSort(s.v)
                       setSortOpen(false)
@@ -227,7 +322,11 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
           filtered.length ? (
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((c) => (
-                <CourseCard key={c.id} course={c} />
+                <CourseCard
+                  key={c.id}
+                  course={c}
+                  reviewStatsState={reviewStats.state}
+                />
               ))}
             </div>
           ) : (
@@ -245,7 +344,13 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
             </div>
             <div className="min-w-[680px] divide-y divide-border">
               {filtered.length ? (
-                filtered.map((c) => <CourseRow key={c.id} course={c} />)
+                filtered.map((c) => (
+                  <CourseRow
+                    key={c.id}
+                    course={c}
+                    reviewStatsState={reviewStats.state}
+                  />
+                ))
               ) : (
                 <Empty />
               )}
@@ -261,6 +366,40 @@ export function CatalogClient({ courses }: { courses: Course[] }) {
       </div>
     </div>
   )
+}
+
+function statsByCourse(rows: Awaited<ReturnType<typeof fetchCatalogStats>>) {
+  const byCourse: Record<string, Course["stats"]> = {}
+  for (const row of rows) {
+    byCourse[row.courseId] = {
+      ...emptyReviewStats(),
+      numReviews: row.numReviews,
+      avgDifficulty: row.avgDifficulty,
+      avgWorkload: row.avgWorkload,
+      avgRating: row.avgRating,
+    }
+  }
+  return byCourse
+}
+
+function matchesAverage(
+  value: number | null,
+  range: [number, number],
+  defaultRange: [number, number]
+) {
+  if (value === null)
+    return range[0] === defaultRange[0] && range[1] === defaultRange[1]
+  return value >= range[0] && value <= range[1]
+}
+
+function compareAverage(
+  a: number | null,
+  b: number | null,
+  order: "asc" | "desc"
+) {
+  if (a === null) return b === null ? 0 : 1
+  if (b === null) return -1
+  return order === "asc" ? a - b : b - a
 }
 
 function Empty() {

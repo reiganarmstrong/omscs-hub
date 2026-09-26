@@ -329,7 +329,7 @@ function FreeElectiveBlock({
       spec.requirements.flatMap((r) => r.poolCourseIds),
     );
     return COURSES.filter((c) => !bucketIds.has(c.id)).sort(
-      (a, b) => b.stats.avgRating - a.stats.avgRating,
+      (a, b) => a.code.localeCompare(b.code),
     );
   }, [spec]);
   const used = candidates.filter((c) => plannedIds.has(c.id));
@@ -415,13 +415,10 @@ function FreeElectiveBlock({
 
 function CourseTableHeader() {
   return (
-    <div className="hidden border-b border-border px-4 py-1.5 text-[11px] text-muted-foreground md:grid md:grid-cols-[24px_84px_minmax(0,1fr)_50px_50px_60px_72px] md:items-baseline md:gap-3">
+    <div className="hidden border-b border-border px-4 py-1.5 text-[11px] text-muted-foreground md:grid md:grid-cols-[24px_84px_minmax(0,1fr)_72px] md:items-baseline md:gap-3">
       <span></span>
       <span>Code</span>
       <span>Title</span>
-      <span>Diff</span>
-      <span>★</span>
-      <span>hr/wk</span>
       <span>Terms</span>
     </div>
   );
@@ -441,7 +438,7 @@ function CourseRow({
       className={cn(
         "grid items-baseline gap-2 px-4 py-2 text-sm",
         "grid-cols-[24px_minmax(0,1fr)] sm:grid-cols-[24px_84px_minmax(0,1fr)]",
-        "md:grid-cols-[24px_84px_minmax(0,1fr)_50px_50px_60px_72px] md:gap-3",
+        "md:grid-cols-[24px_84px_minmax(0,1fr)_72px] md:gap-3",
         planned && "bg-leaf/[0.06]",
       )}
     >
@@ -474,15 +471,6 @@ function CourseRow({
         </span>
         {course.title}
       </Link>
-      <span className="tabular hidden text-xs text-muted-foreground md:inline">
-        {course.stats.avgDifficulty.toFixed(1)}
-      </span>
-      <span className="tabular hidden text-xs text-muted-foreground md:inline">
-        {course.stats.avgRating.toFixed(1)}
-      </span>
-      <span className="tabular hidden text-xs text-muted-foreground md:inline">
-        {course.stats.avgWorkload.toFixed(0)}
-      </span>
       <span className="hidden justify-start gap-0.5 md:flex">
         <TermBadges terms={course.termsOffered} />
       </span>
