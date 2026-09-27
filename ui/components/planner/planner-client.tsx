@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { COURSES, COURSES_BY_ID, courseMatchesSearch } from "@/lib/data";
-import type { SpecializationId } from "@/lib/types";
+import type { SpecializationId, Term } from "@/lib/types";
 import {
   SPECIALIZATIONS,
   bucketProgress,
@@ -13,25 +13,20 @@ import { usePlanner } from "@/lib/store/planner-store";
 import { usePrefs } from "@/lib/store/prefs-store";
 import { cn } from "@/lib/utils";
 import { PlusIcon, TrashIcon, SearchIcon, CheckIcon } from "@/components/icons";
-
-type TermLabel = { term: "Fall" | "Spring" | "Summer"; year: string };
+import { planningTerms, visiblePlanningTerms, TERM_ORDER, type PlanningTerm } from "@/lib/data/planning-terms";
+import { OfferingNote } from "./offering-note";
+import { useCurrentTermKey } from "@/lib/store/current-term";
 
 const UNSCHEDULED = "unassigned";
-const YEARS = ["2025", "2026", "2027"];
 
-function gridTerms(): TermLabel[] {
-  const out: TermLabel[] = [];
-  const order: TermLabel["term"][] = ["Spring", "Summer", "Fall"];
-  for (const y of YEARS) {
-    for (const t of order) out.push({ term: t, year: y });
-  }
-  return out;
-}
-
-export function PlannerClient() {
+export function PlannerClient({ initialTermKey }: { initialTermKey: string }) {
   const { plan, add, remove, clear, has } = usePlanner();
   const { selectedSpec, setSelectedSpec } = usePrefs();
-  const terms = gridTerms();
+  const currentTermKey = useCurrentTermKey(initialTermKey);
+  const windowTerms = planningTerms(currentTermKey);
+  const currentYear = windowTerms[0].year;
+  const [earlierYear, setEarlierYear] = React.useState<number>();
+  const terms = visiblePlanningTerms(Object.keys(plan), earlierYear, currentTermKey);
   const [picker, setPicker] = React.useState<string | null>(null);
   const [q, setQ] = React.useState("");
 
@@ -67,14 +62,37 @@ export function PlannerClient() {
           <UnscheduledPanel
             ids={unscheduled}
             specId={spec?.id ?? null}
+            terms={windowTerms}
             onAssign={(id, key) => add(key, id)}
             onRemove={(id) => remove(UNSCHEDULED, id)}
           />
         )}
 
-        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {terms.map(({ term, year }) => {
-            const key = `${term}-${year}`;
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="label">Planning window</p>
+            <p className="text-sm text-muted-foreground">{windowTerms[0].term} {windowTerms[0].year}–{windowTerms[17].term} {windowTerms[17].year} · 18 terms</p>
+            <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
+              Window rolls after typical exam weeks; exact dates vary. Confirmed means a dated online section in OSCAR. Typically offered comes from course history, not a guarantee. No matching evidence does not prove a course is unavailable.
+            </p>
+          </div>
+          <label className="text-xs text-muted-foreground">
+            View earlier year{" "}
+            <select
+              aria-label="View earlier year"
+              value={earlierYear ?? ""}
+              onChange={(event) => setEarlierYear(event.target.value ? Number(event.target.value) : undefined)}
+              className="ml-2 rounded-md border border-border bg-background px-2 py-1"
+            >
+              <option value="">Choose year</option>
+              {Array.from({ length: currentYear - 2013 }, (_, index) => currentYear - index).map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {terms.map(({ term, year, key }) => {
             const ids = plan[key] ?? [];
             return (
               <div
@@ -104,17 +122,12 @@ export function PlannerClient() {
                         key={id}
                         className="flex items-center justify-between gap-2 py-1.5"
                       >
-                        <Link
-                          href={`/courses/${c.id}`}
-                          className="flex-1 truncate text-sm hover:underline"
-                        >
-                          <span className="text-xs text-muted-foreground">
-                            {c.code}
-                          </span>{" "}
-                          <span>{c.title}</span>
-                          <span className="block text-[10px] text-muted-foreground">
-                            Term availability unverified
-                          </span>
+                        <div className="min-w-0 flex-1 text-sm">
+                          <Link href={`/courses/${c.id}`} className="hover:underline">
+                            <span className="text-xs text-muted-foreground">{c.code}</span>{" "}
+                            <span>{c.title}</span>
+                          </Link>
+                          <OfferingNote courseId={id} termKey={key} />
                           {role && (
                             <span
                               className={cn(
@@ -133,7 +146,7 @@ export function PlannerClient() {
                                   : "Free"}
                             </span>
                           )}
-                        </Link>
+                        </div>
                         <button
                           type="button"
                           onClick={() => remove(key, id)}
@@ -157,6 +170,7 @@ export function PlannerClient() {
                 {picker === key && (
                   <CoursePicker
                     term={term}
+                    termKey={key}
                     q={q}
                     setQ={setQ}
                     onPick={(id) => {
@@ -451,11 +465,13 @@ function Bar({
 function UnscheduledPanel({
   ids,
   specId,
+  terms,
   onAssign,
   onRemove,
 }: {
   ids: string[];
   specId: string | null;
+  terms: PlanningTerm[];
   onAssign: (courseId: string, termKey: string) => void;
   onRemove: (courseId: string) => void;
 }) {
@@ -485,6 +501,7 @@ function UnscheduledPanel({
               key={id}
               course={c}
               role={role}
+              terms={terms}
               onAssign={(key) => onAssign(id, key)}
               onRemove={() => onRemove(id)}
             />
@@ -498,6 +515,7 @@ function UnscheduledPanel({
 function UnscheduledRow({
   course,
   role,
+  terms,
   onAssign,
   onRemove,
 }: {
@@ -505,16 +523,16 @@ function UnscheduledRow({
     id: string;
     code: string;
     title: string;
-    termsOffered: ("Fall" | "Spring" | "Summer")[];
   };
   role: "required" | "bucket" | "free" | null;
+  terms: PlanningTerm[];
   onAssign: (termKey: string) => void;
   onRemove: () => void;
 }) {
-  const [term, setTerm] = React.useState<"Fall" | "Spring" | "Summer">(
-    course.termsOffered[0] ?? "Fall",
-  );
-  const [year, setYear] = React.useState(YEARS[0]);
+  const [term, setTerm] = React.useState<Term>(terms[0].term);
+  const [year, setYear] = React.useState(String(terms[0].year));
+  const years = terms.filter((choice) => choice.term === term).map((choice) => String(choice.year));
+  const selectedYear = years.includes(year) ? year : years[0];
 
   return (
     <li className="grid items-center gap-3 px-4 py-2.5 text-sm sm:grid-cols-[minmax(0,1fr)_auto]">
@@ -541,11 +559,7 @@ function UnscheduledRow({
                 : "Free"}
           </span>
         )}
-        {course.termsOffered.length < 3 && (
-          <span className="ml-2 text-[11px] text-muted-foreground">
-            Future term availability unverified
-          </span>
-        )}
+        <OfferingNote courseId={course.id} termKey={`${term}-${selectedYear}`} />
       </div>
       <div className="flex items-center gap-1.5">
         <select
@@ -556,7 +570,7 @@ function UnscheduledRow({
           }
           className="rounded-md border border-border bg-background px-2 py-1 text-xs"
         >
-          {(["Fall", "Spring", "Summer"] as const).map((t) => (
+          {TERM_ORDER.map((t) => (
             <option key={t} value={t}>
               {t}
             </option>
@@ -564,17 +578,17 @@ function UnscheduledRow({
         </select>
         <select
           aria-label="Year"
-          value={year}
+          value={selectedYear}
           onChange={(e) => setYear(e.target.value)}
           className="rounded-md border border-border bg-background px-2 py-1 text-xs"
         >
-          {YEARS.map((y) => (
+          {years.map((y) => (
             <option key={y}>{y}</option>
           ))}
         </select>
         <button
           type="button"
-          onClick={() => onAssign(`${term}-${year}`)}
+          onClick={() => onAssign(`${term}-${selectedYear}`)}
           className="rounded-md bg-leaf px-3 py-1 text-xs text-leaf-fg hover:opacity-90"
         >
           Assign
@@ -594,12 +608,14 @@ function UnscheduledRow({
 
 function CoursePicker({
   term,
+  termKey,
   q,
   setQ,
   onPick,
   has,
 }: {
   term: "Fall" | "Spring" | "Summer";
+  termKey: string;
   q: string;
   setQ: (s: string) => void;
   onPick: (id: string) => void;
@@ -614,8 +630,7 @@ function CoursePicker({
   return (
     <div className="border-t border-border bg-background p-2">
       <p className="mb-2 text-xs text-muted-foreground">
-        Future term availability unverified. Choose a current Course for your
-        intended term.
+        Current Courses only. Availability varies by term; check evidence before choosing.
       </p>
       <div className="relative">
         <span className="absolute top-1/2 left-2 -translate-y-1/2 text-muted-foreground">
@@ -647,6 +662,7 @@ function CoursePicker({
                     {c.code}
                   </span>{" "}
                   {c.title}
+                  <OfferingNote courseId={c.id} termKey={termKey} showLink={false} />
                 </span>
               </button>
             </li>

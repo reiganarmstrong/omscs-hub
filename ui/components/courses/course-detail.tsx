@@ -16,10 +16,13 @@ import { ReviewList } from "@/components/reviews/review-list"
 import { ReviewForm } from "@/components/reviews/review-form"
 import { Tag, Stars } from "@/components/badges"
 import { ArrowLeft, ArrowRight, CheckIcon, PlusIcon } from "@/components/icons"
+import { planningTerms, TERM_ORDER } from "@/lib/data/planning-terms"
+import { OfferingNote } from "@/components/planner/offering-note"
+import { useCurrentTermKey } from "@/lib/store/current-term"
 
 type Stats = ReturnType<typeof aggregateStats>
 
-export function CourseDetail({ course }: { course: Course }) {
+export function CourseDetail({ course, initialTermKey }: { course: Course; initialTermKey: string }) {
   const {
     reviewsFor,
     statsFor,
@@ -103,6 +106,7 @@ export function CourseDetail({ course }: { course: Course }) {
         <aside className="col-span-12 lg:col-span-4">
           <SidebarSummary
             course={course}
+            initialTermKey={initialTermKey}
             stats={stats}
             reviewState={
               reviewLoading ? "loading" : reviewError ? "unavailable" : "ready"
@@ -118,6 +122,9 @@ export function CourseDetail({ course }: { course: Course }) {
             <p className="text-sm text-muted-foreground">
               Unverified for future terms. Current-list inclusion does not
               guarantee a term offering.
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              See term-specific official schedule or historical pattern when choosing a term.
             </p>
           </Block>
           <Block heading="Prerequisites">
@@ -216,10 +223,12 @@ function Crumbs({ course }: { course: Course }) {
 
 function SidebarSummary({
   course,
+  initialTermKey,
   stats,
   reviewState,
 }: {
   course: Course
+  initialTermKey: string
   stats: Stats
   reviewState: "loading" | "ready" | "unavailable"
 }) {
@@ -227,12 +236,13 @@ function SidebarSummary({
   const inTerm = has(course.id)
   const [picker, setPicker] = React.useState(false)
 
-  const yearOptions = ["2025", "2026", "2027"]
-  const termOptions = ["Fall", "Spring", "Summer"] as const
-  const [year, setYear] = React.useState(yearOptions[0])
-  const [term, setTerm] = React.useState<(typeof termOptions)[number]>(
-    course.termsOffered[0] ?? "Fall"
-  )
+  const currentTermKey = useCurrentTermKey(initialTermKey)
+  const terms = planningTerms(currentTermKey)
+  const termOptions = TERM_ORDER
+  const [year, setYear] = React.useState(String(terms[0].year))
+  const [term, setTerm] = React.useState<(typeof termOptions)[number]>(terms[0].term)
+  const yearOptions = terms.filter((choice) => choice.term === term).map((choice) => String(choice.year))
+  const selectedYear = yearOptions.includes(year) ? year : yearOptions[0]
 
   return (
     <div className="rounded-xl border border-border bg-card p-5">
@@ -310,9 +320,7 @@ function SidebarSummary({
             </div>
           ) : (
             <div className="mt-2 space-y-1.5">
-              <p className="text-xs text-muted-foreground">
-                Future term availability unverified. Choose your intended term.
-              </p>
+              <OfferingNote courseId={course.id} termKey={`${term}-${selectedYear}`} />
               <div className="grid grid-cols-[1fr_1fr_auto] gap-1.5">
                 <select
                   value={term}
@@ -328,7 +336,7 @@ function SidebarSummary({
                   ))}
                 </select>
                 <select
-                  value={year}
+                  value={selectedYear}
                   onChange={(e) => setYear(e.target.value)}
                   className="rounded-md border border-border bg-background px-2 py-1.5 text-sm dark:border-white dark:bg-white dark:text-black"
                 >
@@ -339,7 +347,7 @@ function SidebarSummary({
                 <button
                   type="button"
                   onClick={() => {
-                    add(`${term}-${year}`, course.id)
+                    add(`${term}-${selectedYear}`, course.id)
                     setPicker(false)
                   }}
                   className="rounded-md bg-leaf px-3 py-1.5 text-xs text-leaf-fg hover:opacity-90"
@@ -355,6 +363,9 @@ function SidebarSummary({
                 <ArrowLeft size={12} /> Back
               </button>
             </div>
+          )}
+          {inTerm && inTerm !== "unassigned" && (
+            <div className="mt-2"><OfferingNote courseId={course.id} termKey={inTerm} /></div>
           )}
         </div>
       )}

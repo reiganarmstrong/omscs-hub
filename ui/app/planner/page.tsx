@@ -1,4 +1,5 @@
 import { PlannerClient } from "@/components/planner/planner-client";
+import { currentPlanningTerm } from "@/lib/data/planning-terms";
 
 export default function Page() {
   return (
@@ -13,7 +14,7 @@ export default function Page() {
           track persist between visits.
         </p>
       </header>
-      <PlannerClient />
+      <PlannerClient initialTermKey={currentPlanningTerm().key} />
     </div>
   );
 }

@@ -1,0 +1,510 @@
+{
+  "lastChecked": "2026-09-26",
+  "scope": "Verified online sections in the Fall 2026 OSCAR schedule. Missing rows are not proof a course is unavailable.",
+  "offerings": [
+    {
+      "courseId": "CS-6035",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6035&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6200",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6200&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6210",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6210&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6211",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6211&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6238",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6238&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6250",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6250&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6260",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6260&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6261",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6261&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6262",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6262&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6263",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6263&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6264",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6264&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6265",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6265&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6290",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6290&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6291",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6291&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6300",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6300&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6310",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6310&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6340",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6340&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6400",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6400&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6422",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6422&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6435",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6435&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6440",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6440&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6457",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6457&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6460",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6460&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6475",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6475&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6476",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6476&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6491",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6491&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6515",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6515&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6601",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6601&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6603",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6603&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6675",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6675&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6747",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6747&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6750",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6750&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-6795",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6795&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7210",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7210&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7280",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7280&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7295",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7295&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7400",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7400&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7470",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7470&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7496",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7496&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7632",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7632&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7637",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7637&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7638",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7638&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7639",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7639&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7641",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7641&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7642",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7642&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7643",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7643&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7646",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7646&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-7650",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=7650&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CS-8803-O08",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8803&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O08"
+    },
+    {
+      "courseId": "CS-8803-O15",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8803&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O15"
+    },
+    {
+      "courseId": "CS-8803-O17",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8803&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O17"
+    },
+    {
+      "courseId": "CS-8803-O20",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8803&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O20"
+    },
+    {
+      "courseId": "CS-8803-O24",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8803&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O24"
+    },
+    {
+      "courseId": "CS-8803-O25",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8803&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O25"
+    },
+    {
+      "courseId": "CS-8803-O27",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8803&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "O27"
+    },
+    {
+      "courseId": "CS-8803-ORO",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8803&schd_in=%25&subj_in=CS&term_in=202608",
+      "section": "ORO"
+    },
+    {
+      "courseId": "CSE-6220",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6220&schd_in=%25&subj_in=CSE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CSE-6242",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6242&schd_in=%25&subj_in=CSE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CSE-6250",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6250&schd_in=%25&subj_in=CSE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "CSE-6742",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6742&schd_in=%25&subj_in=CSE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "INTA-6450",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6450&schd_in=%25&subj_in=INTA&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "ISYE-6402",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6402&schd_in=%25&subj_in=ISYE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "ISYE-6414",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6414&schd_in=%25&subj_in=ISYE&term_in=202608",
+      "section": "OAN"
+    },
+    {
+      "courseId": "ISYE-6420",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6420&schd_in=%25&subj_in=ISYE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "ISYE-6501",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6501&schd_in=%25&subj_in=ISYE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "ISYE-6525",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6525&schd_in=%25&subj_in=ISYE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "ISYE-6644",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6644&schd_in=%25&subj_in=ISYE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "ISYE-6669",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6669&schd_in=%25&subj_in=ISYE&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "MGT-6311",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6311&schd_in=%25&subj_in=MGT&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "MGT-8813",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8813&schd_in=%25&subj_in=MGT&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "PUBP-6725",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=6725&schd_in=%25&subj_in=PUBP&term_in=202608",
+      "section": "O01"
+    },
+    {
+      "courseId": "PUBP-8823",
+      "termKey": "Fall-2026",
+      "scheduleDate": "2026-09-26",
+      "sourceUrl": "https://oscar.gatech.edu/bprod/bwckctlg.p_disp_listcrse?crse_in=8823&schd_in=%25&subj_in=PUBP&term_in=202608",
+      "section": "O01"
+    }
+  ]
+}

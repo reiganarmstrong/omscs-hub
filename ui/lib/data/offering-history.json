@@ -1,0 +1,328 @@
+{
+  "sourceUrl": "https://omscs.gatech.edu/sites/default/files/documents/Other/Fall%202026%20OMSCS%20Course%20Offering%20History.pdf",
+  "lastChecked": "2026-09-26",
+  "method": "At least two offerings in the same season from Fall 2022 through Summer 2026. History is not a future guarantee.",
+  "patterns": {
+    "CS-6035": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6150": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-6200": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6210": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-6211": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-6238": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6250": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6260": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-6261": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-6262": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6263": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6264": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6265": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6290": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6291": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6300": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6310": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6340": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6400": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-6422": [
+      "Spring",
+      "Summer"
+    ],
+    "CS-6435": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6440": [
+      "Summer",
+      "Fall"
+    ],
+    "CS-6457": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6460": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6475": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-6476": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-6491": [
+      "Spring",
+      "Summer"
+    ],
+    "CS-6515": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6601": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6603": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6675": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6747": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6750": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-6795": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7210": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-7280": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7295": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7400": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7470": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7496": [
+      "Summer"
+    ],
+    "CS-7632": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7637": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7638": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7639": [
+      "Spring",
+      "Fall"
+    ],
+    "CS-7641": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7642": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7643": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7646": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-7650": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-8803-O08": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-8803-O15": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-8803-O17": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CS-8803-O20": [
+      "Summer"
+    ],
+    "CS-8803-O24": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CSE-6220": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "CSE-6242": [
+      "Spring",
+      "Fall"
+    ],
+    "CSE-6250": [
+      "Spring",
+      "Fall"
+    ],
+    "CSE-6742": [
+      "Spring",
+      "Fall"
+    ],
+    "INTA-6450": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "ISYE-6402": [
+      "Spring",
+      "Fall"
+    ],
+    "ISYE-6420": [
+      "Spring",
+      "Fall"
+    ],
+    "ISYE-6501": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "ISYE-6525": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "ISYE-6644": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "ISYE-6669": [
+      "Spring",
+      "Fall"
+    ],
+    "MGT-6311": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "MGT-8813": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "PUBP-6725": [
+      "Spring",
+      "Summer",
+      "Fall"
+    ],
+    "PUBP-8823": [
+      "Spring",
+      "Fall"
+    ]
+  }
+}

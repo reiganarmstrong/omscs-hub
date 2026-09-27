@@ -7,6 +7,7 @@ import {
 } from "@/lib/data"
 import { HISTORICAL_COURSES, HISTORICAL_BY_ID } from "@/lib/data/historical"
 import { CourseDetail } from "@/components/courses/course-detail"
+import { currentPlanningTerm } from "@/lib/data/planning-terms"
 
 export function generateStaticParams() {
   return [
@@ -26,5 +27,5 @@ export default async function Page({
   const course = COURSES_BY_ID[canonical] ?? HISTORICAL_BY_ID[canonical]
   if (!course) notFound()
   if (id !== canonical) redirect(`/courses/${canonical}`)
-  return <CourseDetail course={course} />
+  return <CourseDetail course={course} initialTermKey={currentPlanningTerm().key} />
 }
