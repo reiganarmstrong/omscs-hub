@@ -58,6 +58,48 @@ test("verified author publishes, edits, deletes, and reposts under one pseudonym
   })).status()).toBe(200)
 })
 
+test("operator hide removes Hub Review from public page and unhide restores it", async ({ page }) => {
+  const api = "http://127.0.0.1:8799"
+  const reviews = `${api}/courses/CS-6515/reviews`
+  const reviewBody = "A Hub Review that needs a temporary manual hide."
+  const created = await page.request.post(reviews, {
+    headers: { authorization: "Bearer fixture:moderation-author" },
+    data: { semester: "Fall 2025", difficulty: 3, workload: 12, rating: 5,
+      recommend: true, programStage: "Mid", body: reviewBody },
+  })
+  expect(created.status()).toBe(201)
+  const { reviewId } = await created.json() as { reviewId: string }
+  const moderate = (action: "hide" | "unhide", reason: string) =>
+    page.request.post(`${api}/operator/hub-reviews/${reviewId}/${action}`, {
+      headers: { authorization: "Bearer fixture:moderation-operator" },
+      data: { reason },
+    })
+
+  try {
+    await page.goto("/courses/CS-6515")
+    await expect(page.getByText(reviewBody)).toBeVisible()
+    await expect(page.getByRole("link", { name: "Read original review" })).toBeVisible()
+    await expect(page.getByText("Reviews (2)")).toBeVisible()
+
+    expect((await moderate("hide", "Contains a serious issue under manual review")).status()).toBe(200)
+    await page.getByRole("button", { name: "Refresh reviews" }).click()
+    await expect(page.getByText(reviewBody)).toHaveCount(0)
+    await expect(page.getByText("Reviews (1)")).toBeVisible()
+    await expect(page.getByRole("link", { name: "Read original review" })).toBeVisible()
+    const hiddenStats = await (await page.request.get(`${api}/reviews/catalog-stats`)).json()
+    expect(hiddenStats.courses.find((course: { courseId: string }) => course.courseId === "CS-6515").numReviews).toBe(1)
+
+    expect((await moderate("unhide", "Manual review found no ongoing concern")).status()).toBe(200)
+    await page.getByRole("button", { name: "Refresh reviews" }).click()
+    await expect(page.getByText(reviewBody)).toBeVisible()
+    await expect(page.getByText("Reviews (2)")).toBeVisible()
+  } finally {
+    await page.request.delete(`${reviews}/me`, {
+      headers: { authorization: "Bearer fixture:moderation-author" },
+    })
+  }
+})
+
 test("review write failure keeps draft and shows service error", async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem("clerk-fixture-session", "active")

@@ -1,7 +1,7 @@
 // Serve the real Hono application, replacing only external Clerk and D1 boundaries.
 import { build } from 'esbuild';
 import { createServer } from 'node:http';
-import { mkdtemp, rm, readFile } from 'node:fs/promises';
+import { mkdtemp, rm, readFile, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -20,10 +20,14 @@ const { default: app } = await import(pathToFileURL(outfile).href);
 // Import saved source fixtures into SQLite, then exercise the real Hono SQL.
 execFileSync(process.execPath, ['--import', 'tsx', 'scripts/import-omscentral.ts', '--data-dir', resolve('../api/tests/fixtures/omscentral'), '--sql-out', join(directory, 'import.sql'), '--historical-out', resolve('tests/fixtures/historical-courses.json')], { cwd: resolve('../api') });
 const sqlite = new DatabaseSync(':memory:');
-for (const migration of ['0001_reviews.sql', '0002_course_source_slugs.sql', '0003_study_plans.sql', '0004_course_attempts.sql', '0005_hub_review_authors.sql', '0006_account_deletions.sql']) sqlite.exec(await readFile(resolve('../api/migrations', migration), 'utf8'));
+const migrationsDir = resolve('../api/migrations');
+for (const migration of (await readdir(migrationsDir)).filter((name) => name.endsWith('.sql')).sort()) {
+  sqlite.exec(await readFile(resolve(migrationsDir, migration), 'utf8'));
+}
 sqlite.exec(await readFile(join(directory, 'import.sql'), 'utf8'));
 const env = {
   CLERK_SECRET_KEY: 'browser-fixture', CORS_ORIGIN: 'http://127.0.0.1:3101',
+  OPERATOR_CLERK_USER_ID: 'user_moderation-operator',
   DB: { async batch(statements) {
     sqlite.exec('BEGIN');
     try {
