@@ -127,7 +127,7 @@ export function PlannerClient() {
                               )}
                             >
                               {role === "required"
-                                ? "Required"
+                                ? "Core option"
                                 : role === "bucket"
                                   ? "Bucket"
                                   : "Free"}
@@ -535,7 +535,7 @@ function UnscheduledRow({
             )}
           >
             {role === "required"
-              ? "Required"
+              ? "Core option"
               : role === "bucket"
                 ? "Bucket"
                 : "Free"}
