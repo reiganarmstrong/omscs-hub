@@ -6,6 +6,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import { useGatechSession } from "@/components/auth/gatech-session"
+import { usePlanner } from "@/lib/store/planner-store"
 import { cn } from "@/lib/utils"
 import { MoonIcon, SunIcon } from "@/components/icons"
 
@@ -20,6 +21,7 @@ export function SiteNav() {
   const pathname = usePathname()
   const { resolvedTheme, setTheme } = useTheme()
   const { isSignedIn } = useGatechSession()
+  const { syncStatus } = usePlanner()
   const mounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -120,6 +122,30 @@ export function SiteNav() {
             )
           })}
         </nav>
+      </div>
+      <div className="mx-auto max-w-[1400px] px-4 md:px-6">
+        {isSignedIn && syncStatus === "reconcile" && (
+          <p className="border-t border-border py-2 text-sm">
+            Your local and account Study Plans need a choice.{" "}
+            <Link
+              href="/planner"
+              className="font-medium underline underline-offset-2"
+            >
+              Review plans
+            </Link>
+          </p>
+        )}
+        {isSignedIn && syncStatus === "sync-error" && (
+          <p className="border-t border-border py-2 text-sm">
+            Study Plan sync needs attention.{" "}
+            <Link
+              href="/planner"
+              className="font-medium underline underline-offset-2"
+            >
+              Open planner
+            </Link>
+          </p>
+        )}
       </div>
     </header>
   )

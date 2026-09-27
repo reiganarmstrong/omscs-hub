@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { reviews } from "./reviews";
 import { requireGatechUser } from "./auth";
+import { studyPlans } from "./study-plans";
 import type { Bindings, Variables } from "./types";
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
@@ -23,6 +24,7 @@ app.get("/health", (c) =>
 );
 
 app.route("/", reviews);
+app.route("/", studyPlans);
 
 app.get("/auth/session", requireGatechUser, (c) => {
   c.header("Cache-Control", "no-store");

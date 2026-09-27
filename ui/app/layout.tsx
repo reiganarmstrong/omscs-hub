@@ -5,7 +5,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReviewsProvider } from "@/lib/store/reviews-store";
 import { PlannerProvider } from "@/lib/store/planner-store";
-import { PrefsProvider } from "@/lib/store/prefs-store";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ClerkClientProvider } from "@/components/auth/clerk-client-provider";
@@ -57,11 +56,9 @@ export default function RootLayout({
           <ThemeProvider>
             <ReviewsProvider>
               <PlannerProvider>
-                <PrefsProvider>
-                  <SiteNav />
-                  <main className="flex-1">{children}</main>
-                  <SiteFooter />
-                </PrefsProvider>
+                <SiteNav />
+                <main className="flex-1">{children}</main>
+                <SiteFooter />
               </PlannerProvider>
             </ReviewsProvider>
           </ThemeProvider>

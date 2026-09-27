@@ -45,8 +45,10 @@ const addresses = () => {
     },
   ]
 }
-let user: { primaryEmailAddress: ReturnType<typeof addresses>[number] } | null =
-  null
+let user: {
+  id: string
+  primaryEmailAddress: ReturnType<typeof addresses>[number]
+} | null = null
 export function ClerkProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     scenario =
@@ -55,7 +57,7 @@ export function ClerkProvider({ children }: { children: React.ReactNode }) {
       "verified"
     localStorage.setItem("clerk-fixture-scenario", scenario)
     active = localStorage.getItem("clerk-fixture-session") === "active"
-    user = { primaryEmailAddress: addresses()[0] }
+    user = { id: `user_${scenario}`, primaryEmailAddress: addresses()[0] }
     notify()
   }, [])
   return children
@@ -107,7 +109,7 @@ const flow = {
     }) => Promise<void>
   }) => {
     active = true
-    user = { primaryEmailAddress: addresses()[0] }
+    user = { id: `user_${scenario}`, primaryEmailAddress: addresses()[0] }
     localStorage.setItem("clerk-fixture-session", "active")
     notify()
     await navigate({ session: { getToken }, decorateUrl: (url) => url })

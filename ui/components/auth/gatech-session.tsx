@@ -13,12 +13,16 @@ type Session = {
   isSignedIn: boolean
   checking: boolean
   error: string | null
+  userId: string | null
+  getToken: () => Promise<string | null>
 }
 const SessionContext = React.createContext<Session>({
   authConfigured: false,
   isSignedIn: false,
   checking: false,
   error: null,
+  userId: null,
+  getToken: async () => null,
 })
 
 export function GuestSessionProvider({
@@ -33,6 +37,8 @@ export function GuestSessionProvider({
         isSignedIn: false,
         checking: false,
         error: null,
+        userId: null,
+        getToken: async () => null,
       }}
     >
       {children}
@@ -106,6 +112,8 @@ export function GatechSessionProvider({
         isSignedIn: allowed,
         checking: Boolean(isSignedIn && !allowed && !error),
         error,
+        userId: allowed ? (user?.id ?? null) : null,
+        getToken: allowed ? getToken : async () => null,
       }}
     >
       {error && (

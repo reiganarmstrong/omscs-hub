@@ -5,7 +5,6 @@ import Link from "next/link";
 import { SPECIALIZATIONS, bucketProgress } from "@/lib/data/specializations";
 import { COURSES, COURSES_BY_ID, courseMatchesSearch } from "@/lib/data";
 import { usePlanner } from "@/lib/store/planner-store";
-import { usePrefs } from "@/lib/store/prefs-store";
 import { CheckIcon, ChevronRight, SearchIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import type {
@@ -18,8 +17,7 @@ import type {
 const UNSCHEDULED = "unassigned";
 
 export function SpecializationsClient() {
-  const { plan, add, remove, has } = usePlanner();
-  const { selectedSpec, setSelectedSpec } = usePrefs();
+  const { plan, add, remove, has, selectedSpec, setSelectedSpec } = usePlanner();
   const plannedIds = React.useMemo(
     () => new Set(Object.values(plan).flat()),
     [plan],

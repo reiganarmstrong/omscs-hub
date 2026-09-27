@@ -10,18 +10,17 @@ import {
   courseSpecializations,
 } from "@/lib/data/specializations";
 import { usePlanner } from "@/lib/store/planner-store";
-import { usePrefs } from "@/lib/store/prefs-store";
 import { cn } from "@/lib/utils";
 import { PlusIcon, TrashIcon, SearchIcon, CheckIcon } from "@/components/icons";
 import { planningTerms, visiblePlanningTerms, TERM_ORDER, type PlanningTerm } from "@/lib/data/planning-terms";
 import { OfferingNote } from "./offering-note";
 import { useCurrentTermKey } from "@/lib/store/current-term";
+import { PlanSyncPanel } from "./plan-sync-panel";
 
 const UNSCHEDULED = "unassigned";
 
 export function PlannerClient({ initialTermKey }: { initialTermKey: string }) {
-  const { plan, add, remove, clear, has } = usePlanner();
-  const { selectedSpec, setSelectedSpec } = usePrefs();
+  const { plan, add, remove, clear, has, selectedSpec, setSelectedSpec } = usePlanner();
   const currentTermKey = useCurrentTermKey(initialTermKey);
   const windowTerms = planningTerms(currentTermKey);
   const currentYear = windowTerms[0].year;
@@ -40,6 +39,7 @@ export function PlannerClient({ initialTermKey }: { initialTermKey: string }) {
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px]">
+      <PlanSyncPanel />
       <div>
         <SpecSelector
           selected={selectedSpec}

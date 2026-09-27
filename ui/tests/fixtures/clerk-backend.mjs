@@ -4,7 +4,7 @@ export async function verifyToken(token) {
 }
 export function createClerkClient() {
   return { users: { getUser: async (scenario) => ({
-    id: 'user_private',
+    id: `user_${scenario}`,
     primaryEmailAddressId: scenario === 'missing-primary' ? 'missing' : 'primary',
     emailAddresses: [
       { id: 'primary', emailAddress: scenario === 'non-gatech' ? 'private@example.com' : 'student@gatech.edu', verification: { status: scenario === 'unverified' ? 'unverified' : 'verified' } },
