@@ -1,0 +1,51 @@
+name: Check current OMSCS courses
+
+on:
+  schedule:
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test source parser and comparison
+        run: python -m unittest discover -s scripts/tests -v
+      - name: Check official source
+        run: python scripts/check_current_courses.py
+      - name: Find existing Catalog proposal
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: echo "number=$(gh pr list --head automation/current-course-catalog --state open --json number --jq '.[0].number // ""')" >> "$GITHUB_OUTPUT"
+      - name: Propose review of detected changes
+        if: ${{ hashFiles('proposals/current-course-catalog.md') != '' && steps.existing.outputs.number == '' }}
+        uses: peter-evans/create-pull-request@v8
+        with:
+          add-paths: |
+            proposals/current-course-catalog.md
+            proposals/catalog-change-set.json
+          branch: automation/current-course-catalog
+          delete-branch: true
+          commit-message: "chore(catalog): propose current-course source review"
+          title: "Review official current-course Catalog changes"
+          body-path: proposals/current-course-catalog.md
+          draft: true
+      - name: Surface changes while a proposal is under review
+        if: ${{ hashFiles('proposals/current-course-catalog.md') != '' && steps.existing.outputs.number != '' }}
+        run: |
+          echo "::error::Catalog source differs while an existing draft PR is under review. Review that PR and rerun this workflow after it closes."
+          exit 1
+      - name: Surface obsolete proposal
+        if: ${{ hashFiles('proposals/current-course-catalog.md') == '' && steps.existing.outputs.number != '' }}
+        run: |
+          echo "::error::Official current-course source matches the published Catalog, but an older draft proposal remains open. Review and close the obsolete PR."
+          exit 1
