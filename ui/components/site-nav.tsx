@@ -20,7 +20,7 @@ const NAV = [
 export function SiteNav() {
   const pathname = usePathname()
   const { resolvedTheme, setTheme } = useTheme()
-  const { isSignedIn } = useGatechSession()
+  const { isSignedIn, deletionPending } = useGatechSession()
   const { syncStatus } = usePlanner()
   const mounted = React.useSyncExternalStore(
     () => () => {},
@@ -79,7 +79,7 @@ export function SiteNav() {
               <MoonIcon size={15} />
             )}
           </button>
-          {!isSignedIn && (
+          {!isSignedIn && !deletionPending && (
             <Link
               href="/sign-in"
               className="shrink-0 rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-leaf/60 hover:text-leaf"
@@ -88,14 +88,12 @@ export function SiteNav() {
             </Link>
           )}
           {isSignedIn && (
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "size-8",
-                },
-              }}
-            />
+            <>
+              <Link href="/account" className="shrink-0 rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">Account</Link>
+              <UserButton appearance={{ elements: { avatarBox: "size-8" } }} />
+            </>
           )}
+          {deletionPending && <Link href="/account" className="shrink-0 rounded-md border border-border px-3 py-1.5 text-sm text-rose">Finish account deletion</Link>}
         </div>
         <nav
           aria-label="Primary navigation tabs"

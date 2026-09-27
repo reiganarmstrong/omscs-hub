@@ -4,6 +4,8 @@ export const gatechEmailSchema = z.email().regex(/^[^\s@]+@gatech\.edu$/i)
 export const SIGN_IN_RESTRICTION =
   "Sign-in requires a verified primary @gatech.edu email."
 const eligibilitySchema = z.object({ eligible: z.literal(true) })
+const deletedSchema = z.object({ error: z.literal("Account deleted.") })
+export class AccountDeletionPendingError extends Error {}
 
 export async function authorizeSession(token: string | null) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "")
@@ -13,6 +15,8 @@ export async function authorizeSession(token: string | null) {
     headers: { authorization: `Bearer ${token}` },
     cache: "no-store",
   })
+  if (res.status === 403 && deletedSchema.safeParse(await res.clone().json().catch(() => null)).success)
+    throw new AccountDeletionPendingError("Account deletion pending.")
   if (res.status === 401 || res.status === 403)
     throw new Error(SIGN_IN_RESTRICTION)
   if (!res.ok) throw new Error("Unable to verify sign-in. Try again later.")

@@ -4,20 +4,35 @@ import type { Bindings, Variables, AuthUser } from "./types";
 
 type AppContext = Context<{ Bindings: Bindings; Variables: Variables }>;
 
-export const requireGatechUser: MiddlewareHandler<{
+type AuthMiddleware = MiddlewareHandler<{
   Bindings: Bindings;
   Variables: Variables;
-}> = async (c, next) => {
-  c.header("Cache-Control", "no-store");
-  const user = await authenticate(c).catch((error) => {
-    if (error instanceof Response) return error;
-    throw error;
-  });
-  if (user instanceof Response) return user;
+}>;
 
-  c.set("authUser", user);
-  await next();
-};
+function gatechUserMiddleware(allowDeleted: boolean): AuthMiddleware {
+  return async (c, next) => {
+    c.header("Cache-Control", "no-store");
+    const user = await authenticate(c).catch((error) => {
+      if (error instanceof Response) return error;
+      throw error;
+    });
+    if (user instanceof Response) return user;
+
+    if (!allowDeleted) {
+      const deleted = await c.env.DB.prepare("SELECT 1 FROM account_deletions WHERE user_id = ?")
+        .bind(user.id).first();
+      if (deleted) return new Response(JSON.stringify({ error: "Account deleted." }), {
+        status: 403, headers: { "content-type": "application/json" },
+      });
+    }
+
+    c.set("authUser", user);
+    await next();
+  };
+}
+
+export const requireGatechUser = gatechUserMiddleware(false);
+export const requireGatechUserForDeletion = gatechUserMiddleware(true);
 
 async function authenticate(c: AppContext): Promise<AuthUser> {
   const token = c.req.header("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
@@ -29,7 +44,10 @@ async function authenticate(c: AppContext): Promise<AuthUser> {
   if (!payload.sub) throwUnauthorized();
 
   const client = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY });
-  const user = await client.users.getUser(payload.sub);
+  const user = await client.users.getUser(payload.sub).catch((error: unknown) => {
+    if (typeof error === "object" && error !== null && "status" in error && error.status === 404) throwUnauthorized();
+    throw error;
+  });
   // A verified secondary address never substitutes for the primary address.
   const primaryEmail = user.emailAddresses.find(
     (email) => email.id === user.primaryEmailAddressId,

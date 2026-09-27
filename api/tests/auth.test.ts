@@ -10,7 +10,7 @@ vi.mock("@clerk/backend", () => ({
 const email = (id: string, emailAddress: string, status = "verified") => ({
   id, emailAddress, verification: { status },
 });
-const env = { CLERK_SECRET_KEY: "sk_test_fixture" } as Env;
+const env = { CLERK_SECRET_KEY: "sk_test_fixture", DB: { prepare: () => ({ bind: () => ({ first: async () => null }) }) } } as unknown as Env;
 const routes = [
   ["GET", "/auth/session"],
   ["POST", "/courses/CS-6200/reviews"],

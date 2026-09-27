@@ -53,6 +53,15 @@ type Ctx = {
 const PLAN_KEY = "omscs-hub:planner:v1"
 const PREFS_KEY = "omscs-hub:prefs:v1"
 const ATTEMPTS_KEY = "omscs-hub:attempts:v1"
+export function clearAcademicStorage(userId: string) {
+  writeStorage(PLAN_KEY, {})
+  writeStorage(PREFS_KEY, { selectedSpec: null })
+  writeStorage(ATTEMPTS_KEY, [])
+  localStorage.removeItem(`omscs-hub:plan-choice:${userId}`)
+  for (const key of Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index))) {
+    if (key?.startsWith(`omscs-hub:pending-plan:${userId}:`)) localStorage.removeItem(key)
+  }
+}
 const EMPTY_PLAN: StudyPlan = {}
 const EMPTY_ATTEMPTS: CourseAttempt[] = []
 const EMPTY_PREFS: { selectedSpec: SpecializationId | null } = {

@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useAuth, useClerk, useUser } from "@clerk/react"
 import {
+  AccountDeletionPendingError,
   authorizeSession,
   gatechEmailSchema,
   SIGN_IN_RESTRICTION,
@@ -11,6 +12,7 @@ import {
 type Session = {
   authConfigured: boolean
   isSignedIn: boolean
+  deletionPending: boolean
   checking: boolean
   error: string | null
   userId: string | null
@@ -19,6 +21,7 @@ type Session = {
 const SessionContext = React.createContext<Session>({
   authConfigured: false,
   isSignedIn: false,
+  deletionPending: false,
   checking: false,
   error: null,
   userId: null,
@@ -35,6 +38,7 @@ export function GuestSessionProvider({
       value={{
         authConfigured: false,
         isSignedIn: false,
+        deletionPending: false,
         checking: false,
         error: null,
         userId: null,
@@ -66,6 +70,7 @@ export function GatechSessionProvider({
     user: typeof user
     getToken: typeof getToken
     signOut: typeof signOut
+    deletionPending: boolean
   } | null>(null)
   const [error, setError] = React.useState<string | null>(null)
 
@@ -77,11 +82,16 @@ export function GatechSessionProvider({
         if (!validPrimary) throw new Error(SIGN_IN_RESTRICTION)
         await authorizeSession(await getToken())
         if (!cancelled) {
-          setApproval({ key, user, getToken, signOut })
+          setApproval({ key, user, getToken, signOut, deletionPending: false })
           setError(null)
         }
       } catch (cause) {
         if (cancelled) return
+        if (cause instanceof AccountDeletionPendingError) {
+          setApproval({ key, user, getToken, signOut, deletionPending: true })
+          setError(null)
+          return
+        }
         setApproval(null)
         setError(
           cause instanceof Error && cause.message === SIGN_IN_RESTRICTION
@@ -103,17 +113,24 @@ export function GatechSessionProvider({
     key === approval?.key &&
     user === approval.user &&
     getToken === approval.getToken &&
-    signOut === approval.signOut
+    signOut === approval.signOut &&
+    !approval.deletionPending
+  )
+  const deletionPending = Boolean(
+    key && key === approval?.key && user === approval.user &&
+    getToken === approval.getToken && signOut === approval.signOut &&
+    approval.deletionPending
   )
   return (
     <SessionContext.Provider
       value={{
         authConfigured: true,
         isSignedIn: allowed,
-        checking: Boolean(isSignedIn && !allowed && !error),
+        deletionPending,
+        checking: Boolean(isSignedIn && !allowed && !deletionPending && !error),
         error,
-        userId: allowed ? (user?.id ?? null) : null,
-        getToken: allowed ? getToken : async () => null,
+        userId: allowed || deletionPending ? (user?.id ?? null) : null,
+        getToken: allowed || deletionPending ? getToken : async () => null,
       }}
     >
       {error && (

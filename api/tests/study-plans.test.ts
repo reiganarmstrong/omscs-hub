@@ -19,8 +19,11 @@ const request = (user: string, method = "GET", body?: unknown) => app.request("/
 
 beforeEach(() => {
   sqlite = new DatabaseSync(":memory:");
+  sqlite.exec(readFileSync(new URL("../migrations/0001_reviews.sql", import.meta.url), "utf8"));
+  sqlite.exec(readFileSync(new URL("../migrations/0005_hub_review_authors.sql", import.meta.url), "utf8"));
   sqlite.exec(readFileSync(new URL("../migrations/0003_study_plans.sql", import.meta.url), "utf8"));
   sqlite.exec(readFileSync(new URL("../migrations/0004_course_attempts.sql", import.meta.url), "utf8"));
+  sqlite.exec(readFileSync(new URL("../migrations/0006_account_deletions.sql", import.meta.url), "utf8"));
   env = { CLERK_SECRET_KEY: "sk_test_fixture", DB: { prepare(sql: string) {
     let params: unknown[] = [];
     return {
