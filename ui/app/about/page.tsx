@@ -56,6 +56,22 @@ export default function Page() {
           </p>
         </section>
 
+        <section id="academic-record-export">
+          <h2 className="font-display text-xl tracking-tight">Academic record export</h2>
+          <p className="mt-2 text-muted-foreground">
+            Signed-in students can download their saved private Study Plan as UTF-8 JSON.
+            The file has <code>format: &quot;omscs-hub-academic-record&quot;</code>,
+            <code> version: 1</code>, and an ISO 8601 <code>exportedAt</code> time.
+            <code> intendedCourses</code> lists each Course ID and planned term, including
+            <code> unassigned</code>. <code>selectedSpecialization</code> is the selected ID or
+            <code> null</code>. <code>completedCourses</code> lists distinct Course IDs with
+            a graded attempt; it does not certify earned credit. <code>courseAttempts</code>
+            keeps every attempt&apos;s ID, Course ID, term, and outcome, including repeats,
+            withdrawals, and unresolved outcomes. The file contains private academic
+            information; keep it somewhere you control.
+          </p>
+        </section>
+
         <p className="text-muted-foreground">
           <Link href="/" className="underline decoration-dotted underline-offset-4">
             ← Back to the catalog

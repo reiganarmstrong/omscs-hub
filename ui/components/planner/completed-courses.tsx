@@ -5,12 +5,14 @@ import Link from "next/link"
 import { COURSES, COURSES_BY_ID, courseMatchesSearch } from "@/lib/data"
 import { usePlanner } from "@/lib/store/planner-store"
 import { TERM_ORDER, parsePlanningTermKey } from "@/lib/data/planning-terms"
-import { courseAttemptInputSchema, type CourseAttempt } from "@/lib/api/study-plan"
+import { courseAttemptInputSchema, type CourseAttempt, type StudyPlanData } from "@/lib/api/study-plan"
+import { estimatedGpa, exportAcademicRecord } from "@/lib/data/academic-record"
 
 const OUTCOMES: CourseAttempt["outcome"][] = ["A", "B", "C", "D", "F", "W", "I"]
 
 export function CompletedCourses({ currentTermKey }: { currentTermKey: string }) {
-  const { attempts, addAttempt, updateAttempt, removeAttempt, syncStatus } = usePlanner()
+  const { attempts, addAttempt, updateAttempt, removeAttempt, syncStatus, accountDraft, localDraft } = usePlanner()
+  const gpa = estimatedGpa(attempts)
   const canEdit = syncStatus === "guest" || syncStatus === "ready" || syncStatus === "saving"
   const [search, setSearch] = React.useState("")
   const [courseId, setCourseId] = React.useState("")
@@ -28,6 +30,16 @@ export function CompletedCourses({ currentTermKey }: { currentTermKey: string })
     rows.push(attempt)
     grouped.set(attempt.courseId, rows)
   }
+  const download = (data: StudyPlanData, source: "account" | "device") => {
+    const exportedAt = new Date().toISOString()
+    const record = exportAcademicRecord(data, exportedAt)
+    const url = URL.createObjectURL(new Blob([JSON.stringify(record, null, 2) + "\n"], { type: "application/json" }))
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `omscs-hub-academic-record-${source}-${exportedAt.slice(0, 10)}.json`
+    link.click()
+    window.setTimeout(() => URL.revokeObjectURL(url), 0)
+  }
 
   return (
     <section aria-label="Completed Courses" className="mt-8 rounded-xl border border-border bg-card p-4 sm:p-5">
@@ -35,7 +47,22 @@ export function CompletedCourses({ currentTermKey }: { currentTermKey: string })
         <p className="label">Academic record</p>
         <h2 className="font-display text-2xl tracking-tight">Completed Courses</h2>
         <p className="mt-1 text-sm text-muted-foreground">Record each Course Attempt separately, including repeats and outcomes that earned no credit. {syncStatus === "guest" ? "Guest entries stay on this device until you choose how to sync after sign-in." : "Your account entries are private and sync across devices."}</p>
+        {syncStatus !== "guest" && syncStatus !== "loading" && <div className="mt-3">
+          <div className="flex flex-wrap gap-2">
+            {accountDraft && <button type="button" onClick={() => download(accountDraft, "account")} className="rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-leaf">{syncStatus === "ready" ? "Export private Study Plan (JSON)" : "Export account Study Plan draft (JSON)"}</button>}
+            {(syncStatus === "reconcile" || (syncStatus === "sync-error" && !accountDraft)) && <button type="button" onClick={() => download(localDraft, "device")} className="rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-leaf">Export device Study Plan draft (JSON)</button>}
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">Downloads intended Courses, Specialization, Completed Courses, and every Course Attempt. A draft may contain changes not saved to your account. <Link href="/about#academic-record-export" className="underline underline-offset-2">Export format</Link></p>
+        </div>}
       </div>
+      <section aria-label="Estimated GPA" className="mt-4 rounded-lg border border-border bg-muted/40 p-4">
+        <p className="label">Estimated GPA</p>
+        <p className="mt-1 font-display text-3xl tabular-nums">{gpa.value === null ? "—" : (Math.trunc(gpa.value * 100) / 100).toFixed(2)}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{gpa.gradedAttempts} graded {gpa.gradedAttempts === 1 ? "attempt" : "attempts"} · {gpa.gradedHours} attempted credit hours. Every entered A/B/C/D/F attempt counts at its Course credit hours, including repeats. W and unresolved outcomes are omitted.</p>
+        {gpa.omittedOutcomes > 0 && <p className="mt-1 text-xs text-muted-foreground">{gpa.omittedOutcomes} W or unresolved {gpa.omittedOutcomes === 1 ? "outcome" : "outcomes"} omitted.</p>}
+        {gpa.unknownCreditAttempts > 0 && <p className="mt-1 text-sm text-rose">{gpa.unknownCreditAttempts} graded {gpa.unknownCreditAttempts === 1 ? "attempt is" : "attempts are"} omitted because Course credits are unavailable.</p>}
+        <p className="mt-2 text-xs text-muted-foreground">This is an estimate from entered attempts, not your official Georgia Tech GPA. Missing coursework and approved grade substitution may change the official GPA. See <a href="https://catalog.gatech.edu/rules/5/" target="_blank" rel="noreferrer" className="underline underline-offset-2">Georgia Tech grading rules</a>.</p>
+      </section>
       <form className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]" onSubmit={(event) => {
         event.preventDefault()
         const parsed = courseAttemptInputSchema.safeParse({ courseId, term, outcome })
