@@ -1,4 +1,5 @@
 import { canonicalCourseId, COURSES_BY_ID } from "./index";
+import type { CourseAttempt } from "@/lib/api/study-plan";
 import type {
   CourseSpecialization,
   Specialization,
@@ -10,7 +11,8 @@ import type {
 // listed as offered online and present in the current OMSCS Catalog are shown.
 // On-campus options in the source pages are deliberately omitted.
 export const SPECIALIZATION_LAST_CHECKED = "2026-09-26";
-const NON_CS_CREDIT_LIMIT = 6;
+const LIMITED_CREDIT_HOURS = 6;
+export const DEGREE_REQUIREMENT_HOURS = 30;
 const source = (slug: string) =>
   `https://omscs.gatech.edu/specialization-${slug}`;
 const codes = (list: string) =>
@@ -43,7 +45,7 @@ const spec = (
   value: Omit<Specialization, "totalHours" | "totalCourses" | "lastChecked">,
 ): Specialization => ({
   ...value,
-  totalHours: 30,
+  totalHours: DEGREE_REQUIREMENT_HOURS,
   totalCourses: 10,
   lastChecked: SPECIALIZATION_LAST_CHECKED,
 });
@@ -244,18 +246,79 @@ export function courseSpecializations(
   });
 }
 
-export function bucketProgress(entry: Specialization, plannedIds: Set<string>) {
+function restrictedCredit(id: string) {
+  const [subject, number] = id.split("-");
+  return !["CS", "CSE"].includes(subject) || Number(number.slice(0, 1)) === 4;
+}
+
+function courseHours(ids: Iterable<string>) {
+  return [...ids].reduce(
+    (sum, id) => sum + (COURSES_BY_ID[id]?.credits ?? 0),
+    0,
+  );
+}
+
+export function eligibleCreditHours(courseIds: Set<string>) {
+  const current = [...courseIds].filter((id) => Boolean(COURSES_BY_ID[id]));
+  const unlimited = courseHours(current.filter((id) => !restrictedCredit(id)));
+  let limited = new Set([0]);
+  for (const id of current.filter(restrictedCredit)) {
+    const hours = COURSES_BY_ID[id].credits;
+    limited = new Set([
+      ...limited,
+      ...[...limited]
+        .map((sum) => sum + hours)
+        .filter((sum) => sum <= LIMITED_CREDIT_HOURS),
+    ]);
+  }
+  return Math.min(DEGREE_REQUIREMENT_HOURS, unlimited + Math.max(...limited));
+}
+
+export function latestAttemptEligibility(attempts: CourseAttempt[]) {
+  const latest = new Map<string, { attempt: CourseAttempt; order: number }>();
+  const season = { Spring: 0, Summer: 1, Fall: 2 };
+  attempts.forEach((attempt) => {
+    const id = canonicalCourseId(attempt.courseId);
+    const [term, year] = attempt.term.split("-");
+    const order = Number(year) * 3 + season[term as keyof typeof season];
+    const previous = latest.get(id);
+    // No within-term timestamp exists. Last entered attempt breaks same-term ties.
+    if (!previous || order >= previous.order)
+      latest.set(id, { attempt, order });
+  });
+  const degreeIds = new Set<string>();
+  const specializationIds = new Set<string>();
+  for (const [id, { attempt }] of latest) {
+    if (!COURSES_BY_ID[id]) continue;
+    if (["A", "B", "C"].includes(attempt.outcome)) degreeIds.add(id);
+    if (["A", "B"].includes(attempt.outcome)) specializationIds.add(id);
+  }
+  return { degreeIds, specializationIds };
+}
+
+export function earnedBucketProgress(
+  entry: Specialization,
+  attempts: CourseAttempt[],
+) {
+  const { degreeIds, specializationIds } = latestAttemptEligibility(attempts);
+  return bucketProgress(entry, degreeIds, specializationIds);
+}
+
+export function bucketProgress(
+  entry: Specialization,
+  plannedIds: Set<string>,
+  specializationEligibleIds: Set<string> = plannedIds,
+) {
   const slots = entry.requirements.flatMap((requirement) =>
     Array.from({ length: requirement.pick }, () => requirement),
   );
   const planned = [...plannedIds].filter((id) => Boolean(COURSES_BY_ID[id]));
-  const isCS = (id: string) => /^(CS|CSE)-/.test(id);
-  const csCourses = planned.filter(isCS);
-  const otherCourses = planned.filter((id) => !isCS(id));
-  const otherHours = otherCourses.reduce(
-    (sum, id) => sum + COURSES_BY_ID[id].credits,
-    0,
+  const unrestricted = planned.filter((id) => !restrictedCredit(id));
+  const restricted = planned.filter(restrictedCredit);
+  const otherHours = courseHours(
+    planned.filter((id) => !/^(CS|CSE)-/.test(id)),
   );
+  const restrictedHours = courseHours(restricted);
 
   const match = (eligible: Set<string>) => {
     // Each course can occupy one slot; an augmenting path can move a course
@@ -263,7 +326,12 @@ export function bucketProgress(entry: Specialization, plannedIds: Set<string>) {
     const owner = new Map<string, number>();
     const assign = (slot: number, visited: Set<string>): boolean => {
       for (const id of slots[slot].poolCourseIds) {
-        if (!eligible.has(id) || visited.has(id)) continue;
+        if (
+          !eligible.has(id) ||
+          !specializationEligibleIds.has(id) ||
+          visited.has(id)
+        )
+          continue;
         visited.add(id);
         const previous = owner.get(id);
         if (previous === undefined || assign(previous, visited)) {
@@ -285,35 +353,50 @@ export function bucketProgress(entry: Specialization, plannedIds: Set<string>) {
         ];
       }),
     );
+    const specializationCourseIds = new Set(owner.keys());
+    const freeCourseIds = [...eligible]
+      .filter((id) => !specializationCourseIds.has(id))
+      .sort((a, b) => COURSES_BY_ID[b].credits - COURSES_BY_ID[a].credits)
+      .slice(0, entry.freeElectiveCount);
+    const degreeCourseIds = new Set([
+      ...specializationCourseIds,
+      ...freeCourseIds,
+    ]);
     return {
       byBucket,
       matchedFulfilled: owner.size,
-      freeElectivesUsed: Math.min(
-        entry.freeElectiveCount,
-        Math.max(0, eligible.size - owner.size),
+      freeElectivesUsed: freeCourseIds.length,
+      specializationCourseIds,
+      freeCourseIds: new Set(freeCourseIds),
+      degreeCourseIds,
+      specializationHours: courseHours(specializationCourseIds),
+      freeElectiveHours: courseHours(freeCourseIds),
+      degreeHours: Math.min(
+        DEGREE_REQUIREMENT_HOURS,
+        courseHours(degreeCourseIds),
       ),
-      specializationCourseIds: new Set(owner.keys()),
     };
   };
 
-  // The current Catalog has 3-credit courses. Enumerating allowed non-CS/CSE
-  // subsets also respects actual credit hours if a smaller course is added.
-  let best = match(new Set(csCourses));
+  // Enumerate the combined 4000-level/non-CS/CSE cap by actual credit hours.
+  let best = match(new Set(unrestricted));
   const consider = (index: number, selected: string[], hours: number) => {
-    if (index === otherCourses.length) {
-      const candidate = match(new Set([...csCourses, ...selected]));
+    if (index === restricted.length) {
+      const candidate = match(new Set([...unrestricted, ...selected]));
       if (
         candidate.matchedFulfilled > best.matchedFulfilled ||
         (candidate.matchedFulfilled === best.matchedFulfilled &&
-          candidate.freeElectivesUsed > best.freeElectivesUsed)
+          (candidate.freeElectivesUsed > best.freeElectivesUsed ||
+            (candidate.freeElectivesUsed === best.freeElectivesUsed &&
+              candidate.degreeHours > best.degreeHours)))
       )
         best = candidate;
       return;
     }
     consider(index + 1, selected, hours);
-    const id = otherCourses[index];
+    const id = restricted[index];
     const nextHours = hours + COURSES_BY_ID[id].credits;
-    if (nextHours <= NON_CS_CREDIT_LIMIT)
+    if (nextHours <= LIMITED_CREDIT_HOURS)
       consider(index + 1, [...selected, id], nextHours);
   };
   consider(0, [], 0);
@@ -324,6 +407,7 @@ export function bucketProgress(entry: Specialization, plannedIds: Set<string>) {
     plannedTotal: planned.length,
     totalCourses: entry.totalCourses,
     nonCsPlannedHours: otherHours,
-    nonCsCreditLimit: NON_CS_CREDIT_LIMIT,
+    limitedCreditHours: restrictedHours,
+    limitedCreditLimit: LIMITED_CREDIT_HOURS,
   };
 }

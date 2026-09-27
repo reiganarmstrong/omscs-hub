@@ -2,7 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { SPECIALIZATIONS, bucketProgress } from "@/lib/data/specializations";
+import {
+  SPECIALIZATIONS,
+  bucketProgress,
+  earnedBucketProgress,
+} from "@/lib/data/specializations";
 import { COURSES, COURSES_BY_ID, courseMatchesSearch } from "@/lib/data";
 import { usePlanner } from "@/lib/store/planner-store";
 import { CheckIcon, ChevronRight, SearchIcon } from "@/components/icons";
@@ -17,7 +21,8 @@ import type {
 const UNSCHEDULED = "unassigned";
 
 export function SpecializationsClient() {
-  const { plan, add, remove, has, selectedSpec, setSelectedSpec } = usePlanner();
+  const { plan, attempts, add, remove, has, selectedSpec, setSelectedSpec } =
+    usePlanner();
   const plannedIds = React.useMemo(
     () => new Set(Object.values(plan).flat()),
     [plan],
@@ -41,6 +46,10 @@ export function SpecializationsClient() {
   const progress = React.useMemo(
     () => bucketProgress(spec, plannedIds),
     [spec, plannedIds],
+  );
+  const earned = React.useMemo(
+    () => earnedBucketProgress(spec, attempts),
+    [spec, attempts],
   );
 
   return (
@@ -130,6 +139,7 @@ export function SpecializationsClient() {
             onPick={() => setSelectedSpec(spec.id)}
             onUnpick={() => setSelectedSpec(null)}
             prog={progress}
+            earned={earned}
           />
           <div className="mt-5 space-y-4">
             {spec.requirements.map((req, idx) => (
@@ -164,12 +174,14 @@ function SpecHeader({
   onPick,
   onUnpick,
   prog,
+  earned,
 }: {
   spec: Specialization;
   isMine: boolean;
   onPick: () => void;
   onUnpick: () => void;
   prog: ReturnType<typeof bucketProgress>;
+  earned: ReturnType<typeof earnedBucketProgress>;
 }) {
   const requiredPct =
     prog.requiredFulfilled === 0
@@ -209,6 +221,23 @@ function SpecHeader({
             value={`${prog.plannedTotal}/${spec.totalCourses}`}
           />
         </div>
+        <div
+          aria-label="Earned progress"
+          className="mt-4 border-t border-border pt-3"
+        >
+          <p className="label">Earned from latest attempts</p>
+          <p className="tabular mt-1 text-sm">
+            {earned.degreeHours}/{spec.totalHours} credit hours ·{" "}
+            {earned.matchedFulfilled}/{earned.requiredFulfilled} specialization
+            slots · {earned.freeElectivesUsed}/{spec.freeElectiveCount} free
+            electives
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            B or better fills specialization slots. C or better can fill free
+            electives. Each course counts once; later attempts replace earlier
+            outcomes.
+          </p>
+        </div>
         <div className="mt-4 space-y-2">
           <ProgressBar
             label="Required structure"
@@ -241,12 +270,14 @@ function SpecHeader({
           >
             OMSCS degree requirements
           </a>
-          . Planned courses do not establish earned credit or degree completion.
+          . Planned and earned progress are guidance under current rules, not
+          official degree completion. Check your applicable catalog and Degree
+          Works audit.
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          At most six credit hours with a subject other than CS or CSE can
-          count. To continue after the first 12 months, complete two
-          foundational courses with B or better; see the{" "}
+          At most six combined 4000-level or non-CS/CSE credit hours can count.
+          To continue after the first 12 months, complete two foundational
+          courses with B or better; see the{" "}
           <a
             href="https://omscs.gatech.edu/current-courses"
             target="_blank"
@@ -255,12 +286,22 @@ function SpecHeader({
           >
             current-course list
           </a>
-          .
+          . See the{" "}
+          <a
+            href="https://catalog.gatech.edu/programs/computer-science-ms/"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2"
+          >
+            Georgia Tech catalog
+          </a>{" "}
+          for the combined credit limit.
         </p>
-        {prog.nonCsPlannedHours > prog.nonCsCreditLimit && (
+        {prog.limitedCreditHours > prog.limitedCreditLimit && (
           <p role="status" className="mt-2 text-xs text-rose">
-            {prog.nonCsPlannedHours} non-CS/CSE hours planned; only{" "}
-            {prog.nonCsCreditLimit} hours count in the slot guidance above.
+            {prog.limitedCreditHours} combined 4000-level/non-CS/CSE hours
+            planned; only {prog.limitedCreditLimit} hours count in the slot
+            guidance above.
           </p>
         )}
       </div>
