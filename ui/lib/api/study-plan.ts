@@ -2,9 +2,16 @@ import { z } from "zod"
 import type { SpecializationId } from "@/lib/types"
 
 export type StudyPlan = Record<string, string[]>
+export type CourseAttempt = {
+  id: string
+  courseId: string
+  term: string
+  outcome: "A" | "B" | "C" | "D" | "F" | "W" | "I"
+}
 export type StudyPlanData = {
   plan: StudyPlan
   selectedSpec: SpecializationId | null
+  attempts: CourseAttempt[]
   revision: number
 }
 
@@ -29,6 +36,20 @@ const planSchema = z
         placed.add(id)
       }
   })
+export const courseAttemptSchema = z.object({
+  id: z.uuid(),
+  courseId: courseIdSchema,
+  term: z.string().regex(/^(Spring|Summer|Fall)-\d{4}$/),
+  outcome: z.enum(["A", "B", "C", "D", "F", "W", "I"]),
+})
+export const courseAttemptInputSchema = courseAttemptSchema.omit({ id: true })
+const attemptsSchema = z.array(courseAttemptSchema).max(500).superRefine((attempts, ctx) => {
+  const ids = new Set<string>()
+  for (const attempt of attempts) {
+    if (ids.has(attempt.id)) ctx.addIssue({ code: "custom", message: `Duplicate Course Attempt ${attempt.id}.` })
+    ids.add(attempt.id)
+  }
+})
 
 const responseSchema = z.object({
   plan: planSchema,
@@ -43,6 +64,7 @@ const responseSchema = z.object({
     ])
     .nullable(),
   revision: z.number().int().nonnegative(),
+  attempts: attemptsSchema.default([]),
 })
 
 export function parseStudyPlanData(value: unknown): StudyPlanData | null {

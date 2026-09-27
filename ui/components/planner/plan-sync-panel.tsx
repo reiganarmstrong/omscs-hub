@@ -74,6 +74,7 @@ export function PlanSyncPanel() {
   const accountPlaces = [...placements(accountDraft.plan)]
   const canMerge =
     differences.conflicts.every(({ id }) => choices[id]) &&
+    differences.attemptConflicts.every(({ id }) => choices[`attempt:${id}`]) &&
     (!differences.specConflict || specChoice)
   return (
     <section
@@ -96,11 +97,13 @@ export function PlanSyncPanel() {
           title={recovering ? "Unsaved draft on this device" : "This device"}
           places={localPlaces}
           spec={localDraft.selectedSpec}
+          attempts={localDraft.attempts}
         />
         <PlanPreview
           title="Your account"
           places={accountPlaces}
           spec={accountDraft.selectedSpec}
+          attempts={accountDraft.attempts}
         />
       </div>
       <div className="mt-4 border-t border-border pt-4 text-sm">
@@ -115,6 +118,24 @@ export function PlanSyncPanel() {
             placement per Course.
           </p>
         )}
+        <p className="mt-1 text-muted-foreground">
+          Course Attempts only on this device: {differences.localAttempts.length}. Only in your account: {differences.accountAttempts.length}. Merge keeps both sets of attempts.
+        </p>
+        {differences.attemptConflicts.map((attempt) => (
+          <label key={attempt.id} className="mt-2 flex items-center gap-2">
+            Conflicting attempt for {attempt.courseId} ({attempt.term})
+            <select
+              aria-label={`Attempt ${attempt.id} to merge`}
+              value={choices[`attempt:${attempt.id}`] ?? ""}
+              onChange={(event) => setChoices({ ...choices, [`attempt:${attempt.id}`]: event.target.value as "local" | "account" })}
+              className="rounded-md border border-border bg-background px-2 py-1"
+            >
+              <option value="">Choose version</option>
+              <option value="local">This device</option>
+              <option value="account">Account</option>
+            </select>
+          </label>
+        ))}
         {differences.conflicts.length > 0 && (
           <div className="mt-3 space-y-2">
             <p className="font-medium">
@@ -201,10 +222,12 @@ function PlanPreview({
   title,
   places,
   spec,
+  attempts,
 }: {
   title: string
   places: [string, string][]
   spec: string | null
+  attempts: { id: string; courseId: string; term: string; outcome: string }[]
 }) {
   return (
     <div className="rounded-lg border border-border bg-background p-3">
@@ -223,6 +246,10 @@ function PlanPreview({
         ) : (
           <li className="text-muted-foreground">No Courses yet</li>
         )}
+      </ul>
+      <p className="mt-3 text-xs text-muted-foreground">Course Attempts: {attempts.length}</p>
+      <ul className="mt-1 max-h-32 space-y-1 overflow-y-auto text-xs">
+        {attempts.map((attempt) => <li key={attempt.id}>{attempt.courseId} · {attempt.term} · {attempt.outcome}</li>)}
       </ul>
     </div>
   )

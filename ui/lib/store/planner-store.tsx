@@ -11,6 +11,7 @@ import {
   StudyPlanConflictError,
   type StudyPlan,
   type StudyPlanData,
+  type CourseAttempt,
 } from "@/lib/api/study-plan"
 import { mergePlans, planDifferences } from "./plan-merge"
 import { readStorage, subscribeStorage, writeStorage } from "./storage"
@@ -25,6 +26,10 @@ type SyncStatus =
   | "sync-error"
 type Ctx = {
   plan: StudyPlan
+  attempts: CourseAttempt[]
+  addAttempt: (courseId: string, term: string, outcome: CourseAttempt["outcome"]) => void
+  updateAttempt: (id: string, term: string, outcome: CourseAttempt["outcome"]) => void
+  removeAttempt: (id: string) => void
   selectedSpec: SpecializationId | null
   setSelectedSpec: (id: SpecializationId | null) => void
   add: (term: PlannerTermKey, courseId: string) => void
@@ -47,7 +52,9 @@ type Ctx = {
 
 const PLAN_KEY = "omscs-hub:planner:v1"
 const PREFS_KEY = "omscs-hub:prefs:v1"
+const ATTEMPTS_KEY = "omscs-hub:attempts:v1"
 const EMPTY_PLAN: StudyPlan = {}
+const EMPTY_ATTEMPTS: CourseAttempt[] = []
 const EMPTY_PREFS: { selectedSpec: SpecializationId | null } = {
   selectedSpec: null,
 }
@@ -68,10 +75,11 @@ function normalize(plan: StudyPlan): StudyPlan {
 }
 
 function samePlan(a: StudyPlanData, b: StudyPlanData) {
-  return (
-    JSON.stringify({ plan: a.plan, selectedSpec: a.selectedSpec }) ===
-    JSON.stringify({ plan: b.plan, selectedSpec: b.selectedSpec })
-  )
+  return fingerprint(a) === fingerprint(b)
+}
+
+function fingerprint(data: StudyPlanData) {
+  return JSON.stringify({ plan: data.plan, selectedSpec: data.selectedSpec, attempts: data.attempts })
 }
 
 const PENDING_PREFIX = "omscs-hub:pending-plan:"
@@ -145,6 +153,11 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     () => readStorage(PREFS_KEY, EMPTY_PREFS),
     () => EMPTY_PREFS
   )
+  const guestAttempts = React.useSyncExternalStore(
+    (cb) => subscribeStorage(ATTEMPTS_KEY, cb),
+    () => readStorage<CourseAttempt[]>(ATTEMPTS_KEY, EMPTY_ATTEMPTS),
+    () => EMPTY_ATTEMPTS
+  )
   const localDraft = React.useMemo<StudyPlanData>(
     () => ({
       plan: normalize(guestPlan),
@@ -154,8 +167,9 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
           ? "artificial-intelligence"
           : guestPrefs.selectedSpec,
       revision: 0,
+      attempts: guestAttempts,
     }),
-    [guestPlan, guestPrefs]
+    [guestPlan, guestPrefs, guestAttempts]
   )
   const [account, setAccount] = React.useState<StudyPlanData | null>(null)
   const [recoveryDraft, setRecoveryDraft] =
@@ -236,16 +250,13 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         const local = localRef.current
         const hasLocal =
           Object.values(local.plan).some((ids) => ids.length) ||
+          local.attempts.length > 0 ||
           Boolean(local.selectedSpec)
         const marker = readStorage<string>(
           `omscs-hub:plan-choice:${userId}`,
           ""
         )
-        const fingerprint = JSON.stringify({
-          plan: local.plan,
-          selectedSpec: local.selectedSpec,
-        })
-        setStatus(hasLocal && marker !== fingerprint ? "reconcile" : "ready")
+        setStatus(hasLocal && marker !== fingerprint(local) ? "reconcile" : "ready")
       } catch (cause) {
         if (cancelled) return
         setError(
@@ -356,7 +367,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         choice === "merge"
           ? mergePlans(local, current, choices, specChoice)
           : choice === "replace-local"
-            ? { ...current, plan: local.plan, selectedSpec: local.selectedSpec }
+            ? { ...current, plan: local.plan, selectedSpec: local.selectedSpec, attempts: local.attempts }
             : current
       if (!next) return false
       if (choice !== "keep-account") {
@@ -372,10 +383,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
       if (saved)
         writeStorage(
           `omscs-hub:plan-choice:${userId}`,
-          JSON.stringify({
-            plan: localRef.current.plan,
-            selectedSpec: localRef.current.selectedSpec,
-          })
+          fingerprint(localRef.current)
         )
       return saved
     },
@@ -388,6 +396,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         const next = change(localRef.current)
         writeStorage(PLAN_KEY, next.plan)
         writeStorage(PREFS_KEY, { selectedSpec: next.selectedSpec })
+        writeStorage(ATTEMPTS_KEY, next.attempts)
       } else if (
         (status === "ready" || status === "saving") &&
         accountRef.current &&
@@ -410,9 +419,20 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     [data?.plan]
   )
   const selectedSpec = data?.selectedSpec ?? null
+  const attempts = data?.attempts ?? EMPTY_ATTEMPTS
   const value = React.useMemo<Ctx>(
     () => ({
       plan,
+      attempts,
+      addAttempt(courseId, term, outcome) {
+        update((current) => ({ ...current, attempts: [...current.attempts, { id: crypto.randomUUID(), courseId: canonicalCourseId(courseId), term, outcome }] }))
+      },
+      updateAttempt(id, term, outcome) {
+        update((current) => ({ ...current, attempts: current.attempts.map((attempt) => attempt.id === id ? { ...attempt, term, outcome } : attempt) }))
+      },
+      removeAttempt(id) {
+        update((current) => ({ ...current, attempts: current.attempts.filter((attempt) => attempt.id !== id) }))
+      },
       selectedSpec,
       syncStatus: isSignedIn ? status : "guest",
       syncError: error,
@@ -428,10 +448,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
             const local = localRef.current
             writeStorage(
               `omscs-hub:plan-choice:${userRef.current}`,
-              JSON.stringify({
-                plan: local.plan,
-                selectedSpec: local.selectedSpec,
-              })
+              fingerprint(local)
             )
           }
         } else setRetryCount((count) => count + 1)
@@ -494,6 +511,7 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       plan,
+      attempts,
       selectedSpec,
       isSignedIn,
       status,

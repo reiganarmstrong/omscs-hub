@@ -5,7 +5,7 @@ const account = (
   plan: Record<string, string[]>,
   selectedSpec: string | null,
   revision = 0
-) => ({ plan, selectedSpec, revision })
+) => ({ plan, selectedSpec, attempts: [], revision })
 
 async function seed(
   page: Page,

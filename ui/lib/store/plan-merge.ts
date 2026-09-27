@@ -15,6 +15,7 @@ export function placements(plan: StudyPlan) {
 export function planDifferences(local: StudyPlanData, account: StudyPlanData) {
   const localPlaces = placements(local.plan)
   const accountPlaces = placements(account.plan)
+  const accountAttempts = new Map(account.attempts.map((attempt) => [attempt.id, attempt]))
   return {
     localOnly: [...localPlaces.keys()].filter((id) => !accountPlaces.has(id)),
     accountOnly: [...accountPlaces.keys()].filter((id) => !localPlaces.has(id)),
@@ -35,6 +36,12 @@ export function planDifferences(local: StudyPlanData, account: StudyPlanData) {
       account.selectedSpec &&
       local.selectedSpec !== account.selectedSpec
     ),
+    localAttempts: local.attempts.filter((attempt) => !accountAttempts.has(attempt.id)),
+    accountAttempts: account.attempts.filter((attempt) => !local.attempts.some((localAttempt) => localAttempt.id === attempt.id)),
+    attemptConflicts: local.attempts.filter((attempt) => {
+      const other = accountAttempts.get(attempt.id)
+      return other && JSON.stringify(attempt) !== JSON.stringify(other)
+    }),
   }
 }
 
@@ -46,6 +53,7 @@ export function mergePlans(
 ) {
   const differences = planDifferences(local, account)
   if (differences.conflicts.some(({ id }) => !choices[id])) return null
+  if (differences.attemptConflicts.some(({ id }) => !choices[`attempt:${id}`])) return null
   if (differences.specConflict && !specChoice) return null
   const resolved = placements(account.plan)
   for (const [id, term] of placements(local.plan)) {
@@ -58,5 +66,9 @@ export function mergePlans(
       ? local.selectedSpec
       : account.selectedSpec
     : (local.selectedSpec ?? account.selectedSpec)
-  return { plan, selectedSpec, revision: account.revision }
+  const attempts = new Map(account.attempts.map((attempt) => [attempt.id, attempt]))
+  for (const attempt of local.attempts) {
+    if (!attempts.has(attempt.id) || choices[`attempt:${attempt.id}`] === "local") attempts.set(attempt.id, attempt)
+  }
+  return { plan, selectedSpec, attempts: [...attempts.values()], revision: account.revision }
 }

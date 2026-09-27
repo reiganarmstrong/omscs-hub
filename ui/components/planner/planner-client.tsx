@@ -16,6 +16,7 @@ import { planningTerms, visiblePlanningTerms, TERM_ORDER, type PlanningTerm } fr
 import { OfferingNote } from "./offering-note";
 import { useCurrentTermKey } from "@/lib/store/current-term";
 import { PlanSyncPanel } from "./plan-sync-panel";
+import { CompletedCourses } from "./completed-courses";
 
 const UNSCHEDULED = "unassigned";
 
@@ -41,6 +42,7 @@ export function PlannerClient({ initialTermKey }: { initialTermKey: string }) {
     <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px]">
       <PlanSyncPanel />
       <div>
+        <h2 className="font-display text-2xl tracking-tight">Intended Courses</h2>
         <SpecSelector
           selected={selectedSpec}
           onSelect={setSelectedSpec}
@@ -185,6 +187,7 @@ export function PlannerClient({ initialTermKey }: { initialTermKey: string }) {
             );
           })}
         </div>
+        <CompletedCourses currentTermKey={currentTermKey} />
       </div>
 
       <aside className="self-start xl:sticky xl:top-[80px]">
