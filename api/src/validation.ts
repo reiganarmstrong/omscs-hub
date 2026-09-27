@@ -3,10 +3,6 @@ import type { Context } from "hono";
 
 export const sourceQuerySchema = z.object({
   source: z.enum(["all", "omscentral", "app"]).default("all"),
-  includeDeleted: z
-    .enum(["true", "false"])
-    .optional()
-    .transform((value) => value === "true"),
 });
 
 export const reviewBodySchema = z.object({

@@ -1,15 +1,17 @@
 import type { Review } from "@/lib/types"
 import { z } from "zod"
 
-export type ReviewInput = {
-  semester: string
-  difficulty: number
-  workload: number
-  rating: number
-  recommend: boolean
-  programStage: "First" | "Mid" | "Late"
-  body: string
-}
+export const reviewInputSchema = z.object({
+  semester: z.string().trim().min(1).max(64, "Semester must be 64 characters or fewer."),
+  difficulty: z.number().int().min(1).max(5),
+  workload: z.number().min(0).max(80),
+  rating: z.number().int().min(1).max(5),
+  recommend: z.boolean(),
+  programStage: z.enum(["First", "Mid", "Late"]),
+  body: z.string().trim().min(20, "Review must be at least 20 characters.").max(8000),
+})
+
+export type ReviewInput = z.infer<typeof reviewInputSchema>
 
 type ApiReview = Omit<Review, "createdAt"> & {
   createdAt: string
@@ -41,6 +43,7 @@ const reviewResponseSchema = z.object({
             .regex(/^https?:\/\//)
             .nullable()
             .optional(),
+          pseudonym: z.string().nullable().optional(),
         })
         .optional(),
     })
@@ -58,6 +61,9 @@ const catalogStatsSchema = z.object({
     })
   ),
 })
+
+const reviewWriteResponseSchema = z.object({ reviewId: z.string().uuid() })
+const reviewDeleteResponseSchema = reviewWriteResponseSchema.extend({ deletedAt: z.string().datetime() })
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "")
 
@@ -87,16 +93,25 @@ export async function createReview(
   input: ReviewInput,
   token: string
 ) {
-  return request<{ reviewId: string }>(
+  const data = await request<unknown>(
     `/courses/${encodeURIComponent(courseId)}/reviews`,
     {
       method: "POST",
       token,
-      body: input,
+      body: reviewInputSchema.parse(input),
       unavailableMessage:
         "Review API unavailable. Check NEXT_PUBLIC_API_BASE_URL or CORS settings before submitting.",
     }
   )
+  return reviewWriteResponseSchema.parse(data)
+}
+
+export async function fetchMyReviewId(courseId: string, token: string) {
+  const data = await request<unknown>(
+    `/courses/${encodeURIComponent(courseId)}/reviews/me`,
+    { token, unavailableMessage: "Unable to check your review. Try again." }
+  )
+  return z.object({ reviewId: z.string().nullable() }).parse(data).reviewId
 }
 
 export async function updateMyReview(
@@ -104,20 +119,21 @@ export async function updateMyReview(
   input: ReviewInput,
   token: string
 ) {
-  return request<{ reviewId: string }>(
+  const data = await request<unknown>(
     `/courses/${encodeURIComponent(courseId)}/reviews/me`,
     {
       method: "PUT",
       token,
-      body: input,
+      body: reviewInputSchema.parse(input),
       unavailableMessage:
         "Review API unavailable. Check NEXT_PUBLIC_API_BASE_URL or CORS settings before submitting.",
     }
   )
+  return reviewWriteResponseSchema.parse(data)
 }
 
 export async function deleteMyReview(courseId: string, token: string) {
-  return request<{ reviewId: string; deletedAt: string }>(
+  const data = await request<unknown>(
     `/courses/${encodeURIComponent(courseId)}/reviews/me`,
     {
       method: "DELETE",
@@ -126,6 +142,7 @@ export async function deleteMyReview(courseId: string, token: string) {
         "Review API unavailable. Check NEXT_PUBLIC_API_BASE_URL or CORS settings before submitting.",
     }
   )
+  return reviewDeleteResponseSchema.parse(data)
 }
 
 async function request<T>(
@@ -166,10 +183,10 @@ function apiErrorMessage(
   data: { error?: unknown; issues?: { message?: string }[] },
   status: number
 ) {
-  if (typeof data.error === "string") return data.error
-
   const issueMessage = data.issues?.find((issue) => issue.message)?.message
   if (issueMessage) return issueMessage
+
+  if (typeof data.error === "string") return data.error
 
   if (data.error && typeof data.error === "object" && "message" in data.error) {
     const message = (data.error as { message?: unknown }).message

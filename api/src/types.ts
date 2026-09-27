@@ -26,7 +26,7 @@ export type ReviewRow = {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
-  user_id?: string | null;
+  public_pseudonym?: string | null;
   source_url?: string | null;
   source_author_hash?: string | null;
 };

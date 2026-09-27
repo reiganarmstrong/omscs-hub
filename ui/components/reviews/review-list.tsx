@@ -236,6 +236,11 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
                   ? "OMSCS Hub"
                   : "OMSCentral Imported Review"}
               </span>
+              {r.source === "app" && r.metadata?.pseudonym && (
+                <span className="text-xs text-muted-foreground">
+                  By {r.metadata.pseudonym}
+                </span>
+              )}
             </aside>
             <div>
               <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">

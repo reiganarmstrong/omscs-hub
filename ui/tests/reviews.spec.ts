@@ -1,5 +1,100 @@
 import { expect, test } from "@playwright/test"
 
+test("verified author publishes, edits, deletes, and reposts under one pseudonym", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("clerk-fixture-session", "active")
+    localStorage.setItem("clerk-fixture-scenario", "review-lifecycle")
+  })
+  const api = "http://127.0.0.1:8799/courses/CS-6200/reviews"
+  await page.goto("/courses/CS-6200")
+  await page.getByRole("button", { name: "Write a review" }).click()
+  const form = page.locator("form").filter({ has: page.getByRole("button", { name: "Publish review" }) })
+  await form.locator("textarea").fill("Too short")
+  await form.getByRole("button", { name: "Publish review" }).click()
+  await expect(form.getByRole("alert")).toHaveText("Review must be at least 20 characters.")
+  await form.locator("textarea").fill("My first review describes the course and its assignments.")
+  await form.getByPlaceholder("e.g. Fall 2025").fill("S".repeat(65))
+  await form.getByRole("button", { name: "Publish review" }).click()
+  await expect(form.getByRole("alert")).toHaveText("Semester must be 64 characters or fewer.")
+  await form.getByPlaceholder("e.g. Fall 2025").fill("Fall 2025")
+  await form.getByRole("button", { name: "Publish review" }).click()
+  await expect(page.getByRole("status").filter({ hasText: "Review published." })).toBeVisible()
+  await expect(page.getByText("My first review describes the course and its assignments.")).toBeVisible()
+  const initial = await (await page.request.get(`${api}?source=app`)).json()
+  expect(initial.reviews).toHaveLength(1)
+  const first = initial.reviews[0]
+  expect(first.metadata.pseudonym).toMatch(/^Reviewer-[0-9a-f]{16}$/)
+  expect(JSON.stringify(initial)).not.toContain("student@gatech.edu")
+  expect(JSON.stringify(initial)).not.toContain("userId")
+  await expect(page.getByText(`By ${first.metadata.pseudonym}`)).toBeVisible()
+  await expect(page.getByRole("button", { name: "Write a review" })).toHaveCount(0)
+
+  const denied = await page.request.put(`${api}/me`, {
+    headers: { authorization: "Bearer fixture:review-outsider" },
+    data: { semester: "Fall 2025", difficulty: 3, workload: 12, rating: 5,
+      recommend: true, programStage: "Mid", body: "Outsider attempted to change another review." },
+  })
+  expect(denied.status()).toBe(404)
+  await page.getByRole("button", { name: "Edit your review" }).click()
+  await page.locator("form").locator("textarea").fill("Edited review describes course projects in more detail.")
+  await page.getByRole("button", { name: "Save changes" }).click()
+  await expect(page.getByRole("status").filter({ hasText: "Changes saved." })).toBeVisible()
+  await expect(page.getByText("Edited review describes course projects in more detail.")).toBeVisible()
+  await page.getByRole("button", { name: "Delete your review" }).click()
+  await page.getByRole("button", { name: "Confirm delete" }).click()
+  await expect(page.getByRole("status").filter({ hasText: "Review deleted." })).toBeVisible()
+  await expect(page.getByText("Edited review describes course projects in more detail.")).toHaveCount(0)
+  await page.getByRole("button", { name: "Write a review" }).click()
+  await page.locator("form").locator("textarea").fill("Reposted review remains a separate public contribution.")
+  await page.getByRole("button", { name: "Publish review" }).click()
+  await expect(page.getByText("Reposted review remains a separate public contribution.")).toBeVisible()
+  const after = await (await page.request.get(`${api}?source=app&includeDeleted=true`)).json()
+  expect(after.reviews).toHaveLength(1)
+  expect(after.reviews[0].id).not.toBe(first.id)
+  expect(after.reviews[0].metadata.pseudonym).toBe(first.metadata.pseudonym)
+  expect((await (await page.request.get("http://127.0.0.1:8799/courses/CS-6515/reviews?source=omscentral")).json()).reviews.length).toBeGreaterThan(0)
+  expect((await page.request.delete(`${api}/me`, {
+    headers: { authorization: "Bearer fixture:review-lifecycle" },
+  })).status()).toBe(200)
+})
+
+test("review write failure keeps draft and shows service error", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("clerk-fixture-session", "active")
+    localStorage.setItem("clerk-fixture-scenario", "review-service-error")
+  })
+  await page.goto("/courses/CS-6200")
+  await page.getByRole("button", { name: "Write a review" }).click()
+  const draft = "This draft remains intact while the review service is unavailable."
+  await page.locator("form").locator("textarea").fill(draft)
+  await page.route("**/courses/CS-6200/reviews", (route) => {
+    if (route.request().method() === "POST")
+      return route.fulfill({ status: 503, json: { error: "Review service unavailable. Try again." } })
+    return route.continue()
+  })
+  await page.getByRole("button", { name: "Publish review" }).click()
+  await expect(page.locator("form").getByRole("alert")).toHaveText("Review service unavailable. Try again.")
+  await expect(page.locator("form").locator("textarea")).toHaveValue(draft)
+})
+
+test("successful write stays acknowledged if review refresh fails", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("clerk-fixture-session", "active")
+    localStorage.setItem("clerk-fixture-scenario", "review-refresh-failure")
+  })
+  const api = "http://127.0.0.1:8799/courses/CS-6200/reviews"
+  await page.goto("/courses/CS-6200")
+  await page.getByRole("button", { name: "Write a review" }).click()
+  await page.locator("form textarea").fill("Review saved while the following list refresh fails.")
+  await page.route("**/courses/CS-6200/reviews?source=all", (route) => route.abort())
+  await page.getByRole("button", { name: "Publish review" }).click()
+  await expect(page.getByRole("status").filter({ hasText: "Review published. Review list unavailable" })).toBeVisible()
+  await expect(page.getByRole("status").filter({ hasText: "Reviews unavailable" })).toBeVisible()
+  expect((await page.request.delete(`${api}/me`, {
+    headers: { authorization: "Bearer fixture:review-refresh-failure" },
+  })).status()).toBe(200)
+})
+
 test("old code opens canonical Course with complete Imported Review text and original link", async ({
   page,
 }) => {

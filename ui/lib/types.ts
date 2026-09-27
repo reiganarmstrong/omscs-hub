@@ -60,7 +60,7 @@ export type Review = {
   cons: string[]
   recommend: boolean | null
   createdAt: string // ISO
-  metadata?: { sourceUrl?: string | null }
+  metadata?: { sourceUrl?: string | null; pseudonym?: string | null }
   updatedAt?: string
   deletedAt?: string | null
 }

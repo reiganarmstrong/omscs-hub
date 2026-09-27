@@ -195,15 +195,13 @@ export function CourseDetail({ course, initialTermKey }: { course: Course; initi
         >
           {reviewError ? "Retry reviews" : "Refresh reviews"}
         </button>
+        <div className="mt-4">
+          <ReviewForm courseId={course.id} available={reviewsAvailable} />
+        </div>
         {reviewsAvailable && (
-          <>
-            <div className="mt-4">
-              <ReviewForm courseId={course.id} />
-            </div>
-            <div className="mt-4">
-              <ReviewList reviews={reviews} />
-            </div>
-          </>
+          <div className="mt-4">
+            <ReviewList reviews={reviews} />
+          </div>
         )}
       </section>
     </div>

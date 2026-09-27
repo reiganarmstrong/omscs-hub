@@ -39,8 +39,8 @@ reviews.get(
     const courseId = await resolveCourseId(c.env.DB, c.req.param("courseId"));
     if (!courseId) return c.json({ error: "Course not found." }, 404);
 
-    const { source, includeDeleted } = c.req.valid("query");
-    const rows = await listReviews(c.env.DB, courseId, source, includeDeleted);
+    const { source } = c.req.valid("query");
+    const rows = await listReviews(c.env.DB, courseId, source);
 
     return c.json({
       courseId,
@@ -59,10 +59,17 @@ reviews.get(
     if (!courseId) return c.json({ error: "Course not found." }, 404);
 
     const { source } = c.req.valid("query");
-    const rows = await listReviews(c.env.DB, courseId, source, false);
+    const rows = await listReviews(c.env.DB, courseId, source);
     return c.json({ courseId, summary: summarize(rows) });
   },
 );
+
+reviews.get("/courses/:courseId/reviews/me", requireGatechUser, async (c) => {
+  const courseId = await resolveCourseId(c.env.DB, c.req.param("courseId"));
+  if (!courseId) return c.json({ error: "Course not found." }, 404);
+  const review = await findUserReview(c.env.DB, c.get("authUser").id, courseId);
+  return c.json({ reviewId: review?.id ?? null });
+});
 
 reviews.post(
   "/courses/:courseId/reviews",
@@ -78,32 +85,21 @@ reviews.post(
     const input = c.req.valid("json");
     await upsertUser(c.env.DB, user.id, user.primaryEmail, user.emailDomain);
 
-    const existing = await c.env.DB.prepare(
-      `SELECT r.id, r.deleted_at
-       FROM app_review_metadata arm
-       JOIN reviews r ON r.id = arm.review_id
-       WHERE arm.user_id = ? AND arm.course_id = ?`,
-    )
-      .bind(user.id, courseId)
-      .first<{ id: string; deleted_at: string | null }>();
-
-    if (existing?.id && !existing.deleted_at) {
+    const existing = await findUserReview(c.env.DB, user.id, courseId);
+    if (existing) {
       return c.json({ error: "You already have an active review for this course." }, 409);
     }
 
-    const reviewId = existing?.id ?? crypto.randomUUID();
-    await writeAppReview(c.env.DB, reviewId, courseId, input, existing?.id ? "update" : "insert");
-
-    if (!existing?.id) {
-      await c.env.DB.prepare(
-        `INSERT INTO app_review_metadata (review_id, user_id, course_id)
-         VALUES (?, ?, ?)`,
-      )
-        .bind(reviewId, user.id, courseId)
-        .run();
+    const reviewId = crypto.randomUUID();
+    try {
+      await writeAppReview(c.env.DB, reviewId, courseId, input, { mode: "insert", userId: user.id });
+    } catch (error) {
+      if (error instanceof Error && /UNIQUE constraint failed: app_review_metadata\.(user_id|course_id)/.test(error.message)) {
+        return c.json({ error: "You already have an active review for this course." }, 409);
+      }
+      throw error;
     }
-
-    return c.json({ reviewId }, existing?.id ? 200 : 201);
+    return c.json({ reviewId }, 201);
   },
 );
 
@@ -119,9 +115,9 @@ reviews.put(
 
     const user = c.get("authUser");
     const review = await findUserReview(c.env.DB, user.id, courseId);
-    if (!review || review.deleted_at) return c.json({ error: "Active review not found." }, 404);
+    if (!review) return c.json({ error: "Active review not found." }, 404);
 
-    await writeAppReview(c.env.DB, review.id, courseId, c.req.valid("json"), "update");
+    await writeAppReview(c.env.DB, review.id, courseId, c.req.valid("json"), { mode: "update" });
     return c.json({ reviewId: review.id });
   },
 );
@@ -132,12 +128,15 @@ reviews.delete("/courses/:courseId/reviews/me", requireGatechUser, async (c) => 
 
   const user = c.get("authUser");
   const review = await findUserReview(c.env.DB, user.id, courseId);
-  if (!review || review.deleted_at) return c.json({ error: "Active review not found." }, 404);
+  if (!review) return c.json({ error: "Active review not found." }, 404);
 
   const now = new Date().toISOString();
-  await c.env.DB.prepare("UPDATE reviews SET deleted_at = ?, updated_at = ? WHERE id = ?")
-    .bind(now, now, review.id)
-    .run();
+  await c.env.DB.batch([
+    c.env.DB.prepare("UPDATE reviews SET deleted_at = ?, updated_at = ? WHERE id = ?")
+      .bind(now, now, review.id),
+    c.env.DB.prepare("UPDATE app_review_metadata SET active = 0, updated_at = ? WHERE review_id = ?")
+      .bind(now, review.id),
+  ]);
 
   return c.json({ reviewId: review.id, deletedAt: now });
 });
@@ -164,7 +163,6 @@ async function listReviews(
   db: D1Database,
   courseId: string,
   source: "all" | "omscentral" | "app",
-  includeDeleted: boolean,
 ) {
   const filters = ["r.course_id = ?"];
   const params: unknown[] = [courseId];
@@ -172,12 +170,13 @@ async function listReviews(
     filters.push("r.source = ?");
     params.push(source);
   }
-  if (!includeDeleted) filters.push("r.deleted_at IS NULL");
+  filters.push("r.deleted_at IS NULL");
 
   const query = `
-    SELECT r.*, arm.user_id, orm.source_url, orm.source_author_hash
+    SELECT r.*, u.public_pseudonym, orm.source_url, orm.source_author_hash
     FROM reviews r
     LEFT JOIN app_review_metadata arm ON arm.review_id = r.id
+    LEFT JOIN app_users u ON u.id = arm.user_id
     LEFT JOIN omscentral_review_metadata orm ON orm.review_id = r.id
     WHERE ${filters.join(" AND ")}
     ORDER BY datetime(r.created_at) DESC`;
@@ -190,27 +189,27 @@ async function upsertUser(db: D1Database, id: string, email: string, domain: str
   const now = new Date().toISOString();
   await db
     .prepare(
-      `INSERT INTO app_users (id, primary_email, verified_email_domain, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?)
+      `INSERT INTO app_users (id, primary_email, verified_email_domain, public_pseudonym, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET
          primary_email = excluded.primary_email,
          verified_email_domain = excluded.verified_email_domain,
          updated_at = excluded.updated_at`,
     )
-    .bind(id, email, domain, now, now)
+    .bind(id, email, domain, `Reviewer-${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`, now, now)
     .run();
 }
 
 async function findUserReview(db: D1Database, userId: string, courseId: string) {
   return db
     .prepare(
-      `SELECT r.id, r.deleted_at
+      `SELECT r.id
        FROM app_review_metadata arm
        JOIN reviews r ON r.id = arm.review_id
-       WHERE arm.user_id = ? AND arm.course_id = ?`,
+       WHERE arm.user_id = ? AND arm.course_id = ? AND arm.active = 1 AND r.deleted_at IS NULL`,
     )
     .bind(userId, courseId)
-    .first<{ id: string; deleted_at: string | null }>();
+    .first<{ id: string }>();
 }
 
 async function writeAppReview(
@@ -218,22 +217,21 @@ async function writeAppReview(
   reviewId: string,
   courseId: string,
   input: ReviewBodyInput,
-  mode: "insert" | "update",
+  operation: { mode: "insert"; userId: string } | { mode: "update" },
 ) {
   const now = new Date().toISOString();
   const term = normalizeTerm(input.semester);
 
-  await db
+  const termStatement = db
     .prepare(
       `INSERT INTO academic_terms (id, season, year, label, sort_key)
        VALUES (?, ?, ?, ?, ?)
        ON CONFLICT(id) DO NOTHING`,
     )
-    .bind(term.id, term.season, term.year, term.label, term.sortKey)
-    .run();
+    .bind(term.id, term.season, term.year, term.label, term.sortKey);
 
-  if (mode === "insert") {
-    await db
+  if (operation.mode === "insert") {
+    const reviewStatement = db
       .prepare(
         `INSERT INTO reviews (
           id, course_id, source, term_id, semester_label, body, difficulty,
@@ -254,16 +252,21 @@ async function writeAppReview(
         input.programStage,
         now,
         now,
-      )
-      .run();
+      );
+    await db.batch([
+      termStatement,
+      reviewStatement,
+      db.prepare(`INSERT INTO app_review_metadata (review_id, user_id, course_id)
+                  VALUES (?, ?, ?)`).bind(reviewId, operation.userId, courseId),
+    ]);
   } else {
-    await db
+    const reviewStatement = db
       .prepare(
         `UPDATE reviews
          SET term_id = ?, semester_label = ?, body = ?, difficulty = ?,
              workload = ?, rating = ?, recommend = ?, program_stage = ?,
-             updated_at = ?, deleted_at = NULL
-         WHERE id = ?`,
+             updated_at = ?
+         WHERE id = ? AND deleted_at IS NULL`,
       )
       .bind(
         term.id,
@@ -276,8 +279,8 @@ async function writeAppReview(
         input.programStage,
         now,
         reviewId,
-      )
-      .run();
+      );
+    await db.batch([termStatement, reviewStatement]);
   }
 
 }
@@ -306,7 +309,7 @@ function serializeReview(row: ReviewRow) {
             sourceAuthorHash: row.source_author_hash,
           }
         : {
-            userId: row.user_id,
+            pseudonym: row.public_pseudonym,
           },
   };
 }

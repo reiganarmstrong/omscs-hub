@@ -6,7 +6,7 @@ vi.mock("@clerk/backend", () => ({
     return { sub: token.slice(8) };
   },
   createClerkClient: () => ({ users: { getUser: async (id: string) => ({
-    id: "user_1",
+    id,
     primaryEmailAddressId: "primary",
     emailAddresses: [{ id: "primary", emailAddress: id, verification: { status: "verified" } }],
   }) } }),
@@ -217,6 +217,69 @@ describe("review API", () => {
     expect(deleted.status).toBe(200);
     expect(body.reviews).toHaveLength(0);
   });
+
+  it("keeps author identity private through create, edit, delete, and repost", async () => {
+    const env = testEnv();
+    const course = "/courses/CS-6200/reviews";
+    const owner = authHeaders("student@gatech.edu");
+    const other = authHeaders("other@gatech.edu");
+    const original = await app.request(course, {
+      method: "POST", headers: owner, body: JSON.stringify(validReview()),
+    }, env);
+    expect(original.status).toBe(201);
+    const originalId = ((await original.json()) as { reviewId: string }).reviewId;
+
+    const publicBefore = await app.request(`${course}?source=app`, {}, env);
+    const publicJson = await publicBefore.text();
+    const first = (JSON.parse(publicJson) as { reviews: { id: string; metadata: { pseudonym: string } }[] }).reviews[0];
+    expect(first.id).toBe(originalId);
+    expect(first.metadata.pseudonym).toMatch(/^Reviewer-[0-9a-f]{16}$/);
+    expect(publicJson).not.toContain("student@gatech.edu");
+    expect(publicJson).not.toContain("userId");
+
+    const otherLookup = await app.request(`${course}/me`, { headers: other }, env);
+    expect(await otherLookup.json()).toEqual({ reviewId: null });
+    const otherEdit = await app.request(`${course}/me`, {
+      method: "PUT", headers: other,
+      body: JSON.stringify(validReview({ body: "This outsider tried to edit the review body." })),
+    }, env);
+    const otherDelete = await app.request(`${course}/me`, { method: "DELETE", headers: other }, env);
+    expect(otherEdit.status).toBe(404);
+    expect(otherDelete.status).toBe(404);
+
+    const edit = await app.request(`${course}/me`, {
+      method: "PUT", headers: owner,
+      body: JSON.stringify(validReview({ body: "Edited review with clearer details about the class." })),
+    }, env);
+    expect(edit.status).toBe(200);
+    expect(await edit.json()).toEqual({ reviewId: originalId });
+    const duplicate = await app.request(course, {
+      method: "POST", headers: owner, body: JSON.stringify(validReview()),
+    }, env);
+    expect(duplicate.status).toBe(409);
+
+    const deleted = await app.request(`${course}/me`, { method: "DELETE", headers: owner }, env);
+    expect(deleted.status).toBe(200);
+    expect((env.DB as unknown as FakeD1).reviews.get(originalId)?.deleted_at).not.toBeNull();
+    const hidden = await app.request(`${course}?source=app&includeDeleted=true`, {}, env);
+    expect((await hidden.json() as { reviews: unknown[] }).reviews).toEqual([]);
+
+    const repost = await app.request(course, {
+      method: "POST", headers: owner,
+      body: JSON.stringify(validReview({ body: "A fresh review after deletion stays separate from history." })),
+    }, env);
+    expect(repost.status).toBe(201);
+    const repostId = (await repost.json() as { reviewId: string }).reviewId;
+    expect(repostId).not.toBe(originalId);
+    expect((env.DB as unknown as FakeD1).reviews.get(originalId)?.deleted_at).not.toBeNull();
+    const publicAfter = await app.request(`${course}?source=app`, {}, env);
+    const second = (await publicAfter.json() as { reviews: { id: string; metadata: { pseudonym: string } }[] }).reviews;
+    expect(second).toHaveLength(1);
+    expect(second[0].id).toBe(repostId);
+    expect(second[0].metadata.pseudonym).toBe(first.metadata.pseudonym);
+    const imported = await app.request(`${course}?source=omscentral`, {}, env);
+    expect((await imported.json() as { reviews: unknown[] }).reviews).toHaveLength(1);
+  });
 });
 
 function validReview(overrides: Partial<Record<string, unknown>> = {}) {
@@ -292,7 +355,8 @@ class FakeD1 {
       },
     ],
   ]);
-  appMetadata = new Map<string, { review_id: string; user_id: string; course_id: string }>();
+  appMetadata = new Map<string, { review_id: string; user_id: string; course_id: string; active: boolean }>();
+  appUsers = new Map<string, { pseudonym: string }>();
 
   prepare(query: string) {
     return new FakeStatement(this, query);
@@ -325,7 +389,7 @@ class FakeStatement {
 
     if (this.query.includes("FROM app_review_metadata arm")) {
       const [userId, courseId] = this.params as string[];
-      const metadata = this.db.appMetadata.get(`${userId}:${courseId}`);
+      const metadata = [...this.db.appMetadata.values()].find((item) => item.user_id === userId && item.course_id === courseId && item.active);
       if (!metadata) return null;
       const review = this.db.reviews.get(metadata.review_id);
       return (review ? { id: review.id, deleted_at: review.deleted_at } : null) as T | null;
@@ -364,14 +428,23 @@ class FakeStatement {
         if (!includeDeleted && review.deleted_at) return false;
         return true;
       });
-      return { results: rows } as { results: T[] };
+      return { results: rows.map((row) => {
+        const metadata = this.db.appMetadata.get(row.id);
+        return {
+          ...row,
+          public_pseudonym: metadata ? this.db.appUsers.get(metadata.user_id)?.pseudonym : null,
+        };
+      }) } as { results: T[] };
     }
 
     return { results: [] as T[] };
   }
 
   async run() {
-    if (this.query.includes("INSERT INTO reviews")) {
+    if (this.query.includes("INSERT INTO app_users")) {
+      const [id, , , pseudonym] = this.params as string[];
+      if (!this.db.appUsers.has(id)) this.db.appUsers.set(id, { pseudonym });
+    } else if (this.query.includes("INSERT INTO reviews")) {
       const [
         id,
         courseId,
@@ -404,7 +477,15 @@ class FakeStatement {
       });
     } else if (this.query.includes("INSERT INTO app_review_metadata")) {
       const [reviewId, userId, courseId] = this.params as string[];
-      this.db.appMetadata.set(`${userId}:${courseId}`, { review_id: reviewId, user_id: userId, course_id: courseId });
+      if ([...this.db.appMetadata.values()].some((item) => item.user_id === userId && item.course_id === courseId && item.active)) {
+        throw new Error("UNIQUE constraint failed: app_review_metadata.user_id, app_review_metadata.course_id");
+      }
+      this.db.appMetadata.set(reviewId, { review_id: reviewId, user_id: userId, course_id: courseId, active: true });
+    } else if (this.query.includes("UPDATE app_review_metadata")) {
+      const [updatedAt, reviewId] = this.params as string[];
+      void updatedAt;
+      const metadata = this.db.appMetadata.get(reviewId);
+      if (metadata) metadata.active = false;
     } else if (this.query.includes("UPDATE reviews") && this.query.includes("deleted_at = ?")) {
       const [deletedAt, updatedAt, reviewId] = this.params as string[];
       const review = this.db.reviews.get(reviewId);
@@ -426,7 +507,7 @@ class FakeStatement {
         reviewId,
       ] = this.params;
       const review = this.db.reviews.get(String(reviewId));
-      if (review) {
+      if (review && (!this.query.includes("deleted_at IS NULL") || !review.deleted_at)) {
         Object.assign(review, {
           term_id: String(termId),
           semester_label: String(semesterLabel),
@@ -437,7 +518,7 @@ class FakeStatement {
           recommend: Number(recommend),
           program_stage: programStage,
           updated_at: String(updatedAt),
-          deleted_at: null,
+          ...(this.query.includes("deleted_at = NULL") ? { deleted_at: null } : {}),
         });
       }
     }

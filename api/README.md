@@ -116,7 +116,9 @@ to uppercase with spaces converted to hyphens.
 Query parameters:
 
 - `source`: `all`, `omscentral`, or `app`; defaults to `all`.
-- `includeDeleted`: `true` or `false`; defaults to `false`.
+
+Deleted reviews are never returned by this public endpoint.
+Hub Reviews expose a stable public pseudonym, not their owner's account ID or email.
 
 Response:
 
@@ -149,7 +151,16 @@ Content-Type: application/json
 ```
 
 Creates a review for the signed-in user. A user may have only one active app
-review per course.
+review per course. A new review can be created after soft deletion.
+
+### Find My Review
+
+```text
+GET /courses/:courseId/reviews/me
+Authorization: Bearer <clerk-token>
+```
+
+Returns the signed-in user's active `reviewId`, or `null` when none exists.
 
 ### Update My Review
 
