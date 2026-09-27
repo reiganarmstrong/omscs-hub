@@ -1,10 +1,11 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { requireGatechUser } from "./auth";
+import { requireGatechUser, requireOperator } from "./auth";
 import { normalizeTerm } from "./terms";
 import type { Bindings, ReviewRow, Variables } from "./types";
 import {
   reviewBodySchema,
+  moderationBodySchema,
   sourceQuerySchema,
   validationErrorResponse,
   type ReviewBodyInput,
@@ -18,7 +19,7 @@ reviews.get("/reviews/catalog-stats", async (c) => {
             AVG(difficulty) AS avgDifficulty, AVG(workload) AS avgWorkload,
             AVG(rating) AS avgRating
      FROM reviews
-     WHERE deleted_at IS NULL AND source IN ('omscentral', 'app')
+     WHERE deleted_at IS NULL AND hidden_at IS NULL AND source IN ('omscentral', 'app')
      GROUP BY course_id`,
   ).all<{
     courseId: string;
@@ -141,6 +142,46 @@ reviews.delete("/courses/:courseId/reviews/me", requireGatechUser, async (c) => 
   return c.json({ reviewId: review.id, deletedAt: now });
 });
 
+for (const action of ["hide", "unhide"] as const) {
+  reviews.post(
+    `/operator/hub-reviews/:reviewId/${action}`,
+    requireGatechUser,
+    requireOperator,
+    zValidator("json", moderationBodySchema, (result, c) => {
+      if (!result.success) return validationErrorResponse(result, c);
+    }),
+    async (c) => {
+      const reviewId = c.req.param("reviewId");
+      const reason = c.req.valid("json").reason;
+      const review = await c.env.DB.prepare(
+        "SELECT id, hidden_at FROM reviews WHERE id = ? AND source = 'app' AND deleted_at IS NULL",
+      ).bind(reviewId).first<{ id: string; hidden_at: string | null }>();
+      if (!review) return c.json({ error: "Hub Review not found." }, 404);
+      if ((action === "hide") === (review.hidden_at !== null)) {
+        return c.json({ error: `Hub Review already ${action === "hide" ? "hidden" : "visible"}.` }, 409);
+      }
+
+      const eventId = crypto.randomUUID();
+      const now = new Date().toISOString();
+      try {
+        await c.env.DB.prepare(
+          `INSERT INTO hub_review_moderation_events
+           (id, review_id, action, reason, actor_user_id, created_at)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+        ).bind(eventId, reviewId, action, reason, c.get("authUser").id, now).run();
+      } catch (error) {
+        // The database trigger rejects concurrent deletion or state changes.
+        if (error instanceof Error && error.message.includes("Hub Review not found or already in requested state")) {
+          return c.json({ error: "Hub Review changed; reload and retry." }, 409);
+        }
+        throw error;
+      }
+      c.header("Cache-Control", "no-store");
+      return c.json({ reviewId, hidden: action === "hide", eventId });
+    },
+  );
+}
+
 async function resolveCourseId(db: D1Database, value: string) {
   const decoded = decodeURIComponent(value);
   const normalizedCode = decoded.toUpperCase().replace(/\s+/g, "-");
@@ -170,7 +211,7 @@ async function listReviews(
     filters.push("r.source = ?");
     params.push(source);
   }
-  filters.push("r.deleted_at IS NULL");
+  filters.push("r.deleted_at IS NULL", "r.hidden_at IS NULL");
 
   const query = `
     SELECT r.*, u.public_pseudonym, orm.source_url, orm.source_author_hash

@@ -15,6 +15,10 @@ export const reviewBodySchema = z.object({
   body: z.string().trim().min(20, "Review must be at least 20 characters.").max(8000),
 });
 
+export const moderationBodySchema = z.object({
+  reason: z.string().trim().min(10).max(1000),
+});
+
 export type ReviewBodyInput = z.infer<typeof reviewBodySchema>;
 
 type ValidationFailure = {

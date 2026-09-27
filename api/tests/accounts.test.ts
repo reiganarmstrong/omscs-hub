@@ -26,7 +26,7 @@ const remove = (id: string, confirmation = "DELETE MY ACCOUNT") => app.request("
 
 beforeEach(() => {
   sqlite = new DatabaseSync(":memory:");
-  for (const file of ["0001_reviews.sql", "0002_course_source_slugs.sql", "0003_study_plans.sql", "0004_course_attempts.sql", "0005_hub_review_authors.sql", "0006_account_deletions.sql"]) {
+  for (const file of ["0001_reviews.sql", "0002_course_source_slugs.sql", "0003_study_plans.sql", "0004_course_attempts.sql", "0005_hub_review_authors.sql", "0006_account_deletions.sql", "0007_hub_review_moderation.sql"]) {
     sqlite.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), "utf8"));
   }
   sqlite.exec(`

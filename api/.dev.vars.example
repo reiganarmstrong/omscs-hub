@@ -1,2 +1,4 @@
 CLERK_SECRET_KEY=sk_test_...
 CORS_ORIGIN=http://localhost:3001
+# Optional. Set to the operator's exact Clerk user ID to enable moderation.
+OPERATOR_CLERK_USER_ID=user_replace_with_operator_clerk_id

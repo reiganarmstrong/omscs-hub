@@ -9,7 +9,7 @@ import app from "../src/index";
 function importFixture() {
   const directory = mkdtempSync(join(tmpdir(), "omscs-import-"));
   const db = new DatabaseSync(":memory:");
-  for (const file of ["0001_reviews.sql", "0002_course_source_slugs.sql", "0005_hub_review_authors.sql"]) db.exec(readFileSync(`migrations/${file}`, "utf8"));
+  for (const file of ["0001_reviews.sql", "0002_course_source_slugs.sql", "0005_hub_review_authors.sql", "0007_hub_review_moderation.sql"]) db.exec(readFileSync(`migrations/${file}`, "utf8"));
   for (const file of ["courses.json", "reviews.json"]) writeFileSync(join(directory, file), readFileSync(`tests/fixtures/omscentral/${file}`));
   return { db, directory, generate() {
     execFileSync(process.execPath, ["--import", "tsx", "scripts/import-omscentral.ts", "--data-dir", directory, "--sql-out", join(directory, "import.sql"), "--historical-out", join(directory, "history.json")]);

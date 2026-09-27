@@ -128,6 +128,81 @@ describe("review API", () => {
     }
   });
 
+  it("permits only the configured operator to moderate Hub Reviews", async () => {
+    const env = testEnv({ OPERATOR_CLERK_USER_ID: "operator@gatech.edu" });
+    const create = await app.request("/courses/CS-6200/reviews", {
+      method: "POST", headers: authHeaders("author@gatech.edu"),
+      body: JSON.stringify(validReview()),
+    }, env);
+    const { reviewId } = await create.json() as { reviewId: string };
+    const url = `/operator/hub-reviews/${reviewId}/hide`;
+    const request = (headers: Record<string, string>, target = env) =>
+      app.request(url, { method: "POST", headers,
+        body: JSON.stringify({ reason: "Serious manual moderation concern" }) }, target);
+
+    expect((await request(jsonHeaders())).status).toBe(401);
+    expect((await request(authHeaders("author@gatech.edu"))).status).toBe(403);
+    expect((await request(authHeaders("operator@example.com"))).status).toBe(403);
+    expect((await request(authHeaders("operator@gatech.edu"),
+      { ...env, OPERATOR_CLERK_USER_ID: undefined })).status).toBe(403);
+    expect((env.DB as unknown as FakeD1).moderationEvents).toHaveLength(0);
+    expect((env.DB as unknown as FakeD1).reviews.get(reviewId)?.hidden_at).toBeNull();
+
+    const invalid = await app.request(url, { method: "POST",
+      headers: authHeaders("operator@gatech.edu"),
+      body: JSON.stringify({ reason: "short" }) }, env);
+    expect(invalid.status).toBe(400);
+    expect((await request(authHeaders("operator@gatech.edu"))).status).toBe(200);
+    expect((await request(authHeaders("operator@gatech.edu"))).status).toBe(409);
+    expect((env.DB as unknown as FakeD1).moderationEvents).toHaveLength(1);
+  });
+
+  it("hides only Hub Reviews from every public read and retains hide/unhide audit events", async () => {
+    const env = testEnv({ OPERATOR_CLERK_USER_ID: "operator@gatech.edu" });
+    const course = "/courses/CS-6200/reviews";
+    const create = await app.request(course, { method: "POST",
+      headers: authHeaders("author@gatech.edu"),
+      body: JSON.stringify(validReview()) }, env);
+    const { reviewId } = await create.json() as { reviewId: string };
+    const db = env.DB as unknown as FakeD1;
+    const moderate = (id: string, action: "hide" | "unhide", reason: string) =>
+      app.request(`/operator/hub-reviews/${id}/${action}`, { method: "POST",
+        headers: authHeaders("operator@gatech.edu"), body: JSON.stringify({ reason }) }, env);
+
+    expect((await moderate("omscentral-1", "hide", "Imported review cannot be hidden")).status).toBe(404);
+    expect((await moderate("missing", "hide", "Unknown review cannot be hidden")).status).toBe(404);
+    expect((await moderate(reviewId, "unhide", "Review has not been hidden")).status).toBe(409);
+    expect((await moderate(reviewId, "hide", "Contains serious personal information")).status).toBe(200);
+    expect(db.reviews.get(reviewId)?.hidden_at).toBeTruthy();
+
+    const all = await app.request(course, {}, env);
+    const appOnly = await app.request(`${course}?source=app`, {}, env);
+    const summary = await app.request(`${course}/summary`, {}, env);
+    const stats = await app.request("/reviews/catalog-stats", {}, env);
+    expect((await all.json() as { reviews: { id: string }[] }).reviews.map((row) => row.id)).toEqual(["omscentral-1"]);
+    expect((await appOnly.json() as { reviews: unknown[] }).reviews).toEqual([]);
+    expect((await summary.json() as { summary: { count: number; sourceCounts: { app: number; omscentral: number } } }).summary)
+      .toEqual(expect.objectContaining({ count: 1, sourceCounts: { app: 0, omscentral: 1 } }));
+    expect((await stats.json() as { courses: { numReviews: number; avgRating: number }[] }).courses)
+      .toEqual([expect.objectContaining({ numReviews: 1, avgRating: 4 })]);
+    const ownerResponse = await app.request(`${course}/me`,
+      { headers: authHeaders("author@gatech.edu") }, env);
+    expect((await ownerResponse.json() as { reviewId: string }).reviewId).toBe(reviewId);
+    expect(db.moderationEvents).toEqual([expect.objectContaining({
+      review_id: reviewId, action: "hide", reason: "Contains serious personal information",
+      actor_user_id: "operator@gatech.edu", created_at: expect.any(String),
+    })]);
+
+    expect((await moderate(reviewId, "unhide", "Issue resolved after manual review")).status).toBe(200);
+    expect(db.reviews.get(reviewId)?.hidden_at).toBeNull();
+    expect(db.moderationEvents).toHaveLength(2);
+    expect(db.moderationEvents[1]).toEqual(expect.objectContaining({
+      review_id: reviewId, action: "unhide", reason: "Issue resolved after manual review",
+      actor_user_id: "operator@gatech.edu",
+    }));
+    expect((await (await app.request(course, {}, env)).json() as { reviews: unknown[] }).reviews).toHaveLength(2);
+  });
+
   it("requires auth for review writes", async () => {
     const res = await app.request(
       "/courses/CS-6200/reviews",
@@ -329,6 +404,7 @@ type Review = {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  hidden_at: string | null;
 };
 
 class FakeD1 {
@@ -352,11 +428,13 @@ class FakeD1 {
         created_at: "2026-01-01T00:00:00.000Z",
         updated_at: "2026-01-01T00:00:00.000Z",
         deleted_at: null,
+        hidden_at: null,
       },
     ],
   ]);
   appMetadata = new Map<string, { review_id: string; user_id: string; course_id: string; active: boolean }>();
   appUsers = new Map<string, { pseudonym: string }>();
+  moderationEvents: { id: string; review_id: string; action: string; reason: string; actor_user_id: string; created_at: string }[] = [];
 
   prepare(query: string) {
     return new FakeStatement(this, query);
@@ -379,6 +457,11 @@ class FakeStatement {
   }
 
   async first<T>() {
+    if (this.query.includes("SELECT id, hidden_at FROM reviews")) {
+      const review = this.db.reviews.get(String(this.params[0]));
+      return (review?.source === "app" && !review.deleted_at
+        ? { id: review.id, hidden_at: review.hidden_at } : null) as T | null;
+    }
     if (this.query.includes("FROM courses c")) {
       const [id, slug, code] = this.params as string[];
       const found = [...this.db.courses.values()].find(
@@ -402,7 +485,7 @@ class FakeStatement {
     if (this.query.includes("GROUP BY course_id")) {
       const grouped = new Map<string, Review[]>();
       for (const review of this.db.reviews.values()) {
-        if (review.deleted_at || !["omscentral", "app"].includes(review.source))
+        if (review.deleted_at || review.hidden_at || !["omscentral", "app"].includes(review.source))
           continue;
         grouped.set(review.course_id, [
           ...(grouped.get(review.course_id) ?? []),
@@ -426,6 +509,7 @@ class FakeStatement {
         if (review.course_id !== courseId) return false;
         if (source && review.source !== source) return false;
         if (!includeDeleted && review.deleted_at) return false;
+        if (this.query.includes("r.hidden_at IS NULL") && review.hidden_at) return false;
         return true;
       });
       return { results: rows.map((row) => {
@@ -441,7 +525,17 @@ class FakeStatement {
   }
 
   async run() {
-    if (this.query.includes("INSERT INTO app_users")) {
+    if (this.query.includes("INSERT INTO hub_review_moderation_events")) {
+      const [id, reviewId, action, reason, actorId, createdAt] = this.params as string[];
+      const review = this.db.reviews.get(reviewId);
+      if (!review || review.source !== "app" || review.deleted_at ||
+        (action === "hide" ? review.hidden_at !== null : review.hidden_at === null)) {
+        throw new Error("Hub Review not found or already in requested state");
+      }
+      this.db.moderationEvents.push({ id, review_id: reviewId, action, reason,
+        actor_user_id: actorId, created_at: createdAt });
+      review.hidden_at = action === "hide" ? createdAt : null;
+    } else if (this.query.includes("INSERT INTO app_users")) {
       const [id, , , pseudonym] = this.params as string[];
       if (!this.db.appUsers.has(id)) this.db.appUsers.set(id, { pseudonym });
     } else if (this.query.includes("INSERT INTO reviews")) {
@@ -474,6 +568,7 @@ class FakeStatement {
         created_at: String(createdAt),
         updated_at: String(updatedAt),
         deleted_at: null,
+        hidden_at: null,
       });
     } else if (this.query.includes("INSERT INTO app_review_metadata")) {
       const [reviewId, userId, courseId] = this.params as string[];

@@ -60,6 +60,10 @@ Required values:
 - `CLERK_SECRET_KEY`: Clerk secret key. Tests use `test`.
 - `CORS_ORIGIN`: Browser origins allowed by CORS. Use
   `http://localhost:3001` for the local UI.
+- `OPERATOR_CLERK_USER_ID`: Exact Clerk user ID of the one site operator allowed
+  to hide or unhide Hub Reviews. If absent or blank, moderation is disabled.
+  Use a server-side Worker secret or deployment variable, never a `NEXT_PUBLIC_`
+  variable. A verified `@gatech.edu` primary email is still required.
 
 `CORS_ORIGIN` accepts comma-separated values. If any configured origin is a
 localhost or loopback origin, the API permits other localhost/loopback ports for
@@ -68,11 +72,13 @@ development.
 Cloudflare Worker secrets:
 
 - `CLERK_SECRET_KEY`
+- `OPERATOR_CLERK_USER_ID` (only when moderation is enabled)
 
 Set the remote Worker secret after the API Worker exists:
 
 ```bash
 pnpm wrangler secret put CLERK_SECRET_KEY
+pnpm wrangler secret put OPERATOR_CLERK_USER_ID
 ```
 
 ## Commands
@@ -117,7 +123,7 @@ Query parameters:
 
 - `source`: `all`, `omscentral`, or `app`; defaults to `all`.
 
-Deleted reviews are never returned by this public endpoint.
+Deleted or hidden reviews are never returned by this public endpoint.
 Hub Reviews expose a stable public pseudonym, not their owner's account ID or email.
 
 Response:
@@ -139,8 +145,27 @@ Query parameters:
 
 - `source`: `all`, `omscentral`, or `app`; defaults to `all`.
 
-Returns active review counts, source counts, averages, and rating/difficulty
+Returns visible review counts, source counts, averages, and rating/difficulty
 distributions.
+
+### Operator moderation
+
+```text
+POST /operator/hub-reviews/:reviewId/hide
+POST /operator/hub-reviews/:reviewId/unhide
+Authorization: Bearer <clerk-token>
+Content-Type: application/json
+
+{"reason":"Specific reason, at least ten characters"}
+```
+
+These server-side actions require the configured Clerk user ID. They accept
+only active Hub Reviews, not Imported Reviews. Each state change creates an
+append-only `hub_review_moderation_events` row with action, reason, actor Clerk
+user ID, and time. Hidden reviews remain in storage and are omitted from public
+lists, summaries, and catalog statistics. Unhide makes the same review visible
+again. Repeating the current state returns `409`. This is a manual operator
+endpoint; there is no public report queue or monitored reporting workflow.
 
 ### Create Review
 

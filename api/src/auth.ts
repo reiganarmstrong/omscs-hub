@@ -33,6 +33,13 @@ function gatechUserMiddleware(allowDeleted: boolean): AuthMiddleware {
 
 export const requireGatechUser = gatechUserMiddleware(false);
 export const requireGatechUserForDeletion = gatechUserMiddleware(true);
+export const requireOperator: AuthMiddleware = async (c, next) => {
+  const operatorId = c.env.OPERATOR_CLERK_USER_ID?.trim();
+  if (!operatorId || c.get("authUser").id !== operatorId) {
+    return c.json({ error: "Operator access required." }, 403);
+  }
+  await next();
+};
 
 async function authenticate(c: AppContext): Promise<AuthUser> {
   const token = c.req.header("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
