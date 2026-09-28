@@ -1,0 +1,397 @@
+{
+  "lastChecked": "2026-09-27",
+  "pages": {
+    "artificial-intelligence": {
+      "sourceUrl": "https://omscs.gatech.edu/specialization-artificial-intelligence-formerly-interactive-intelligence",
+      "text": "For a Master of Science in Computer Science, Specialization in Artificial Intelligence (15 hours), students must select from the following:*The following is a complete look at the courses that may be selected to fulfill the Artificial Intelligence specialization, regardless of campus; only courses listed with **bold** titles are offered through the online program.\nCore Courses (9 hours)\nAlgorithms and Design: Take one (1) course from:\nCSE 6140 Computational Science and Engineering Algorithms\n**CS 6300 Software Development Process**\nCS 6301 Advanced Topics in Software Engineering​\nCS 6505 Computability, Complexity, and Algorithms\n**CS 6515 Introduction to Graduate Algorithms**\nAnd, two (2) courses from:\n**CS 6476: Computer Vision**\n**CS 6601 Artificial Intelligence**\n**CS 7637 Knowledge-Based AI**\n**CS 7641 Machine Learning**\n**CS 7643: Deep Learning**\n**CS 7650: Natural Language**\nElectives (6 hours)\nAny core courses in excess of the 9 hour requirement may be used as electives.\nPick two (2) courses from:\nAI Methods:\nCS 6604 Conversational AI\nCS 7476 Advanced Computer Vision\nCS 7631 Multi-Robot Systems\n**CS 7632 Game AI**\nCS 7633 Human-Robot Interaction\nCS 7634 AI Storytelling in Virtual Worlds\nCS 7647 Machine Learning with Limited Supervision\nCS 7652 Large Language Models\nCognition, Ethics, and Human-Centered AI:\n**CS 6440: Introduction to Health Informatics**\n**CS 6460: Educational Technology**\n**CS 6603: AI, Ethics, and Society (formerly CS 8803 O10)**\n**CS 6750: Human-Computer Interaction**\n**CS 6795 Introduction to Cognitive Science**\nCS 7610 Modeling and Design\nCS 7651 Human and Machine Learning\nFree Electives (15 hours)\nFree electives may be any courses offered through the OMSCS program. You can find the list of current OMSCS courses here.",
+      "published": {
+        "id": "artificial-intelligence",
+        "name": "Artificial Intelligence",
+        "blurb": "Algorithms, intelligent systems, and human-centered AI.",
+        "description": "The current name for the path formerly called Interactive Intelligence.",
+        "sourceUrl": "https://omscs.gatech.edu/specialization-artificial-intelligence-formerly-interactive-intelligence",
+        "freeElectiveCount": 5,
+        "requirements": [
+          {
+            "id": "ai-algorithms",
+            "label": "Algorithms and design · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6300",
+              "CS-6515"
+            ],
+            "role": "core",
+            "notes": "Graduate Algorithms is one option, not a universal requirement."
+          },
+          {
+            "id": "ai-core",
+            "label": "AI core · pick 2",
+            "pick": 2,
+            "poolCourseIds": [
+              "CS-6476",
+              "CS-6601",
+              "CS-7637",
+              "CS-7641",
+              "CS-7643",
+              "CS-7650"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "ai-electives",
+            "label": "AI electives · pick 2",
+            "pick": 2,
+            "poolCourseIds": [
+              "CS-6476",
+              "CS-6601",
+              "CS-7637",
+              "CS-7641",
+              "CS-7643",
+              "CS-7650",
+              "CS-7632",
+              "CS-6440",
+              "CS-6460",
+              "CS-6603",
+              "CS-6750",
+              "CS-6795"
+            ],
+            "role": "elective",
+            "notes": "Unused AI core courses may fill elective slots."
+          }
+        ],
+        "totalHours": 30,
+        "totalCourses": 10,
+        "lastChecked": "2026-09-26"
+      }
+    },
+    "computer-graphics": {
+      "sourceUrl": "https://omscs.gatech.edu/specialization-computer-graphics",
+      "text": "For a Master of Science in Computer Science, Specialization in Computer Graphics (15 hours), students must select from the following:*The following is a complete look at the courses that may be selected to fulfill the Computer Graphics specialization, regardless of campus; only courses listed with **bold** titles are offered through the online program.\nCore Courses (6 hours)\nPick one (1) of:\n**CS 6457 Video Game Design**\n**CS 6491 Foundations of Computer Graphics**\n**CS 7496 Computer Animation**\nAnd pick one (1) of:\nCS 6505 Computability, Algorithms, and Complexity\n**CS 6515 Introduction to Graduate Algorithms**\nElectives (9 hours)\nPick three (3) from:\n**CS 6457 Video Game Design**\n**CS 6475 Computational Photography**\n**CS 6476 Computer Vision**\n**CS 6491 Foundations of Computer Graphics**\nCS 6492 Shape Grammars\nCS 6730 Data Visualization Principles\nCS 7450 Information Visualization\n**CS 7496 Computer Animation**\nFree Electives (15 hours)\nFree electives may be any courses offered through the OMSCS program. You can find the list of current OMSCS courses here.",
+      "published": {
+        "id": "computer-graphics",
+        "name": "Computer Graphics",
+        "blurb": "Graphics foundations, games, animation, and vision.",
+        "description": "A 15-credit specialization with two core choices and three electives.",
+        "sourceUrl": "https://omscs.gatech.edu/specialization-computer-graphics",
+        "freeElectiveCount": 5,
+        "requirements": [
+          {
+            "id": "cg-graphics",
+            "label": "Graphics core · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6457",
+              "CS-6491",
+              "CS-7496"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "cg-algorithms",
+            "label": "Algorithms core · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6515"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "cg-electives",
+            "label": "Graphics electives · pick 3",
+            "pick": 3,
+            "poolCourseIds": [
+              "CS-6457",
+              "CS-6475",
+              "CS-6476",
+              "CS-6491",
+              "CS-7496"
+            ],
+            "role": "elective",
+            "notes": "A core course can count here only if it was not used in a core slot."
+          }
+        ],
+        "totalHours": 30,
+        "totalCourses": 10,
+        "lastChecked": "2026-09-26"
+      }
+    },
+    "computing-systems": {
+      "sourceUrl": "https://omscs.gatech.edu/specialization-computing-systems",
+      "text": "For a Master of Science in Computer Science, Specialization in Computing Systems (18 hours), students must select from the following:*The following is a complete look at the courses that may be selected to fulfill the Computing Systems specialization, regardless of campus; only courses listed with **bold** titles are offered through the online program.\nCore Courses (9 hours)\nCS 6505 Computability, Algorithms, and Complexity\nor\n**CS 6515 Introduction to Graduate Algorithms**\nAnd, pick two (2) of:\n**CS 6210 Advanced Operating Systems**\nCS 6241 Compiler Design\n**CS 6250 Computer Networks**\n**CS 6290 High-Performance Computer Architecture**\n**CS 6300 Software Development Process**** **or CS 6301 Advanced Topics in Software Engineering\nCS 6390 Programming Languages\n**CS 6400 Database Systems Concepts and Design**\nAny Core Courses in excess of the 9 hour requirement may be used as Computing Systems Electives\nElectives (9 hours)\nAny core courses in excess of the 9 hour requirement may be used as electives.\nPick three (3) courses from:\n**CS 6035 Introduction to Information Security**\n**CS 6200 Graduate Introduction to Operating Systems​**\n**CS 6211: System Design for Cloud Computing (formerly CS 8803 O12)**\nCS 6220 Big Data Systems and Analytics\nCS 6222 Machine Learning Systems\nCS 6235 Real Time Systems\n**CS 6238 Secure Computer Systems**\nCS 6239 Enterprise Cybersecurity Management\nCS 6245 Parallelizing Compilers\n**CS 6260 Applied Cryptography**\n**CS 6261: Security Operations and Incident Response (formerly CS 8803 O22)**\n**CS 6262 Network Security**\n**CS 6263 Intro to Cyber Physical Systems Security**\nCS 6267 Critical Infrastructures Security and Resilience\nCS 6268 Psychology of Cybersecurity\nCS 6270 Technical Introduction to Blockchain and Cryptocurrency\n**CS 6291 Embedded Systems Optimization​**\n**CS 6310 Software Architecture and Design**\n**CS 6340 Software Analysis and Testing**\nCS 6365 Introduction to Enterprise Computing\n**CS 6422 Database System Implementation**\nCS 6423 Advanced Database System Implementation\nCS 6550 Design and Analysis of Algorithms\n**CS 6675 Advanced Internet Computing Systems and Applications**\n**CS 6747: Advanced Malware Analysis (formerly CS 8813)**\n**CS 7210 Distributed Computing**\nCS 7260 Internetworking Architectures and Protocols\nCS 7263 Advanced Topics in Network Security and Measurement\nCS 7270 Networked Applications and Services\n**CS 7280 Network Science**\nCS 7290 Advanced Topics in Microarchitecture\nCS 7292 Reliability and Security in Computer Architecture\n**CS 7295: GPU Hardware and Software (formerly CS 8803 O21)**\n**CS 7400: Intro to Quantum Computing (formerly CS 8803 O13)**\nCS 7560 Theory of Cryptography\nCS 8803-FPL Special Topics: Foundations of Programming Languages\n**CSE 6220 High-Performance Computing**\nAny Special Topics (CS 8803) course that is being taught by a School of Computer Science faculty member may also count as a Computing Systems elective. The definition of \"School of Computer Science faculty member\" is a faculty member who appears on the School of Computer Science website: https://scs.gatech.edu/people/faculty. The current applicable OMSCS courses are:\n**CS 6264: Information Security Lab - System and Network Defenses (formerly CS 8803 O11)**\n**CS 8803-O08: Compilers - Theory and Practice**\nFree Electives (12 hours)\nFree electives may be any courses offered through the OMSCS program. You can find the list of current OMSCS courses here.",
+      "published": {
+        "id": "computing-systems",
+        "name": "Computing Systems",
+        "blurb": "Systems, networks, architecture, and security.",
+        "description": "An 18-credit specialization with four free electives.",
+        "sourceUrl": "https://omscs.gatech.edu/specialization-computing-systems",
+        "freeElectiveCount": 4,
+        "requirements": [
+          {
+            "id": "cs-algorithms",
+            "label": "Algorithms core · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6515"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "cs-core",
+            "label": "Systems core · pick 2",
+            "pick": 2,
+            "poolCourseIds": [
+              "CS-6210",
+              "CS-6250",
+              "CS-6290",
+              "CS-6300",
+              "CS-6400"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "cs-electives",
+            "label": "Systems electives · pick 3",
+            "pick": 3,
+            "poolCourseIds": [
+              "CS-6210",
+              "CS-6250",
+              "CS-6290",
+              "CS-6300",
+              "CS-6400",
+              "CS-6035",
+              "CS-6200",
+              "CS-6211",
+              "CS-6238",
+              "CS-6260",
+              "CS-6261",
+              "CS-6262",
+              "CS-6263",
+              "CS-6264",
+              "CS-6291",
+              "CS-6310",
+              "CS-6340",
+              "CS-6422",
+              "CS-6675",
+              "CS-6747",
+              "CS-7210",
+              "CS-7280",
+              "CS-7295",
+              "CS-7400",
+              "CSE-6220",
+              "CS-8803-O08"
+            ],
+            "role": "elective",
+            "notes": "Unused systems core courses may fill elective slots. Special-topics eligibility depends on School of Computer Science faculty; check the source."
+          }
+        ],
+        "totalHours": 30,
+        "totalCourses": 10,
+        "lastChecked": "2026-09-26"
+      }
+    },
+    "computational-perception": {
+      "sourceUrl": "https://omscs.gatech.edu/specialization-computational-perception-and-robotics",
+      "text": "For a Master of Science in Computer Science, Specialization in Computational Perception and Robotics (15 hours), students must select from the following:*The following is a complete look at the courses that may be selected to fulfill the Computational Perception and Robotics specialization, regardless of campus; only courses listed with **bold** titles are offered through the online program.\nCore Courses (6 hours)\nAlgorithms: Pick one (1) of:\nCS 6505 Computability, Algorithms, and Complexity\n**CS 6515 Introduction to Graduate Algorithms**\nCS 6520 Computational Complexity Theory\nCS 6550 Design and Analysis of Algorithms\nCS 7520 Approximation Algorithms\nCS 7530 Randomized Algorithms\nCSE 6140 Computational Science and Engineering Algorithms\nAnd, pick one (1) of:\n**CS 6601 Artificial Intelligence**\n**CS 7641 Machine Learning **\nElectives (9 hours)\nPick three (3) courses from Perception and Robotics, with at least one (1) course from each.\nPerception\n**CS 6475 Computational Photography**\n**CS 6476 Computer Vision**\nCS 7499 3D Reconstruction\nCS 7636 Computational Perception\n**CS 7639 Cyber Physical Design and Analysis**\nCS 7644 Machine Learning for Robotics\n**CS 7650 Natural Language**\n**CS 7711: Health Sensing and Interventions (formerly CS 8803 O29)**\nRobotics\nCS 7630 Autonomous Robotics\nCS 7631 Autonomous Multi-Robot Systems\nCS 7633 Human-Robot Interaction\n**CS 7638 Artificial Intelligence Techniques for Robotics**\nCS 7648 Interactive Robot Learning\nCS 7649 Robot Intelligence: Planning\nFree Electives (15 hours)\nFree electives may be any courses offered through the OMSCS program. You can find the list of current OMSCS courses here.",
+      "published": {
+        "id": "computational-perception",
+        "name": "Computational Perception and Robotics",
+        "blurb": "Perception, robotics, vision, and sensing.",
+        "description": "Choose electives from both perception and robotics.",
+        "sourceUrl": "https://omscs.gatech.edu/specialization-computational-perception-and-robotics",
+        "freeElectiveCount": 5,
+        "requirements": [
+          {
+            "id": "cpr-algorithms",
+            "label": "Algorithms core · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6515"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "cpr-ai",
+            "label": "AI or Machine Learning core · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6601",
+              "CS-7641"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "cpr-perception",
+            "label": "Perception elective · at least 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6475",
+              "CS-6476",
+              "CS-7639",
+              "CS-7650",
+              "CS-7711"
+            ],
+            "role": "elective"
+          },
+          {
+            "id": "cpr-robotics",
+            "label": "Robotics elective · at least 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-7638"
+            ],
+            "role": "elective"
+          },
+          {
+            "id": "cpr-extra",
+            "label": "Additional perception or robotics elective · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6475",
+              "CS-6476",
+              "CS-7639",
+              "CS-7650",
+              "CS-7711",
+              "CS-7638"
+            ],
+            "role": "elective"
+          }
+        ],
+        "totalHours": 30,
+        "totalCourses": 10,
+        "lastChecked": "2026-09-26"
+      }
+    },
+    "human-computer-interaction": {
+      "sourceUrl": "https://omscs.gatech.edu/specialization-human-computer-interaction",
+      "text": "For a Master of Science in Computer Science, Specialization in Human-Computer Interaction (15 hours), students must select from the following:*The following is a complete look at the courses that may be selected to fulfill the Human-Computer Interaction specialization, regardless of campus; only courses listed with **bold** titles are offered through the online program.\nCore Courses (6 hours)\nCS 6456 Principles of User Interface Software OR **CS 7470 Mobile and Ubiquitous Computing**\n**CS 6750 Human-Computer Interaction**\nElectives (9 hours)\nPick three (3) courses from the two sub-areas below, including at least one from each sub-area:\nSub-area: Design and evaluation concepts\nCS 6010 Principles of Design\nCS 6320 Software Requirements Analysis and Specification\n**CS 6435 Digital Health Equity**\nCS 6454 Qualitative Methods for Design of Human Computer Interaction\n**CS 6457 Video Game Design**\n**CS 6460 Educational Technology: Conceptual Foundations**\nCS 6465 Computational Journalism\nCS 6470 Design of Online Communities\n**CS 6795 Introduction to Cognitive Science**\nCS 7465 Educational Technology: Design and Evaluation\nCS 7467 Computer-Supported Collaborative Learning\nSub-area: Interactive technology\n**CS 6440 Introduction to Health Informatics**\nCS 6452 Prototyping Interactive Systems\nCS 6456 Principles of User Interface Software\nCS 6641 Personal Health Informatics\nCS 6730 Data Visualization: Principles and Applications\nCS 6745 Information & Communication Technologies and Global Development\nCS 6763 Design of Design Environments\nCS 6770 Mixed Reality Experience Design\nCS 7450 Information Visualization\nCS 7451 Human-Centered Data Analysis\nCS 7460 Collaborative Computing\nCS 7462 Animal Computer Interaction\n**CS 7470 Mobile and Ubiquitous Computing**\n**CS 7632 Game AI**\n**CS 7711: Health Sensing and Interventions (formerly CS 8803 O29)**\nFree Electives (15 hours)\nFree electives may be any courses offered through the OMSCS program. You can find the list of current OMSCS courses here.",
+      "published": {
+        "id": "human-computer-interaction",
+        "name": "Human-Computer Interaction",
+        "blurb": "User research, design, and interactive technology.",
+        "description": "Electives include at least one course from each of two sub-areas.",
+        "sourceUrl": "https://omscs.gatech.edu/specialization-human-computer-interaction",
+        "freeElectiveCount": 5,
+        "requirements": [
+          {
+            "id": "hci-ui",
+            "label": "Interface core · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-7470"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "hci-hci",
+            "label": "HCI core · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6750"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "hci-design",
+            "label": "Design and evaluation · at least 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6435",
+              "CS-6457",
+              "CS-6460",
+              "CS-6795"
+            ],
+            "role": "elective"
+          },
+          {
+            "id": "hci-technology",
+            "label": "Interactive technology · at least 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6440",
+              "CS-7470",
+              "CS-7632",
+              "CS-7711"
+            ],
+            "role": "elective"
+          },
+          {
+            "id": "hci-extra",
+            "label": "Additional HCI elective · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6435",
+              "CS-6457",
+              "CS-6460",
+              "CS-6795",
+              "CS-6440",
+              "CS-7470",
+              "CS-7632",
+              "CS-7711"
+            ],
+            "role": "elective"
+          }
+        ],
+        "totalHours": 30,
+        "totalCourses": 10,
+        "lastChecked": "2026-09-26"
+      }
+    },
+    "machine-learning": {
+      "sourceUrl": "https://omscs.gatech.edu/specialization-machine-learning",
+      "text": "For a Master of Science in Computer Science, Specialization in Machine Learning (15 hours), students must select from the following:\n*The following is a complete look at the courses that may be selected to fulfill the Machine Learning specialization, regardless of campus; only courses listed with **bold** titles are offered through the online program.\nCore Courses (6 hours)\nAlgorithms: Pick one (1) of:\nCS 6505 Computability, Algorithms, and Complexity\n**CS 6515 Introduction to Graduate Algorithms**\nCS 6520 Computational Complexity Theory\nCS 6550 Design and Analysis of Algorithms\nCS 7510 Graph Algorithms\nCS 7520 Approximation Algorithms\nCS 7530 Randomized Algorithms\nCSE 6140 Computational Science and Engineering Algorithms\nAnd, pick one (1) of:\n**CS 7641 Machine Learning**\nCSE 6740 Computational Data Analysis: Learning, Mining, and Computation\nElectives (9 hours)\nElective ML courses must have at least 1/3 of their graded content based on Machine Learning.\nPick three (3) of:\nCS 6220 Big Data Systems & Analysis\nCS 6222 Machine Learning Systems\nCS 6471 Computational Social Science\n**CS 6476 Computer Vision**\n**CS 6601: Artificial Intelligence**\n**CS 6603 AI, Ethics, and Society**\nCS 6604 Conversational Artificial Intelligence\n**CS 7280 Network Science**\nCS 7476 Advanced Computer Vision\nCS 7535 Markov Chain Monte Carlo\nCS 7540 Spectral Algorithms\nCS 7545 Machine Learning Theory\nCS 7616 Pattern Recognition\nCS 7626 Behavioral Imaging\n**CS 7632: Game AI**\nCS 7634 AI Storytelling in Virtual Worlds\n**CS 7637: Knowledge-Based AI**\n**CS 7642 Reinforcement Learning and Decision Making**** **(Formerly CS 8803-O03)\n**CS 7643 Deep Learning**\nCS 7644 Machine Learning for Robotics\n**CS 7646 Machine Learning for Trading**\nCS 7647 Machine Learning with Limited Supervision\nCS 7648 Interactive Robot Learning\nCS 7649 Robot Intelligence: Planning\n**CS 7650 Natural Language**\nCS 7651 Human and Machine Learning\nCS 7652 Large Language Models\nCS 8803 Special Topics: Probabilistic Graph Models\nCSE 6240 Web Search and Text Mining\n**CSE 6242 Data and Visual Analytics**\nCSE 6243 Advanced Topics in Machine Learning\n**CSE 6250 Big Data for Health (formerly CSE 8803)**\nCSE 7752 Scientific Machine Learning\nCSE 7850 Machine Learning in Computational Biology\nISYE 6416 Computational Statistics\n**ISYE 6420 Bayesian Methods**\nISYE 6664 Stochastic Optimization\nFree Electives (15 hours)\nFree electives may be any courses offered through the OMSCS program. You can find the list of current OMSCS courses here.",
+      "published": {
+        "id": "machine-learning",
+        "name": "Machine Learning",
+        "blurb": "Machine learning methods and applications.",
+        "description": "The source requires at least one third of each elective's graded content to be based on machine learning.",
+        "sourceUrl": "https://omscs.gatech.edu/specialization-machine-learning",
+        "freeElectiveCount": 5,
+        "requirements": [
+          {
+            "id": "ml-algorithms",
+            "label": "Algorithms core · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-6515"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "ml-core",
+            "label": "Machine Learning core · pick 1",
+            "pick": 1,
+            "poolCourseIds": [
+              "CS-7641"
+            ],
+            "role": "core"
+          },
+          {
+            "id": "ml-electives",
+            "label": "Machine Learning electives · pick 3",
+            "pick": 3,
+            "poolCourseIds": [
+              "CS-6476",
+              "CS-6601",
+              "CS-6603",
+              "CS-7280",
+              "CS-7632",
+              "CS-7637",
+              "CS-7642",
+              "CS-7643",
+              "CS-7646",
+              "CS-7650",
+              "CSE-6242",
+              "CSE-6250",
+              "ISYE-6420"
+            ],
+            "role": "elective",
+            "notes": "Electives must satisfy Georgia Tech's one-third graded-content rule."
+          }
+        ],
+        "totalHours": 30,
+        "totalCourses": 10,
+        "lastChecked": "2026-09-26"
+      }
+    }
+  }
+}
