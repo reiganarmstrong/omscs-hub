@@ -45,6 +45,9 @@ export async function signIn(page: Page, info: TestInfo) {
   await page.getByLabel("Email code").fill(code)
   await page.getByRole("button", { name: "Verify code" }).click()
   await page.waitForURL((url) => url.pathname === "/")
+  // Account controls appear once the home page's session check approves the session.
+  // Navigating away mid-check fails it, and a failed check signs the session out.
+  await expect(page.getByRole("link", { name: "Account", exact: true })).toBeVisible()
 }
 
 export const accountPlanSaved = "Study Plan saved to your private account."
