@@ -227,14 +227,87 @@ Worker until this deploy completes.
 
 ## 10. Post-Deploy Checks
 
-- Visit the UI custom URL.
-- Confirm Catalog, Specializations, Planner, About, and course detail pages
-  load.
-- Confirm live review loading on a course page.
-- Confirm seeded fallback does not appear when API is healthy.
-- Sign in with a verified `@gatech.edu` account and submit a test review.
-- Confirm non-Georgia-Tech accounts cannot write reviews.
-- Confirm the mobile navbar shows brand/theme/auth on top and nav tabs below.
+Run the deployed smoke suite on desktop and mobile layouts:
+
+```bash
+cd ui
+pnpm exec playwright install --with-deps chromium
+SMOKE_BASE_URL=https://<ui-host> \
+SMOKE_API_URL=https://<api-host> \
+SMOKE_EMAIL=<smoke-account>@gatech.edu \
+SMOKE_EMAIL_CODE=<code> \
+pnpm test:smoke:deployed
+```
+
+It runs `ui/tests/release`, the same journeys CI runs against the local UI and
+API harness:
+
+- API health, CORS for the UI origin, and `401` for unauthenticated or invalid
+  tokens on protected routes.
+- Anonymous Catalog browsing with every current Course, course facts, real
+  Imported Reviews with original links, and current Specialization rules.
+- Review-service failure, from first load and after a course page loads, keeps
+  course facts and shows no reviews, review statistics, or write controls.
+- A verified Georgia Tech account selects a Specialization, plans a course,
+  records a Course Attempt, sees current-rule progress, and sees the same
+  private Study Plan on a second browser context. The run clears the plan
+  before and after.
+- The same account publishes, edits, and deletes a Hub Review under its
+  pseudonym. The review is public for a few seconds; set
+  `SMOKE_REVIEW_COURSE` to choose the Course (default `CS-6300`).
+
+The smoke account must already exist and have a verified primary
+`@gatech.edu` email. With a Clerk development instance, use a Clerk test
+address such as `omscs-smoke+clerk_test@gatech.edu` and code `424242`; no email
+is sent. Production Clerk instances do not accept test codes; there, run the
+suite with `SMOKE_ANONYMOUS_ONLY=1` and walk the signed-in journeys by hand.
+`SMOKE_ANONYMOUS_ONLY=1` skips the signed-in journeys; the release workflow
+never sets it.
+
+Still check manually after release:
+
+- A non-Georgia-Tech email cannot sign up or sign in (Clerk allowlist).
+- The mobile navbar shows brand/theme/auth on top and nav tabs below.
+
+## 11. Release Workflow
+
+`.github/workflows/release-beta.yml` runs steps 5 to 10 in order. Start it
+manually from GitHub Actions. It:
+
+1. Runs API, UI, script, and browser journey checks (desktop and mobile).
+2. Runs `scripts/check_release_config.py`: required values, https origins,
+   `CORS_ORIGIN` containing `PUBLIC_UI_URL`, the D1 name matching
+   `api/wrangler.toml`, matching Clerk key types, a `@gatech.edu` smoke
+   account, and scheduled source-check workflows. It then confirms both
+   source-check workflows are enabled in GitHub.
+3. Scrapes OMSCentral and stops if historical review courses differ from
+   `ui/lib/data/historical-courses.json`. It then applies D1 migrations and
+   imports Catalog facts and Imported Reviews into the same remote database.
+   A failed OMSCentral scrape stops the release before any change.
+4. Deploys the API with `CLERK_SECRET_KEY`, checks `/health`, builds the
+   public Catalog, and deploys UI assets.
+5. Runs the deployed smoke suite and uploads its report.
+
+The public beta is the `dev` environment (Clerk development instance). The
+push-triggered `deploy-api.yml` and `deploy-ui.yml` workflows still deploy code
+without imports or smoke checks; run this workflow for every release.
+
+The `dev` GitHub environment needs:
+
+| Kind | Name |
+| --- | --- |
+| Variable | `PUBLIC_UI_URL` (deployed UI origin) |
+| Variable | `NEXT_PUBLIC_API_BASE_URL` |
+| Variable | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` |
+| Variable | `D1_DATABASE_NAME` |
+| Variable | `SMOKE_EMAIL` |
+| Secret | `SMOKE_EMAIL_CODE` |
+| Secret | `CLERK_SECRET_KEY` |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` |
+| Secret | `CLOUDFLARE_API_TOKEN_API` |
+| Secret | `CLOUDFLARE_API_TOKEN_UI` |
+
+Release notes: [releases/public-beta.md](releases/public-beta.md).
 
 ## Local-Network Development
 

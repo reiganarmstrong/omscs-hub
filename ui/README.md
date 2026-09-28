@@ -84,12 +84,11 @@ ui/
   a short overview excerpt and verified preparation guidance or an unknown label.
 - `lib/data/courses.seed.ts` supplies legacy topic annotations only; its
   descriptions, prerequisites and term patterns are not published.
-- Generated review profiles are not used by the published Catalog.
 - `lib/data/specializations.ts` defines all six sourced OMSCS specialization
   requirements, source dates, and planned-slot progress under the six-hour
   non-CS/CSE credit limit.
-- `ReviewsProvider` exposes live API reviews when available. Its compatibility
-  fallback is empty; review aggregation and outage-state work follows separately.
+- `ReviewsProvider` exposes live API reviews only. On failure it holds no
+  reviews and pages show a review-unavailable state.
 - `PlannerProvider` stores selected courses by term key in local storage.
 - `PrefsProvider` stores selected specialization in local storage.
 

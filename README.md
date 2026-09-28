@@ -14,9 +14,10 @@ review writes.
 
 - Catalog, course detail, specialization, planner, and about pages are live in
   the Next.js UI.
-- The local course catalog contains 68 seeded OMSCS courses.
-- Seeded fallback reviews are generated deterministically for 36 profiled
-  courses, totaling 561 local reviews for offline/demo use.
+- The published Catalog contains the current official OMSCS course list with
+  source links and last-checked dates.
+- The app shows only real Imported Reviews and Hub Reviews. When the review API
+  is unavailable, pages say so and keep course facts; no demo reviews appear.
 - The API supports D1-backed course/review reads and authenticated review
   creates, updates, and soft deletes.
 - OMSCentral imports flow from `omscentral-scraper/data` into generated D1 SQL.
@@ -43,10 +44,11 @@ review writes.
   review controls, and planner actions.
 - **Distribution charts.** Difficulty, weekly workload, and rating use custom
   SVG distribution bars with the mean bucket highlighted.
-- **Review archive.** Course pages load live API reviews when
-  `NEXT_PUBLIC_API_BASE_URL` is configured; otherwise they fall back to seeded
-  data. Review lists support semester filtering, recommendation filtering,
-  minimum rating, and multiple sort orders.
+- **Review archive.** Course pages load live API reviews from
+  `NEXT_PUBLIC_API_BASE_URL`; if it is missing or failing, they show a
+  review-unavailable state instead of review data. Review lists support
+  semester filtering, recommendation filtering, minimum rating, and multiple
+  sort orders.
 - **Verified review submission.** Signed-in Georgia Tech users can submit an
   OMSCS Hub review with rating, difficulty, workload, recommendation, program
   stage, semester, and body. The API enforces one active app review per user per
@@ -88,7 +90,7 @@ review writes.
     components/              # Catalog, course, planner, review, nav, and UI components
     lib/
       api/                   # Browser API client helpers
-      data/                  # Seeded courses, reviews, specializations
+      data/                  # Catalog, specializations, offerings
       store/                 # Review, planner, and preference providers
     scripts/deploy-remote.mjs
     next.config.mjs          # Static export + dev origin config
@@ -179,8 +181,8 @@ terraform validate
 
 ## Data Flow
 
-1. Seeded UI data in `ui/lib/data` powers local browsing and fallback review
-   behavior.
+1. Curated Catalog and Specialization data in `ui/lib/data` powers course
+   facts and planning.
 2. The scraper writes OMSCentral JSON into `omscentral-scraper/data`.
 3. `api/scripts/import-omscentral.ts` converts scraper JSON into idempotent SQL
    for D1.
@@ -188,8 +190,8 @@ terraform validate
    OMSCentral reviews, app users, and app review metadata.
 5. The API exposes review list/summary endpoints publicly and protects review
    writes with Clerk bearer tokens plus a verified `@gatech.edu` check.
-6. The UI reads live reviews from `NEXT_PUBLIC_API_BASE_URL` when configured
-   and falls back to seeded reviews when it is not.
+6. The UI reads live reviews from `NEXT_PUBLIC_API_BASE_URL` and shows an
+   unavailable state, never generated reviews, when that fails.
 
 ## Deployment
 

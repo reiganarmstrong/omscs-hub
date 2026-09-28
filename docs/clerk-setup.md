@@ -160,8 +160,9 @@ Authorization: Bearer <token>
   `NEXT_PUBLIC_API_BASE_URL` is configured.
 - If the API URL is missing, sign-in cannot complete. The UI explains that
   sign-in could not be verified and keeps guest browsing and planning usable.
-- If the API is unreachable, course pages keep seeded reviews visible and show a
-  review API fallback notice.
+- If the API is unreachable, course pages keep course facts visible, show no
+  reviews or review statistics, disable review writes, and show a
+  review-unavailable notice with a retry control.
 
 ## Validation Checklist
 
