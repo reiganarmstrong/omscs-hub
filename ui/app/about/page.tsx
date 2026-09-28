@@ -48,12 +48,20 @@ export default function Page() {
         </section>
 
         <section>
-          <h2 className="font-display text-xl tracking-tight">Status</h2>
+          <h2 className="font-display text-xl tracking-tight">Public beta</h2>
           <p className="mt-2 text-muted-foreground">
-            OMSCentral imports and OMSCS Hub account reviews are stored
-            separately in D1. The UI still keeps deterministic seed data as a
-            fallback until the API is configured and the import has run.
+            Course facts, Specialization rules, and progress follow the current
+            published OMSCS catalog and official sources, with last-checked
+            dates. Your applicable catalog year may differ. Progress and the
+            Estimated GPA are planning guidance, not an official degree audit
+            or registration guarantee.
           </p>
+          <ul className="mt-2 list-disc pl-5 text-muted-foreground">
+            <li>Future term offerings are confirmed only when Georgia Tech has published that term&apos;s schedule.</li>
+            <li>Reviews come only from OMSCentral imports and OMSCS Hub authors. If the review service is down, reviews and review statistics are hidden rather than estimated.</li>
+            <li>Sign-in requires a verified primary @gatech.edu email; there is no other login or account recovery.</li>
+            <li>Transfer credit, grade substitution, and older catalog rules are not modeled.</li>
+          </ul>
         </section>
 
         <section id="academic-record-export">

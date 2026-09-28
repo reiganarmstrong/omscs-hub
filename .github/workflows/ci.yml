@@ -100,3 +100,56 @@ jobs:
       - name: Terraform validate
         working-directory: infra/environments/dev
         run: terraform validate
+
+  release-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            api/pnpm-lock.yaml
+            ui/pnpm-lock.yaml
+
+      - name: Install API dependencies
+        working-directory: api
+        run: pnpm install --frozen-lockfile
+
+      - name: Install UI dependencies
+        working-directory: ui
+        run: pnpm install --frozen-lockfile
+
+      - name: Release and source-check script tests
+        run: python -m unittest discover -s scripts/tests -v
+
+      - name: Install Chromium
+        working-directory: ui
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Browser journeys on desktop and mobile
+        working-directory: ui
+        run: pnpm test:browser
+
+      - name: Upload browser report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-journeys
+          path: |
+            ui/playwright-report
+            ui/test-results

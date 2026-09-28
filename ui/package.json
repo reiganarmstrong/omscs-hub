@@ -12,7 +12,8 @@
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "test:smoke:deployed": "playwright test -c playwright.deployed.config.ts"
   },
   "dependencies": {
     "@clerk/react": "^6.6.2",

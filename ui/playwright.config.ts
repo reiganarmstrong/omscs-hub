@@ -6,7 +6,11 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   workers: 1,
   use: { baseURL: "http://127.0.0.1:3101", trace: "retain-on-failure" },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "desktop", use: { ...devices["Desktop Chrome"] } },
+    // Release journeys also gate the mobile layout.
+    { name: "mobile", testMatch: /release\/.*\.spec\.ts$/, use: { ...devices["Pixel 7"] } },
+  ],
   webServer: [
     {
       command: "node tests/api-server.mjs",
