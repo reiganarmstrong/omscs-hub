@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "sourceUrl": "https://omscs.gatech.edu/current-courses",
+  "checkedAt": "2026-11-06T16:49:00+00:00",
+  "operations": [
+    {
+      "kind": "Added",
+      "code": "CS 8803 O34",
+      "difference": "New official listing; verify credits, description, and preparation before adding to Catalog.",
+      "official": {
+        "code": "CS 8803 O34",
+        "title": "Human Dimension of Cybersecurity",
+        "aliases": [],
+        "foundational": false,
+        "sourceUrl": "https://omscs.gatech.edu/cs-8803-o34-human-dimension-cybersecurity"
+      },
+      "published": null,
+      "requiresHumanVerification": [
+        "identity",
+        "credits",
+        "description",
+        "prerequisites"
+      ]
+    },
+    {
+      "kind": "Changed page fact",
+      "code": "CS 7641",
+      "difference": "Official course page changed: https://omscs.gatech.edu/cs-7641-machine-learning",
+      "official": {
+        "code": "CS 7641",
+        "title": "Machine Learning",
+        "aliases": [],
+        "foundational": true,
+        "sourceUrl": "https://omscs.gatech.edu/cs-7641-machine-learning"
+      },
+      "published": {
+        "id": "CS-7641",
+        "code": "CS 7641",
+        "title": "Machine Learning",
+        "aliases": [],
+        "credits": 3,
+        "description": "This is a graduate Machine Learning Series, initially created by Charles Isbell (Chancellor, University of Illinois Urbana-Champaign) and…",
+        "descriptionStatus": "official-excerpt",
+        "prereqs": [
+          "Introductory AI recommended; consult the official preparedness questions."
+        ],
+        "prerequisitesStatus": "published-guidance",
+        "foundational": true,
+        "sourceUrl": "https://omscs.gatech.edu/cs-7641-machine-learning",
+        "creditsSourceUrl": "https://catalog.gatech.edu/coursesaz/cs/",
+        "lastChecked": "2026-09-26"
+      },
+      "pageTextDiff": "--- previous source\n+++ current source\n@@ -1,13 +1,9 @@\n-Instructional Team Overview This is a graduate Machine Learning Series, initially created by Charles Isbell (Chancellor, University of Illinois Urbana-Champaign) and Michael Littman (Associate Provost, Brown University) where the lectures are Socratic discussions\n-The course is led by Theodore LaGrow (Georgia Tech) and has been updated with current examples, tooling, and assessments \n-Who this is for: graduate students and working professionals who want principled, hands-on mastery of modern ML\n-You should be comfortable with Python, linear algebra, probability, and basic calculus\n-How the pieces connect: We progress from prediction with labeled data (Supervised Learning) to discovering structure in unlabeled data (Unsupervised Learning), then to sequential decision-making under uncertainty (Reinforcement Learning)\n-Artifacts from each unit feed the next\n-Format and tools: Video lectures are delivered in Canvas\n-Reports are written in LaTeX on Overleaf, and code lives in private Georgia Tech GitHub repos\n-Course communication runs through Canvas announcements and Ed Discussions\n-Each week also includes supplemental recordings on advanced topics aligned to the module\n-Outcomes: You’ll leave with a portfolio of defensible analyses, models, and policies with the judgment to explain when and why to use them\n-Over the term you’ll complete four reports (~30 pages) spanning supervised learning, optimization and uncertainty in learning, unsupervised learning, and reinforcement learning\n+Instructional Team Overview Created and taught by Max Mahdi Roozbahani, this offering of CS 7641 begins with the mathematics and concepts behind machine learning algorithms\n+We want students to understand how and why the methods work so they can connect theory with applied problem-solving\n+We focus on using that understanding to apply machine learning appropriately, reason through unfamiliar problems, and develop new algorithms\n+The course deliverables help students translate these concepts into solutions for real-world problems\n+These foundations significantly support a deeper understanding of modern AI, including generative AI\n+The course progresses through three areas: Mathematical foundations: linear algebra, probability and statistics, information theory, and optimization\n+Unsupervised learning: k-means, Gaussian mixture models, hierarchical and density-based clustering, kernel density estimation, and dimensionality reduction\n+Supervised learning: linear and regularized regression, logistic regression, neural and convolutional neural networks, decision trees, random forests, and support vector machines with kernels\n GT LOGIN"
+    }
+  ]
+}
